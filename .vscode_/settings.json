@@ -1,9 +1,0 @@
-{
-    "python.testing.pytestArgs": [
-        "tests"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "editor.foldingMaximumRegions": 50000,
-    "explorer.sortOrder": "modified"
-}

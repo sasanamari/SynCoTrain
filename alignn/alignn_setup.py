@@ -18,57 +18,57 @@ import torch
 # %%
 # import subprocess as sp
 # %%
-parser = argparse.ArgumentParser(
-    description="Atomistic Line Graph Neural Network"
-)
-parser.add_argument(
-    "--root_dir",
-    default="./alignn/sample_synth",
-    help="Folder with id_props.csv, structure files",
-)
-parser.add_argument(
-    "--config_name",
-    # default="alignn/examples/sample_data/config_example.json",
-    # default="alignn/config_example.json",
-    default="./alignn/config_example_class.json",
-    help="Name of the config file",
-)
-
-parser.add_argument(
-    "--file_format", default="poscar", help="poscar/cif/xyz/pdb file format."
-)
-
-parser.add_argument(
-    "--keep_data_order",
-    default=False,
-    help="Whether to randomly shuffle samples, True/False",
-)
-
-parser.add_argument(
-    "--classification_threshold",
-    default=None,
-    help="Floating point threshold for converting into 0/1 class"
-    + ", use only for classification tasks",
-)
-
-parser.add_argument(
-    "--batch_size", default=None, help="Batch size, generally 64"
-)
-
-parser.add_argument(
-    "--epochs", default=None, help="Number of epochs, generally 300"
-)
-
-parser.add_argument(
-    # "--output_dir", default="./",
-    "--output_dir", default=None, #set to none, to be read from config
-    help="Folder to save outputs",
-)
+# parser = argparse.ArgumentParser(
+#     description="Atomistic Line Graph Neural Network"
+# )
+# parser.add_argument(
+#     "--root_dir",
+#     default="./alignn/sample_synth",
+#     help="Folder with id_props.csv, structure files",
+# )
+# parser.add_argument(
+#     "--config_name",
+#     # default="alignn/examples/sample_data/config_example.json",
+#     # default="alignn/config_example.json",
+#     default="./alignn/config_example_class.json",
+#     help="Name of the config file",
+# )
 
 # parser.add_argument(
-#     "--shuffle_seed", default="42",
-#     help="seed to shuffle data before splitting train-test splitting",
+#     "--file_format", default="poscar", help="poscar/cif/xyz/pdb file format."
 # )
+
+# parser.add_argument(
+#     "--keep_data_order",
+#     default=False,
+#     help="Whether to randomly shuffle samples, True/False",
+# )
+
+# parser.add_argument(
+#     "--classification_threshold",
+#     default=None,
+#     help="Floating point threshold for converting into 0/1 class"
+#     + ", use only for classification tasks",
+# )
+
+# parser.add_argument(
+#     "--batch_size", default=None, help="Batch size, generally 64"
+# )
+
+# parser.add_argument(
+#     "--epochs", default=None, help="Number of epochs, generally 300"
+# )
+
+# parser.add_argument(
+#     # "--output_dir", default="./",
+#     "--output_dir", default=None, #set to none, to be read from config
+#     help="Folder to save outputs",
+# )
+
+# # parser.add_argument(
+# #     "--shuffle_seed", default="42",
+# #     help="seed to shuffle data before splitting train-test splitting",
+# # )
 
 device = "cpu"
 if torch.cuda.is_available():
@@ -272,15 +272,15 @@ def train_for_folder(
     # train_data = get_torch_dataset(
 
 
-if __name__ == "__main__":
-    args = parser.parse_args(sys.argv[1:])
-    train_for_folder(
-        root_dir=args.root_dir,
-        config_name=args.config_name,
-        keep_data_order=args.keep_data_order,
-        classification_threshold=args.classification_threshold,
-        output_dir=args.output_dir,
-        batch_size=(args.batch_size),
-        epochs=(args.epochs),
-        file_format=(args.file_format),
-    )
+# if __name__ == "__main__":
+#     args = parser.parse_args(sys.argv[1:])
+#     train_for_folder(
+#         root_dir=args.root_dir,
+#         config_name=args.config_name,
+#         keep_data_order=args.keep_data_order,
+#         classification_threshold=args.classification_threshold,
+#         output_dir=args.output_dir,
+#         batch_size=(args.batch_size),
+#         epochs=(args.epochs),
+#         file_format=(args.file_format),
+#     )

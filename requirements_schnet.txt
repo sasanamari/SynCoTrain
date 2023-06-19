@@ -1,0 +1,17 @@
+aiohttp==3.8.3
+black==22.12.0
+brotlipy==0.7.0
+emmet==2018.6.7
+mkl-fft==1.3.1
+mkl-service==2.4.0
+-e /home/samariam/projects
+nvitop==0.11.0
+pip==22.3.1
+pipdeptree==2.9.3
+pre-commit==2.21.0
+PyQt5-sip==12.11.0
+pytest-datadir==1.4.1
+-e git+https://github.com/atomistic-machine-learning/schnetpack.git@6fe78ef23313ef1c7c07991cd046ca4d49da8717#egg=schnetpack
+tensorboard==2.11.2
+torchaudio==0.13.1
+torchvision==0.14.1

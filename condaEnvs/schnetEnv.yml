@@ -1,7 +1,8 @@
-name: sch2111
+name: schnetEnv
 channels:
   - pytorch
   - nvidia
+  - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=main
@@ -179,7 +180,7 @@ dependencies:
     - ase==3.22.1
     - async-timeout==4.0.2
     - atomate==1.0.3
-    - attrs==22.1.0
+    - attrs==22.2.0
     - babel==2.11.0
     - bcrypt==4.0.1
     - beautifulsoup4==4.11.1
@@ -283,7 +284,7 @@ dependencies:
     - oauthlib==3.2.2
     - omegaconf==2.3.0
     - orjson==3.8.5
-    - packaging==23.0
+    - packaging==22.0
     - palettable==3.3.0
     - pandas==1.5.3
     - paramiko==2.12.0
@@ -291,6 +292,7 @@ dependencies:
     - phonopy==2.17.1
     - pillow==9.3.0
     - pip==22.3.1
+    - pipdeptree==2.9.3
     - platformdirs==2.6.2
     - plotly==5.12.0
     - pluggy==1.0.0
