@@ -1,7 +1,0 @@
-setup.py
-funcs/__init__.py
-funcs/experiment_funcs.py
-postiveData.egg-info/PKG-INFO
-postiveData.egg-info/SOURCES.txt
-postiveData.egg-info/dependency_links.txt
-postiveData.egg-info/top_level.txt
