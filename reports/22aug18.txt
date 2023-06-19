@@ -1,0 +1,7 @@
+
+The target data needs to be integer format. I changed the line 247 in atoms.py:
+I switched 1.0 to int(1).
+now class_dataset[0]['synth'] is an integer tensor, which is what we want. But somewhere down the line
+it is again changed to float. Need to find where.
+Update: The next part where integer property is changed to float is 
+in units.py, line 186 in convert/units. It was changed for now.

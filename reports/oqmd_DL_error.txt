@@ -1,0 +1,158 @@
+Error from the notebook:
+oqmd:  97%|█████████▋| 12850/13185 [1:27:38<02:55,  1.91it/s]
+Could not retrieve required information from provider oqmd and url http://oqmd.org/optimade/v1/structures?filter=(elements HAS ALL "O") AND (nsites>=2 AND nsites<=5) AND (nelements>=2 AND nelements<=4)&response_fields=lattice_vectors,cartesian_site_positions,species_at_sites,species: [Errno Expecting value] <!DOCTYPE html>
+
+
+<html lang="en-us" >
+<head>
+
+<title>Server error (500)</title>
+
+<link rel="stylesheet" type="text/css" href="https://static.oqmd.org/static/css/base.css" />
+
+
+
+
+<script type="text/javascript">window.__admin_media_prefix__ = "https://static.oqmd.org/static/admin/";</script>
+
+
+
+
+
+<meta name="robots" content="NOARCHIVE" />
+
+
+
+<link rel="icon" type="image/ico" href="https://static.oqmd.org/static/img/favicon.ico"/>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+ 
+
+<script>
+	jQuery(document).ready(function($) {
+		$(".clickableRow").click(function() {
+			window.document.location = $(this).attr("href");
+		});
+	});
+</script>
+</head>
+
+
+
+<body class="">
+
+<div id="container">
+	<!-- Header -->
+	<div id="header">
+		<div id="branding">
+			
+<a href="/">
+<img src="https://static.oqmd.org/static/img/new_logo_oqmd.png" width=300 alt="New logo">
+</a>
+
+  </div>
+		<div id="auth" class="auth">
+			
+
+
+ </div>
+		<div id="navigation" class="nav">
+			
+<ul>
+	<li><a href="/">Home</a></li>
+
+	<li><a href="/materials/">Materials</a>
+  <ul>
+    <li> <a href="/materials/composition">Search Compositions</a></li>
+    <li> <a href="/api/search">Query Materials</a></li>
+    
+  </ul>
+  
+	<li><a href="/analysis/">Analysis</a>
+  <ul>
+    <li> <a href="/analysis/gclp/">GCLP</a> </li>
+    <li> <a href="/analysis/phase_diagram/">Phase Diagrams</a> </li>
+    <li> <a href="/analysis/visualize">Visualize</a></li>
+  </ul>
+
+	<li><a href="/documentation/overview">Documentation</a>
+  <ul>
+    <li> <a href="/documentation/vasp">DFT settings</a></li>
+    <li> <a href="https://static.oqmd.org/static/docs/index.html">Python API</a></li>
+    <li> <a href="/documentation/structures">Structure sources</a></li>
+    <li> <a href="/documentation/publications">Publications</a></li>
+    <li> <a href="https://static.oqmd.org/static/docs/faqs.html">FAQ</a></li>
+  </ul>
+
+	<li><a href="/api">API</a>
+  <ul>
+    <li> <a href="/optimade">OPTIMADE API</a></li>
+    <li> <a href="https://static.oqmd.org/static/docs/restful.html">RESTful API Documentation</a></li>
+  </ul>
+
+	<li><a href="/download/">Download</a></li>
+</ul>
+ </div></div>
+  <hr>
+
+  <div id="sub-header">
+     </div>
+
+	<div id="global-warning">
+		
+
+</div>
+	<div id="global-info">
+		
+
+</div>
+
+	<!-- Content -->
+	<div id="content">
+    
+    
+    
+
+    <!-- sidebar -->
+    
+<h1>Server Error <em>(500)</em></h1>
+<p>There's been an error. It's been reported to the site administrators via email and should be fixed shortly. Thanks for your patience.</p>
+
+
+  </div>
+
+	<!-- Footer -->
+	<div id="footer">
+		
+<hr>
+<div style="width:400px;float:left">
+    Contact us by <a href="mailto:oqmd.questions@gmail.com">e-mail</a>. <br>
+    The data in OQMD is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a></div>
+<div style="width:400px;float:right;text-align:right">
+    If you are using any results from this website,
+        please reference this work as shown <a href="/documentation/publications">here</a></div>
+</div></div>
+
+
+</body>
+</html>
+: 0
+
+
+======================
+Error from the script:
+oqmd:  92%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████▏         | 12150/13185 [1:21:00<10:52,  1.59it/s]Could not retrieve required information from provider oqmd and url http://oqmd.org/optimade/v1/structures?filter=(elements HAS ALL "O") AND (nsites>=2 AND nsites<=5) AND (nelements>=2 AND nelements<=4)&response_fields=cartesian_site_positions,species_at_sites,lattice_vectors,species: [Errno Expecting value] 
+<html><head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<title>502 Server Error</title>
+</head>
+<body text=#000000 bgcolor=#ffffff>
+<h1>Error: Server Error</h1>
+<h2>The server encountered a temporary error and could not complete your request.<p>Please try again in 30 seconds.</h2>
+<h2></h2>
+</body></html>
+: 1
+oqmd:  92%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████▏         | 12150/13185 [1:22:07<07:01,  2.46it/s]

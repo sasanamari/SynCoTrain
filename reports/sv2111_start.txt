@@ -1,0 +1,2 @@
+By just changing batch_size from 32 to 512, true positive rate went from ~95% on sv2112 to 60%. (and predicted positive from 3% nearly 9%)
+I should have modified learning rate accordingly. For now, I go back to batch size 32 to see if I can roughly replicate the previous results.
