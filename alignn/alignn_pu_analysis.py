@@ -58,8 +58,18 @@ def pu_report(output_dir : str = None, cotraining = False, synthDF=synthDF):
     cotrain_df = cotrain_df.rename(columns={'prediction': 'new_labels'}) #for clarity
 # We'll overwritre the NaNs from test-set and the co-train-set separately,
 # to show that there is no unwarranted NaN value left.
+    experiment_train_match = { #output_dir: training_label_column
+            'alignn0':'synth',
+            'coAlSch1':'schnet0',
+            'coAlSch2':'coSchAl1',
+    }
+    cotrain_index = synthDF[synthDF.synth!=synthDF[experiment_train_match[
+        output_dir.split('_')[-1]]]].index
+    cotrain_df.loc[cotrain_index, 'new_labels'] = 1 #used in training
     cotrain_df.loc[cotrain_df.synth == 1, 'new_labels'] = 1 #filling up the NaN used for training.
     cotrain_df.new_labels = cotrain_df.new_labels.astype(np.int16)
+    
+    
     
     report = {'res_dir_list':res_dir_list, 'resdf':resdf,
               'true_positive_rate':round(true_positive_rate, 4), 
@@ -76,10 +86,12 @@ exp_dict = { #for publishing, just use the value names for running experiments.
 }
 # %%
 print("stop")
-'PUOutput_coAlSch1'
+# 'PUOutput_coAlSch1'
 # experiment = "PUOutput_100runs"
 experiment = 'PUOutput_coAlSch1'
+# experiment = 'PUOutput_coAlSch2'
 experiment_path =  os.path.join(alignn_dir,experiment)
+# %%
 report = pu_report(output_dir = experiment_path)
 # %%
 report['agg_df'].to_pickle(os.path.join(
@@ -88,7 +100,7 @@ report['resdf'].to_pickle(os.path.join(
     result_dir,exp_dict[experiment]+'_resdf.pkl'))
 
 synthDF[exp_dict[experiment]]=report['cotrain_df'].new_labels #just need the labels
-synthDF.to_pickle(origdatapath)
+# synthDF.to_pickle(origdatapath)
 # %%
 resultcsv = pd.read_csv(os.path.join(result_dir, 'results.csv'),
                         index_col=0)

@@ -5,8 +5,8 @@
   "atom_features": "cgcnn",
   "neighbor_strategy": "k-nearest",
   "id_tag": "jid",
-  "output_dir": "/home/samariam/projects/synth/alignn/PUOutputlonglightDBug/7iter/",
-  "random_seed": 7,
+  "output_dir": "../output/",
+  "random_seed": 321,
   "classification_threshold": 0.5,
   "n_val": null,
   "n_test": null,
@@ -15,7 +15,7 @@
   "val_ratio": 0.1,
   "test_ratio": 0.1,
   "target_multiplication_factor": null,
-  "epochs": 10,
+  "epochs": 120,
   "batch_size": 64,
   "weight_decay": 1e-05,
   "learning_rate": 0.001,
@@ -51,5 +51,5 @@
     "zero_inflated": false,
     "classification": true
   },
-  "n_early_stopping": 3
+  "n_early_stopping": 25
 }

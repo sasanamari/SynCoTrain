@@ -27,3 +27,4 @@ schnet/splitting.lock
 .ipynb_checkpoints
 readme_4me.log
 .vscode/
+!data/README.md

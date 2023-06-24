@@ -1,13 +1,9 @@
 # %%
-# need to upgrade a library to have all the needed versions of the code.
-# pandas version in sch211 was 1.2.4
 import os
-
-os.environ['CUDA_VISIBLE_DEVICES'] = str(0) # safer to use before loading lightning.gpu
-from pathlib import Path  #recommended path library for python3
+os.environ['CUDA_VISIBLE_DEVICES'] = str(0) # use before loading lightning.gpu
+from pathlib import Path 
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 import schnetpack as spk
 from schnetpack.data import ASEAtomsData, BaseAtomsData, AtomsDataFormat, AtomsDataModule
 import schnetpack.transform as trn
@@ -19,12 +15,9 @@ import json
 import pandas as pd
 import time
 from datetime import timedelta
-import int2metric
-from Datamodule4PU import *
-# from Datamodule4PUTrial import *
-from pytorch_lightning.callbacks import EarlyStopping
-import datetime
-# from synth.data_scripts.cotraining_labeling import cotrain_labeling_schnet
+import schnet.pu_learn.int2metric as int2metric
+from schnet.pu_learn.Datamodule4PU import *
+from schnet.schnet_funcs  import directory_setup, predProb
 
 # %%
 # current_config = "25runTest_config.json"
@@ -69,48 +62,9 @@ res_df_fileName = experiment+"_"+str(start_iter)+'_'+str(num_iter)+'ep'+str(epoc
 save_dir = os.path.join(schnetDirectory,experiment+'_res_log')
 fulldatapath = config["fulldatapath"]
 res_dir = os.path.join(save_dir,'res_df')
-# %%
-def directory_setup(dataPath,save_dir, bestModelPath, iteration_num=None):
-    if iteration_num == 0:
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
-            print('Logging directory was created.')
-        if not os.path.exists(res_dir):
-            os.makedirs(res_dir)
-            print('Result directory was created.')
-        
-    splitFile_path = Path('split.npz') #should this be split.lock?
-    try:
-        splitFile_path.unlink()
-    except OSError as e:
-        print(e)
-        splitFile_path = Path(os.path.join(save_dir,str(splitFile_path)))
-        try:
-            splitFile_path.unlink()
-        except OSError as e:
-            print(e)
-            
-    datapathObj = Path(dataPath)
-    try:
-        datapathObj.unlink()
-        print('unlinked')
-    except OSError as e:
-        print(e)        
-        
-    bestModelPath_obj = Path(bestModelPath)
-    try:
-        bestModelPath_obj.unlink()
-    except OSError as e:
-        print(e)       
-         
-    return str(splitFile_path)
-
-
 
 # %%
-print(torch.cuda.is_available())
 np.random.seed(42)
-
 # %%
 crysdf = pd.read_pickle(fulldatapath)
 crysdf["TARGET"] = crysdf.synth.copy()
@@ -219,30 +173,17 @@ task = spk.task.AtomisticTask(
 converter = spk.interfaces.AtomsConverter(neighbor_list=trn.ASENeighborList(cutoff=5.), dtype=torch.float32)
 
 # %%
-def predProb(score): 
-    """returns class label from network score"""
-    prob = nn.Sigmoid()
-    pred_prob = prob(score)     
-    if 0<=pred_prob< 0.5:
-        return 0
-    else:
-        return 1
-# %%
 if saveDfs:
     if not os.path.exists(res_dir):
         os.makedirs(res_dir)
     crysdf.to_pickle(os.path.join(res_dir, "crysdf_bi"))
 # %%
-for it in range(start_iter, num_iter):
-    # if it==start_iter and it!=0:
-        # !crysdf = pd.read_pickle(prev_fileName)
-        # we don't work with crysdf within the loop.
-        # crysdf.target_pd = crysdf.target_pd.map(lambda x: int(x[1]))  #some it's string, changing back to int (it was because of csv)
-        
+for it in range(start_iter, num_iter):      
         
     st = time.time()
     print('we started iteration {}'.format(it))
-    splitFilestring = directory_setup(dataPath = trainDataPath,save_dir = save_dir, 
+    splitFilestring = directory_setup(res_dir = res_dir, 
+                                      dataPath = trainDataPath, save_dir = save_dir,
                                       bestModelPath= bestModelPath, iteration_num=it)
     
     np.random.seed(it)
@@ -296,7 +237,8 @@ for it in range(start_iter, num_iter):
     crysData.prepare_data()
     crysData.setup()
     
-    splitFilestringTest = directory_setup(dataPath = testDatapath,save_dir = save_dir, 
+    splitFilestringTest = directory_setup(res_dir = res_dir, 
+                                          dataPath = testDatapath,save_dir = save_dir, 
                                           bestModelPath= bestModelPath, iteration_num=it)
 
     test_dataset = ASEAtomsData.create(testDatapath, 
@@ -338,10 +280,8 @@ for it in range(start_iter, num_iter):
     
     print('Mean atomization energy / atom:', means.item())
     print('Std. dev. atomization energy / atom:', stddevs.item())
-    # This doesn't work when no test data is given, and it has no docsAccurtring. Does it calculate the mean and and std of test data?
-    
+    # This doesn't work when no test data is given.    
     logger = pl.loggers.TensorBoardLogger(save_dir=save_dir)
-  
     callbacks = [
         # early_stopping,
     spk.train.ModelCheckpoint(
@@ -357,7 +297,7 @@ for it in range(start_iter, num_iter):
     accelerator='gpu',
     gpus=1,
     auto_select_gpus = True,
-    strategy=None, # or 'ddp'?
+    strategy=None, 
     precision=16,
     callbacks=callbacks,
     logger=logger,
@@ -371,7 +311,6 @@ for it in range(start_iter, num_iter):
     print(myaccuracy)
     
     t = trainer.predict(model=task, 
-                    # datamodule=crysTest,
                     dataloaders= crysTest.predict_dataloader(),
                     return_predictions=True)
 
@@ -389,33 +328,23 @@ for it in range(start_iter, num_iter):
         mid.append([ind,groundTruth,results[i]])
 
     resdf = pd.DataFrame(mid, columns=['testIndex','GT','pred_'+str(it)])  #GT is a duplicate
-    resdf = resdf.set_index('testIndex').sort_index() #new line
+    resdf = resdf.set_index('testIndex').sort_index() 
     if saveDfs:
         resdf.to_pickle(os.path.join(res_dir, 'resdf_'+str(it)))
         it_testdf.to_pickle(os.path.join(res_dir, 'it_testdf')+str(it))
         
-    it_testdf = it_testdf[['material_id']] #new line
+    it_testdf = it_testdf[['material_id']] 
     it_testdf = it_testdf.merge(resdf['pred_'+str(it)],
                                 left_index=True, right_index=True)
     iteration_results = iteration_results.merge(it_testdf,
                             left_on='material_id', right_on='material_id', how='outer')
-    # it_testdf = it_testdf.merge(resdf, left_index=True, right_on='testIndex')
-    # it_testdf = it_testdf[['material_id','pred_'+str(it)]]
-    # crysdf = pd.merge(left = crysdf, right=it_testdf,
-    #         how = 'outer',left_on='material_id', right_on='material_id')
-    
-    # crysdf = crysdf.merge(resdf[['pred_'+str(it), 'GT']], left_index=True, right_index=True, how = 'outer')
 
     et = time.time()
     itt = et-st
     print("===the {}th iteration took  minutes{} to run===".format(it, timedelta(seconds=itt)//60))
-    # !choose smaller data for quicker debugging. just pick a small subset.
-    # iteration_results.to_pickle(os.path.join(res_dir,res_df_fileName+'tmp_'+str(it)))   #saving results at each iteration
     iteration_results.to_pickle(os.path.join(res_dir,res_df_fileName+'tmp'))   #overwriting results at each iteration
-    # crysdf.to_pickle(os.path.join(res_dir,res_df_fileName+'tmp'))   #saving results at each iteration
-    # it_testdf.to_pickle(save_dir+'/res_df/'+res_df_fileName+'tmp')   #saving results at each iteration
-    # I chanegd crysdf to it_test_df!!!
-    try:  #just reporting progress in a small text file.
+
+    try:  #reporting progress in a small text file.
         deltaT = time.time() - startTime
         avgIterTime = deltaT/(it+1)
         estimateRemainSeconds = (num_iter - it) * avgIterTime
@@ -432,9 +361,6 @@ for it in range(start_iter, num_iter):
     
 
 # %%
-# crysdf.target_pd = crysdf.target_pd.map(lambda x: int(x[0])) #changing array to target for easier handling
-# !I saved only the test results. What is it I want?
-# !we should change target_pd here!
 iteration_results.to_pickle(os.path.join(res_dir,res_df_fileName))
 
 # %%

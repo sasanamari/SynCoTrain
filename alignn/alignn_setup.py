@@ -8,9 +8,9 @@ import sys
 import time
 from jarvis.core.atoms import Atoms
 ### from alignn.data import get_train_val_loaders
-from PU_data_handling import get_train_val_loaders_PU
+from alignn.pu_learn.PU_data_handling import get_train_val_loaders_PU
 ### from alignn.train import train_dgl
-from myTrain import train_dgl
+from alignn.pu_learn.myTrain import train_dgl
 from alignn.config import TrainingConfig
 from jarvis.db.jsonutils import loadjson
 import argparse
