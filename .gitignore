@@ -28,3 +28,4 @@ schnet/splitting.lock
 readme_4me.log
 .vscode/
 !data/README.md
+.pytest_cache/

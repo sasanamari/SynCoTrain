@@ -166,7 +166,7 @@ def get_id_train_val_test_PU(
     unlabeledIDs = [x for x in allIDs if x not in allPositiveIDs]
     # !ids_unlabeled = list(np.arange(positive_size, positive_size + unlabeled_size))
     
-    random.seed(777) #reproducibly choose the same postive test-set.
+    random.seed(42) #reproducibly choose the same postive test-set.
     experimentalData = allPositiveIDs[:experimentalDataSize]
     random.shuffle(experimentalData) #shuffling only experimental data
     allPositiveIDs[:experimentalDataSize] = experimentalData

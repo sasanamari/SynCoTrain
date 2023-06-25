@@ -4,6 +4,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = str(0) # use before loading lightning.gpu
 from pathlib import Path 
 import sys
 import numpy as np
+import random
 import schnetpack as spk
 from schnetpack.data import ASEAtomsData, BaseAtomsData, AtomsDataFormat, AtomsDataModule
 import schnetpack.transform as trn
@@ -13,26 +14,15 @@ import torchmetrics
 import pytorch_lightning as pl
 import json
 import pandas as pd
-import time
-from datetime import timedelta
 import schnet.pu_learn.int2metric as int2metric
 from schnet.pu_learn.Datamodule4PU import *
-from schnet.schnet_funcs  import directory_setup, predProb
+from schnet.pu_learn.schnet_funcs  import directory_setup, predProb
 
 # %%
-# current_config = "25runTest_config.json"
-# current_config = "debugsch_config.json"
-# current_config = "longDebug_config.json"
-# current_config = "100runs_config.json"
-# current_config = "3runs_config.json"
-# current_config = "cotrain_debug_config.json"
+
 current_config = "coSchAl1_config.json"
 
-saveDfs = False
-startTime = time.time()
-
-# remove saveDFs parts if the code works fine.
-config_dir = "/home/samariam/projects/synth/schnet/schnet_configs/"
+config_dir = "schnet/schnet_configs"
 with open(os.path.join(config_dir, current_config), "r") as read_file:
     print("Read Experiment configuration")
     config = json.load(read_file)
@@ -87,38 +77,19 @@ crysdf["targets"] = crysdf.targets.map(lambda target: dict(synth=np.array(target
 #The above changes targets fromat from array to dict with array val
 iteration_results = crysdf[["material_id", 'synth', 'TARGET']]
 # %%
-########################
-# ###clean this after this run! This is for consistency!
-# I kept the same random selection as before. In the future,
-# We should first pick the experimental part of the test-set. Then, 
-# we'll choose the train-set based on current labels of the REMAINING data.
-num_pos = crysdf.synth.sum()
-num_theo = crysdf.shape[0]-num_pos
-class_train_num = int(0.9*min(num_pos, num_theo))
-traindf1 = crysdf[crysdf.synth==1].sample(n=class_train_num,random_state=123) #the positive data for training
-testdf1 = crysdf[crysdf.synth==1].drop(index=traindf1.index)
-
-del num_pos, num_theo, class_train_num, traindf1
+num_experimental = crysdf.synth.sum()
+num_theo = crysdf.shape[0]-num_experimental
+experimental_test_num = int(0.1*min(num_experimental, num_theo))
+positive_index = list(range(num_experimental))
+random.seed(42)
+random.shuffle(positive_index)
+testdf1 = crysdf[crysdf.synth==1].iloc[positive_index[:experimental_test_num]]
 
 crysdf = crysdf.drop(index=testdf1.index) # need to remove positive-test...
 
-# num_pos = crysdf.TARGET.sum()
-# num_theo = crysdf.shape[0]-num_pos
-# class_train_num = int(0.9*min(num_pos, num_theo))
 traindf1 = crysdf[crysdf.TARGET==1].sample(frac=1,random_state=123)
 class_train_num = len(traindf1) #number of train-data from each class.
-# when you're done, uncomment/modify the remaining code below!
-# #####################
 
-
-# num_pos = crysdf.TARGET.sum()
-# num_theo = crysdf.shape[0]-num_pos
-# class_train_num = int(0.9*min(num_pos, num_theo)) #positive class is the smaller class
-# # We separate test before iterating begins.
-# # We can do this in the loop, if we want predictions for all the crystals.
-# # The random_state of sampling then should change with the iteration number.
-# traindf1 = crysdf[crysdf.TARGET==1].sample(n=class_train_num,random_state=123) #the positive data for training
-# testdf1 = crysdf[crysdf.TARGET==1].drop(index=traindf1.index)  #the positive data for testing
 if small_data:
     traindf1 = traindf1.sample(frac = .05, random_state = 42)  #for quick computation and debugginng
     testdf1 = testdf1.sample(frac = .05, random_state = 43)  #for quick computation and debugginng
@@ -171,16 +142,9 @@ task = spk.task.AtomisticTask(
 )
 
 converter = spk.interfaces.AtomsConverter(neighbor_list=trn.ASENeighborList(cutoff=5.), dtype=torch.float32)
-
-# %%
-if saveDfs:
-    if not os.path.exists(res_dir):
-        os.makedirs(res_dir)
-    crysdf.to_pickle(os.path.join(res_dir, "crysdf_bi"))
 # %%
 for it in range(start_iter, num_iter):      
         
-    st = time.time()
     print('we started iteration {}'.format(it))
     splitFilestring = directory_setup(res_dir = res_dir, 
                                       dataPath = trainDataPath, save_dir = save_dir,
@@ -203,8 +167,7 @@ for it in range(start_iter, num_iter):
     unlabeledPredictionLength = len(testdf0)
     testLength = len(it_testdf)
 
-    del traindf0, testdf0 #, df1, testdf1
-
+    del traindf0, testdf0 
 
     it_traindf = it_traindf.sample(frac=1,random_state=it, ignore_index=True) #shuffling for each iteration.
     if it==0:
@@ -310,28 +273,24 @@ for it in range(start_iter, num_iter):
     myaccuracy = trainer.callback_metrics["val_synth_Accur"]
     print(myaccuracy)
     
-    t = trainer.predict(model=task, 
+    predictions = trainer.predict(model=task, 
                     dataloaders= crysTest.predict_dataloader(),
                     return_predictions=True)
 
     # %%
     results = []
-    for batch in t:    
+    for batch in predictions:    
         for datum in batch['synth']:
             results = results+[predProb(datum.float())]
             
-
-    mid = []
+    res_list = []
     for i, datum in enumerate(crysTest.test_dataset):
         groundTruth = int(datum['synth'].detach())
         ind = int(datum['_idx'])
-        mid.append([ind,groundTruth,results[i]])
+        res_list.append([ind,groundTruth,results[i]])
 
-    resdf = pd.DataFrame(mid, columns=['testIndex','GT','pred_'+str(it)])  #GT is a duplicate
+    resdf = pd.DataFrame(res_list, columns=['testIndex','GT','pred_'+str(it)])  #GT is a duplicate
     resdf = resdf.set_index('testIndex').sort_index() 
-    if saveDfs:
-        resdf.to_pickle(os.path.join(res_dir, 'resdf_'+str(it)))
-        it_testdf.to_pickle(os.path.join(res_dir, 'it_testdf')+str(it))
         
     it_testdf = it_testdf[['material_id']] 
     it_testdf = it_testdf.merge(resdf['pred_'+str(it)],
@@ -339,36 +298,10 @@ for it in range(start_iter, num_iter):
     iteration_results = iteration_results.merge(it_testdf,
                             left_on='material_id', right_on='material_id', how='outer')
 
-    et = time.time()
-    itt = et-st
-    print("===the {}th iteration took  minutes{} to run===".format(it, timedelta(seconds=itt)//60))
+    print("===the {}th iteration is done.".format(it))
     iteration_results.to_pickle(os.path.join(res_dir,res_df_fileName+'tmp'))   #overwriting results at each iteration
-
-    try:  #reporting progress in a small text file.
-        deltaT = time.time() - startTime
-        avgIterTime = deltaT/(it+1)
-        estimateRemainSeconds = (num_iter - it) * avgIterTime
-        estimateRemainTime = timedelta(seconds = estimateRemainSeconds)
-        remain_days = estimateRemainTime.days
-        remain_hours = estimateRemainTime.seconds//3600
-
-
-        with open("iterReport"+experiment+".txt", "w") as text_file:
-            print(f"So far we have finished iteration #{it}.", file=text_file)
-            print(F"Estimated remaining time is {remain_days} days and {remain_hours} hours.", file=text_file)
-    except:
-        pass
-    
-
+   
 # %%
 iteration_results.to_pickle(os.path.join(res_dir,res_df_fileName))
 
 # %%
-endTime = time.time()
-elapsed_time = endTime-startTime
-print("This script took {} to run.".format(timedelta(seconds=elapsed_time)))
-# !also fix the timing in BOTH scripts
-# %%
-
-
-

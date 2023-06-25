@@ -42,11 +42,11 @@ res_df_fileName = experiment+"_"+str(start_iter)+'_'+str(num_iter)+'ep'+str(epoc
 
 save_dir = os.path.join(schnetDirectory,experiment+'_res_log')
 fulldatapath = config["fulldatapath"]
-exp_dict = { #for publishing, just use the value names for running experiments.
-    '100runs':'schnet0',
-    'coSchAl1':'coSchAl1',
-    'coSchAl2':'coSchAl2',
-}
+# exp_dict = { #for publishing, just use the value names for running experiments.
+#     '100runs':'schnet0',
+#     'coSchAl1':'coSchAl1',
+#     'coSchAl2':'coSchAl2',
+# }
 # %%
 half_way_analysis = False
 # half_way_analysis = True
