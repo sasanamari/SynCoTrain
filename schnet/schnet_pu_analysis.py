@@ -111,7 +111,8 @@ print('and {:.1f}% of currenly unlabeled data have been predicted to belong to t
 crysdf = crysdf.drop(columns=Preds)
 # %%
 crysdf.to_pickle(os.path.join(
-    result_dir,exp_dict[experiment]+'.pkl'))
+    result_dir,experiment+'.pkl'))
+    # result_dir,exp_dict[experiment]+'.pkl'))
 # %%
 synthDF = pd.read_pickle(fulldatapath)
 # synthDF = synthDF.reset_index(drop=True)
@@ -125,15 +126,16 @@ merged_df.loc[cotrain_index, 'new_labels'] = 1 #used in training
 merged_df.loc[merged_df.synth == 1, 'new_labels'] = 1 #used in training
 merged_df.new_labels = merged_df.new_labels.astype(np.int16)
 # %%
-synthDF[exp_dict[experiment]] = merged_df.new_labels
+# synthDF[exp_dict[experiment]] = merged_df.new_labels
+synthDF[experiment] = merged_df.new_labels
 # %%
 synthDF.to_pickle(fulldatapath)
 # %%
 resultcsv = pd.read_csv(os.path.join(result_dir, 'results.csv'),
                         index_col=0)
-resultcsv.loc[exp_dict[experiment], 
-            'true_positive_rate'] = true_positive_rate
-resultcsv.loc[exp_dict[experiment], 
-            'predicted_positive_rate'] = predicted_positive_rate
+# resultcsv.loc[exp_dict[experiment], 
+resultcsv.loc[experiment, 'true_positive_rate'] = true_positive_rate
+# resultcsv.loc[exp_dict[experiment], 
+resultcsv.loc[experiment, 'predicted_positive_rate'] = predicted_positive_rate
 resultcsv.to_csv(os.path.join(result_dir, 'results.csv'))
 # %%

@@ -9,7 +9,16 @@ from alignn.config import TrainingConfig
 import argparse
 import pandas as pd
 # %%
-experiment_name = "coAlSch2" #this could be the argument.
+parser = argparse.ArgumentParser(
+    description="Semi-Supervised ML for Synthesizability Prediction"
+)
+parser.add_argument(
+    "--experiment",
+    default="alignn0",
+    help="name of the experiment and corresponding config files.",
+)
+args = parser.parse_args(sys.argv[1:])
+experiment = args.experiment 
 # normal_experiment = False
 ehull_test = False
 reverse_label=False #to use the prtrained model
@@ -20,7 +29,7 @@ reverse_label=False #to use the prtrained model
     
 alignn_dir = "alignn"
 alignn_config_dir = os.path.join(alignn_dir,"alignn_configs")
-pu_config_name = os.path.join(alignn_config_dir, 'pu_config_'+experiment_name+'.json')
+pu_config_name = os.path.join(alignn_config_dir, 'pu_config_'+experiment+'.json')
 
 pu_setup = loadjson(pu_config_name)
 cotraining  =pu_setup['cotraining']
@@ -32,7 +41,7 @@ if cotraining:
             'coAlSch1':'schnet0',
             'coAlSch2':'coSchAl1',
                             }
-    train_col = experiment_train_match[experiment_name]
+    train_col = experiment_train_match[experiment]
     origdataPath = os.path.join(
         pu_setup['data_dir'],'synthDF'
         )
@@ -71,7 +80,7 @@ def config_generator(
     _config = loadjson(default_class_config)
     _config['random_seed'] = iterNum
     _config['epochs'] = epochNum
-    _config['output_dir'] = os.path.join(alignn_dir,'PUOutput_'+experiment_name+'/'+str(iterNum)+'iter/')
+    _config['output_dir'] = os.path.join(alignn_dir,'PUOutput_'+experiment+'/'+str(iterNum)+'iter/')
 
     dumpjson(_config, filename=newConfigName)
     print('Config file for iteratin {} was generated.'.format(iterNum))

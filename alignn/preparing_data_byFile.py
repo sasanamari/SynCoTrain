@@ -7,12 +7,31 @@ from ase import Atoms as AseAtoms
 from jarvis.core.atoms import Atoms
 import json
 from synth.data_scripts.crystal_structure_conversion import ase_to_jarvis
-# from synth.data_scripts.cotraining_labeling import cotrain_labeling_schnet
+import argparse
 # %%
-cotraining = True
+parser = argparse.ArgumentParser(
+    description="Data preparation for ALIGNN"
+)
+parser.add_argument(
+    "--experiment",
+    default="alignn0",
+    help="name of the experiment and corresponding config files.",
+)
+args = parser.parse_args(sys.argv[1:])
+experiment = args.experiment
+cotraining = False
+if experiment!='alignn0':
+    cotraining = True
+    
+experiment_train_match = { #output_dir: training_label_column
+            'alignn0':'synth',
+            'coAlSch1':'schnet0',
+            'coAlSch2':'coSchAl1',
+    }
+reference_col = experiment_train_match[experiment]    
+    
+
 if cotraining:
-    # reference_col = "schnet0"
-    reference_col = "coSchAl1"
     print(f'You have selected {reference_col} as your reference column!!!!!!!!!')
 reverse_label = False
 ehull_test = False

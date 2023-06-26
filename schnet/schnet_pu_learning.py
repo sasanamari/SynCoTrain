@@ -17,13 +17,23 @@ import pandas as pd
 import schnet.pu_learn.int2metric as int2metric
 from schnet.pu_learn.Datamodule4PU import *
 from schnet.pu_learn.schnet_funcs  import directory_setup, predProb
+import argparse
 
 # %%
+parser = argparse.ArgumentParser(
+    description="Semi-Supervised ML for Synthesizability Prediction"
+)
+parser.add_argument(
+    "--experiment",
+    default="schnet0",
+    help="name of the experiment and corresponding config files.",
+)
+args = parser.parse_args(sys.argv[1:])
+experiment = args.experiment 
 
-current_config = "coSchAl1_config.json"
-
-config_dir = "schnet/schnet_configs"
-with open(os.path.join(config_dir, current_config), "r") as read_file:
+schnet_config_dir = "schnet/schnet_configs"
+config_path = os.path.join(schnet_config_dir, 'pu_config_'+experiment+'.json')
+with open(config_path, "r") as read_file:
     print("Read Experiment configuration")
     config = json.load(read_file)
     

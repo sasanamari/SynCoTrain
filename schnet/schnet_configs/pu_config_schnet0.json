@@ -1,5 +1,5 @@
 {
-  "experiment": "100runs",
+  "experiment": "schnet0",
   "cotraining": false,
   "new_target": null,
   "epoch_num": 15,
