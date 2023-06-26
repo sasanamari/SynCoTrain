@@ -1,7 +1,6 @@
 # %%
 import pandas as pd  #more conveneient for ehull setup
 import sys
-# sys.path.append('/home/samariam/projects/chemheuristics')
 import numpy as np
 import os
 from ase import Atoms as AseAtoms
@@ -31,9 +30,8 @@ def ase_to_atoms(ase_atoms="", cartesian=True):
         coords=ase_atoms.get_positions(),
         cartesian=cartesian,
     )
-os.chdir('/home/samariam/projects/synth')
 # %%
-crysdf = pd.read_pickle("/home/samariam/projects/synth/data/clean_data/synthDF")
+crysdf = pd.read_pickle("data/clean_data/synthDF")
 crysdf["synth"] = crysdf.synth.astype('int16')
 # the order should be first postive, then unlabeld class.
 # %%

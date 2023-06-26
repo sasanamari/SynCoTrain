@@ -12,8 +12,8 @@ import numpy as np
 import pandas as pd
 # %%
 print('Starting to clean.')
-raw_location = "/home/samariam/projects/synth/data/raw"
-clean_location = "/home/samariam/projects/synth/data/clean_data/"
+raw_location = "data/raw"
+clean_location = "data/clean_data/"
 experimental_path =  os.path.join(raw_location,"experimental_raw_oxygen.npy")
 theoretical_path =  os.path.join(raw_location,"theoretical_raw_oxygen.npy")
 # %%

@@ -12,9 +12,9 @@ import numpy as np
 # current_config = "cotrain_debug_config.json"
 current_config = "coSchAl1_config.json"
 
-result_dir = '/home/samariam/projects/synth/data/results'
+result_dir = 'data/results'
 
-config_dir = "/home/samariam/projects/synth/schnet/schnet_configs/"
+config_dir = "schnet/schnet_configs/"
 with open(os.path.join(config_dir, current_config), "r") as read_file:
     print("Read Experiment configuration")
     config = json.load(read_file)
@@ -119,7 +119,8 @@ synthDF = pd.read_pickle(fulldatapath)
 merged_df = synthDF[['material_id', 'synth']].merge(
     theoretical_df[['material_id', 'prediction']], on='material_id', how='left')
 merged_df = merged_df.rename(columns={'prediction': 'new_labels'}) #for clarity
-cotrain_index = synthDF[synthDF.synth!=synthDF.alignn0].index
+cotrain_index = synthDF[
+    synthDF.synth!=synthDF[config['new_target']]].index
 merged_df.loc[cotrain_index, 'new_labels'] = 1 #used in training
 merged_df.loc[merged_df.synth == 1, 'new_labels'] = 1 #used in training
 merged_df.new_labels = merged_df.new_labels.astype(np.int16)
@@ -134,5 +135,5 @@ resultcsv.loc[exp_dict[experiment],
             'true_positive_rate'] = true_positive_rate
 resultcsv.loc[exp_dict[experiment], 
             'predicted_positive_rate'] = predicted_positive_rate
-# resultcsv.to_csv(os.path.join(result_dir, 'results.csv'))
+resultcsv.to_csv(os.path.join(result_dir, 'results.csv'))
 # %%

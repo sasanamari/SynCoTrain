@@ -5,7 +5,7 @@ import os
 import re
 from jarvis.db.jsonutils import loadjson, dumpjson
 import matplotlib.pyplot as plt
-from deepdiff import DeepDiff
+# from deepdiff import DeepDiff
 from tabulate import tabulate
 import pprint 
 # %%

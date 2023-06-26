@@ -1,7 +1,7 @@
 # Build a json file to configure SchNetPack.
 import os
 import json
-os.chdir("/home/samariam/projects/synth/schnet/schnet_configs")
+os.chdir("schnet/schnet_configs")
 config = {
   "experiment": "coSchAl1",
   "cotraining": True,
@@ -9,9 +9,9 @@ config = {
   "epoch_num": 15,
   "num_iter": 100,
   "batch_size": 32,
-  "fulldatapath": "/home/samariam/projects/synth/data/clean_data/synthDF",
+  "fulldatapath": "data/clean_data/synthDF",
   "start_iter": 0,
-  "schnetDirectory": "/home/samariam/projects/synth/schnet",
+  "schnetDirectory": "schnet",
   "small_data": False
 }
 

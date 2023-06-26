@@ -374,4 +374,4 @@ dependencies:
     - werkzeug==2.2.2
     - widgetsnbextension==3.5.2
     - yarl==1.8.2
-prefix: /home/samariam/anaconda3/envs/sch2111
+prefix: envs/puschnet

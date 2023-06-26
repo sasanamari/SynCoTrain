@@ -14,8 +14,8 @@ from pymatgen.analysis.structure_analyzer import OxideType
 from pymatgen.analysis.bond_valence import BVAnalyzer
 
 # %%
-MPID="xOsYnlHNKBgOvQFhIthUJ68KAMxqrCBL"
-location = "/home/samariam/projects/synth/data/raw"
+MPID="your materials project ID here."
+location = "data/raw"
 destination_file = os.path.join(location, "experimental_raw_oxygen")
 database_text = os.path.join(location, "MP_db_version.txt")
 

@@ -2,8 +2,8 @@
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 from alignn_setup import *
-from jarvis.db.jsonutils import loadjson, dumpjson
-from synth.myjsonutil import loadjson, dumpjson
+# from jarvis.db.jsonutils import loadjson, dumpjson
+from myjsonutil import loadjson, dumpjson
 from jarvis.core.atoms import Atoms
 from alignn.config import TrainingConfig
 import argparse

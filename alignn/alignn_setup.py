@@ -182,7 +182,6 @@ def train_for_folder(
         n_outputs.append(info["target"])
         dataset.append(info)
     
-    # data_size = loadjson("/home/samariam/projects/chemheuristics/alignn/dataSize.json")   
     
     print("The size of positive labeled data is ",
           data_portion_dict["positive_data_size"])     
@@ -249,7 +248,7 @@ def train_for_folder(
         from alignn.models.alignn import ALIGNN
         model = ALIGNN(config=config.model)
         model_path = (
-    "/home/samariam/projects/chemheuristics/alignn/pretrain_test/checkpoint_177.pt"
+    "alignn/pretrain_test/checkpoint_177.pt"
                     )
         model.load_state_dict(torch.load(model_path, map_location=device)["model"])
         

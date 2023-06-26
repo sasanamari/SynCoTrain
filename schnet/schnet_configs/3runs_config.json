@@ -5,8 +5,8 @@
   "epoch_num": 5,
   "num_iter": 3,
   "batch_size": 32,
-  "fulldatapath": "/home/samariam/projects/synth/data/clean_data/synthDF",
+  "fulldatapath": "data/clean_data/synthDF",
   "start_iter": 0,
-  "schnetDirectory": "/home/samariam/projects/synth/schnet",
+  "schnetDirectory": "schnet",
   "small_data": false
 }

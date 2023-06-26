@@ -5,7 +5,7 @@
   "atom_features": "cgcnn",
   "neighbor_strategy": "k-nearest",
   "id_tag": "jid",
-  "output_dir": "/home/samariam/projects/synth/alignn/PUOutput_coAlSch2/43iter/",
+  "output_dir": "alignn/PUOutput_coAlSch2/1iter/",
   "random_seed": 43,
   "classification_threshold": 0.5,
   "n_val": null,

@@ -11,7 +11,7 @@ from atomic_feature_func import *
 from typing import Tuple
 import os
 # %%
-currentLoc='/home/samariam/projects/synth/heuristics_analysis'
+currentLoc='heuristics_analysis/'
 os.chdir(currentLoc)
 subdirectory = "data_chunks"
 # os.makedirs(subdirectory, exist_ok=True)

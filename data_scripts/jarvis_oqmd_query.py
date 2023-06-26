@@ -5,7 +5,7 @@ import os
 import numpy as np
 # %matplotlib inline
 # %%
-location = "/home/samariam/projects/synth/data/raw"
+location = "data/raw"
 destination_file = os.path.join(location, "theoretical_raw_oxygen")
 database_text = os.path.join(location, "database_citation.txt")
 

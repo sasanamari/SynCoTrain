@@ -5,16 +5,13 @@ import os
 import re
 from jarvis.db.jsonutils import loadjson, dumpjson
 import matplotlib.pyplot as plt
-from deepdiff import DeepDiff
+# from deepdiff import DeepDiff
 from tabulate import tabulate
 import pprint 
 # %%
-# home_dir = "/home/samariam/projects/chemheuristics"
-# os.chdir("/home/samariam/projects/chemheuristics/alignn")
-origdatapath = '/home/samariam/projects/synth/data/clean_data/synthDF'
-home_dir = "/home/samariam/projects/synth"
-alignn_dir = "/home/samariam/projects/synth/alignn"
-result_dir = '/home/samariam/projects/synth/data/results'
+origdatapath = 'data/clean_data/synthDF'
+alignn_dir = "alignn/"
+result_dir = 'data/results'
 os.chdir(alignn_dir)
 synthDF = pd.read_pickle(origdatapath)
 
@@ -100,7 +97,7 @@ report['resdf'].to_pickle(os.path.join(
     result_dir,exp_dict[experiment]+'_resdf.pkl'))
 
 synthDF[exp_dict[experiment]]=report['cotrain_df'].new_labels #just need the labels
-# synthDF.to_pickle(origdatapath)
+synthDF.to_pickle(origdatapath)
 # %%
 resultcsv = pd.read_csv(os.path.join(result_dir, 'results.csv'),
                         index_col=0)
