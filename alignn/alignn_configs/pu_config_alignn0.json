@@ -11,7 +11,7 @@
   "classification_threshold": 0.5,
   "batch_size": null,
   "output_dir": null,
-  "epochs": null,
-  "max_num_of_iterations": 99,
+  "epochs": 120,
+  "max_num_of_iterations": 100,
   "start_of_iterations": 1
 }

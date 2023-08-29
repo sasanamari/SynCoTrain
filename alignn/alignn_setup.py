@@ -84,7 +84,6 @@ def train_for_folder(
     epochs=None,
     file_format="poscar",
     output_dir=None,
-    reverse_label=False,
     ehull_test = False,
     cotraining = False,
     coConfigPath = None
@@ -99,8 +98,6 @@ def train_for_folder(
         except Exception as exp:
             print("Check this expection here", exp)
             
-    if reverse_label:
-        id_prop_dat = os.path.join(root_dir, "synth_id_prop_rev.csv")
     elif cotraining:
         if coConfigPath==None:
             print('Did not provide a path for coConfig!')
@@ -108,7 +105,7 @@ def train_for_folder(
         coConfig = loadjson(coConfigPath)
         id_prop_dat = coConfig['csvPath']
     elif ehull_test:
-        id_prop_dat = os.path.join(root_dir, "ehull_test.csv")
+        id_prop_dat = os.path.join(root_dir, "ehull_test.csv") not detailed enough, no cotraining.
     else:
         id_prop_dat = os.path.join(root_dir, "synth_id_prop.csv")
         
@@ -244,16 +241,17 @@ def train_for_folder(
         data_portion_dict= data_portion_dict,
     )
     t1 = time.time()
-    if reverse_label:
-        from alignn.models.alignn import ALIGNN
-        model = ALIGNN(config=config.model)
-        model_path = (
-    "alignn/pretrain_test/checkpoint_177.pt"
-                    )
-        model.load_state_dict(torch.load(model_path, map_location=device)["model"])
+    # if reverse_label:
+    #     from alignn.models.alignn import ALIGNN
+    #     model = ALIGNN(config=config.model)
+    #     model_path = (
+    # "alignn/pretrain_test/checkpoint_177.pt"
+    #                 )
+    #     model.load_state_dict(torch.load(model_path, map_location=device)["model"])
         
-    else:
-        model=None
+    # else:
+        # model=None
+    model=None
     
     train_dgl(
         config,

@@ -23,7 +23,7 @@ from tqdm import tqdm
 import math
 from jarvis.db.jsonutils import dumpjson
 
-
+# from sklearn.pipeline import Pipeline
 import pickle as pk
 
 # from sklearn.decomposition import PCA  # ,KernelPCA
@@ -121,6 +121,100 @@ def load_graphs(
     return graphs
 
 
+def get_id_train_val_test_PU(
+    positive_size=1000,
+    unlabeled_size = 2000,
+    experimentalDataSize = 1000, 
+    split_seed=123,
+    train_ratio=None,
+    val_ratio=0.1,
+    test_ratio=0.1,
+    n_train_per_class=None,
+    n_test_positive=None,
+    n_val_per_class=None,
+    keep_data_order=False,
+    data_portion_dict = None,
+):
+    """Get train, val, test IDs."""
+    print('the size of positive data is ', data_portion_dict["positive_data_size"])
+    if (
+        train_ratio is None
+        and val_ratio is not None
+        and test_ratio is not None
+    ):
+        if train_ratio is None:
+            assert val_ratio + test_ratio < 1
+            train_ratio = 1 - val_ratio - test_ratio
+            print("Using rest of the dataset except the test and val sets.")
+        else:
+            assert train_ratio + val_ratio + test_ratio <= 1
+    # indices = list(range(total_size))
+    if n_val_per_class is None:
+        n_val_per_class = int(val_ratio * positive_size)
+    if n_test_positive is None:
+        n_test_positive = int(test_ratio * experimentalDataSize)
+        # n_test_unlabeled = int(unlabeled_size - (n_train + n_val) )
+    if n_train_per_class is None:
+        n_train_per_class = int(positive_size-(n_test_positive + n_val_per_class))  
+    n_test_unlabeled = int(unlabeled_size - (n_train_per_class + n_val_per_class) )
+    allPositiveIDs = data_portion_dict["idsPositiveLabel"]
+    # ids_positive_with_test = list(np.arange(positive_size))
+    # the above is a problem. After the experimental data, the rest are 
+    # randomly distributed.
+    # perhaps I should read their ids and pass with data_size dict?
+    allIDs = list(range(unlabeled_size+positive_size))
+    unlabeledIDs = [x for x in allIDs if x not in allPositiveIDs]
+    # !ids_unlabeled = list(np.arange(positive_size, positive_size + unlabeled_size))
+    
+    random.seed(42) #reproducibly choose the same postive test-set.
+    experimentalData = allPositiveIDs[:experimentalDataSize]
+    random.shuffle(experimentalData) #shuffling only experimental data
+    allPositiveIDs[:experimentalDataSize] = experimentalData
+    positiveTestIDs = allPositiveIDs[:n_test_positive]
+    positiveIDs_train_val = allPositiveIDs[n_test_positive:]
+    
+    
+    if not keep_data_order:
+        random.seed(split_seed)
+        random.shuffle(positiveIDs_train_val)
+        random.shuffle(unlabeledIDs)
+    # np.random.shuffle(ids)
+    if n_train_per_class + n_val_per_class + n_test_positive > positive_size:
+        raise ValueError(
+            "Check total number of samples.",
+            n_train_per_class + n_val_per_class + n_test_positive,
+            ">",
+            positive_size,
+        )
+
+    # shuffle consistently with https://github.com/txie-93/cgcnn/data.py
+    # i.e. shuffle the index in place with standard library random.shuffle
+    # first obtain only valid indices
+
+    # test_size = round(N * 0.2)
+
+    # full train/val test split
+    # ids = ids[::-1]
+    
+    # positive data
+    positiveTrainIDs = positiveIDs_train_val[:n_train_per_class]
+    positiveValIDs = positiveIDs_train_val[-n_val_per_class:]
+    # id_val_positive = ids_positive[-(n_val + n_test_positive) : -n_test_positive]  # noqa:E203
+    # id_test_positive = ids_positive[-n_test_positive:]
+    
+    # unlabeled ids 
+    unlabeledTrainIDs = unlabeledIDs[:n_train_per_class]
+    unlabeledValIDs = unlabeledIDs[-(n_val_per_class + n_test_unlabeled) : -n_test_unlabeled]  
+    unlabeledTestIDs = unlabeledIDs[-n_test_unlabeled:]
+    
+    # all data
+    id_train = positiveTrainIDs + unlabeledTrainIDs
+    id_val = positiveValIDs + unlabeledValIDs
+    id_test = positiveTestIDs + unlabeledTestIDs
+    #they are shuffled later in the script. Can be done here instead.
+    return id_train, id_val, id_test
+
+
 def get_torch_dataset(
     dataset=[],
     id_tag="jid",
@@ -208,10 +302,7 @@ def get_train_val_loaders_PU(
     keep_data_order=False,
     output_features=1,
     output_dir=None,
-    data_portion_dict: dict = None,
-    small_data = False,
-    train_id_path = 'data/clean_data/alignn0/train_id_1.txt',
-    test_id_path ='data/clean_data/alignn0/test_id_1.txt',
+    data_portion_dict: dict = None
 ):
     """Help function to set up JARVIS train and val dataloaders."""
     train_sample = filename + "_train.data"
@@ -244,6 +335,9 @@ def get_train_val_loaders_PU(
             test_loader.num_workers = workers
         if val_loader.num_workers != workers:
             val_loader.num_workers = workers
+        # print("train", len(train_loader.dataset))
+        # print("val", len(val_loader.dataset))
+        # print("test", len(test_loader.dataset))
     else:
 
         if not dataset_array:
@@ -255,7 +349,6 @@ def get_train_val_loaders_PU(
             #    d[ii][target] = pc_y[ii].tolist()
 
         dat = []
-        nan_target = 0
         if classification_threshold is not None:
             print(
                 "Using ",
@@ -296,9 +389,8 @@ def get_train_val_loaders_PU(
 
             elif (
                 i[target] is not None
-                # changed (commented)here for nan values for small data...
-                # and i[target] != "na"
-                # and not math.isnan(i[target])
+                and i[target] != "na"
+                and not math.isnan(i[target])
             ):
                 if target_multiplication_factor is not None:
                     i[target] = i[target] * target_multiplication_factor
@@ -307,8 +399,6 @@ def get_train_val_loaders_PU(
                         i[target] = 0
                     elif i[target] > classification_threshold:
                         i[target] = 1
-                    elif math.isnan(i[target]):
-                        nan_target+=1
                     else:
                         raise ValueError(
                             "Check classification data type.",
@@ -321,17 +411,24 @@ def get_train_val_loaders_PU(
         # id_test = ids[-test_size:]
         # if standardize:
         #    data.setup_standardizer(id_train)
-        print(f'there are {nan_target} nan targets in this dataset.')
-        
-        
-        with open(train_id_path, "r") as f:
-            id_val_train = [int(line.strip()) for line in f]
-        with open(test_id_path, "r") as f2:
-            id_test = [int(line.strip()) for line in f2]
-            
-        valLength = int(val_ratio*(len(id_test)+len(id_val_train))) 
-        id_val = id_val_train[:valLength] #already shuffled.
-        id_train = id_val_train[valLength:]
+        # id_train, id_val, id_test = get_id_train_val_test(
+        id_train, id_val, id_test = get_id_train_val_test_PU(
+            # total_size=len(dat),
+            positive_size=data_portion_dict['positive_data_size'],
+            unlabeled_size=data_portion_dict['unlabeled_data_size'],
+            experimentalDataSize =data_portion_dict['experimentalDataSize'],
+            split_seed=split_seed,
+            train_ratio=train_ratio,
+            val_ratio=val_ratio,
+            test_ratio=test_ratio,
+            n_train_per_class=n_train,
+            n_test_positive=n_test,
+            n_val_per_class=n_val,
+            keep_data_order=keep_data_order,
+            data_portion_dict= data_portion_dict,
+        )
+        # [x+data_size['positive_data_size'] for x in ] 
+        # unlabled data is larger, labels would't go all the way.
         
         ids_train_val_test = {} #no need to shuffle.
         # material_id is being recoreded, not data order.

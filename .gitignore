@@ -29,3 +29,4 @@ readme_4me.log
 .vscode/
 !data/README.md
 .pytest_cache/
+readme_4me
