@@ -5,8 +5,9 @@ import os
 import sys
 import argparse
 from experiment_setup import current_setup
+from alignn.preparing_data_byFile import prepare_alignn_data
 # %%
-data_dir = '/home/samariam/projects/synth/data/clean_data/'
+data_dir = 'data/clean_data/'
 
 # %%
 test_portion = 0.1
@@ -32,29 +33,32 @@ args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment
 ehull_test = args.ehull
 small_data = args.small_data
-cs = current_setup(ehull_test=ehull_test, small_data=small_data)
+cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
-data_prefix = "small_" if small_data else ""
+TARGET = cs["TARGET"]
+data_prefix = cs["dataPrefix"]
+
 # %%
-def data_id_selector(TARGET,
-                     prop,
-                     data_path = '/home/samariam/projects/synth/data/clean_data/synthDF',
+def data_id_selector(TARGET = TARGET,
+                     prop = prop,
+                     data_path = propDFpath,
+                     experiment = experiment,
+                     ehull_test = ehull_test,
+                     small_data = small_data,
                      num_iter = 100,
                      test_ratio = 0.1,
-                     small_data = False,
-                     
                      ):
         
     df = pd.read_pickle(data_path)
     df = df[['material_id', prop, TARGET]]
-    df = df.loc[:, ~df.columns.duplicated()] # drops duplicated synth at round zero.
+    df = df.loc[:, ~df.columns.duplicated()] # drops duplicated props at round zero.
     df = df[~df[TARGET].isna()] #remving NaN values. for small_data
     data_dir = os.path.dirname(data_path)
     
-    experiment_dir = f'{data_prefix}{TARGET}{prop}'
-    dir_path = os.path.join(data_dir, experiment_dir)
+    split_id_dir = f"{data_prefix}{TARGET}{prop}"
+    dir_path = os.path.join(data_dir, split_id_dir)
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
     os.chdir(dir_path)
@@ -63,8 +67,12 @@ def data_id_selector(TARGET,
     with open(f"experimentalDataSize.txt", "w") as f:
         f.write(str(experimentalDataSize))
     # select validation set inside alignn/schnet        
+    alignn_experiment = experiment == "alignn0" or experiment.startswith("coAl")
     positive_df = df[df[TARGET]==1]
-    
+    if alignn_experiment:
+        alignn_data_log = prepare_alignn_data(experiment, ehull_test, small_data)
+        print(alignn_data_log)
+        
     for it in range(num_iter):
         testdf1 = positive_df.sample(frac = test_ratio, random_state =it)
         df_wo_test = df.drop(index=testdf1.index) #remove test data
@@ -86,21 +94,13 @@ def data_id_selector(TARGET,
                 f.write(str(it_test_id) + "\n")
         # break
         # print(f'saving ids for iteration {it}.')
-    
-    return
+    print(f"Train/Test splits for {experiment} experiment were produced in {data_prefix}{TARGET}{prop} directory.")
+    return 
 
 # %%
-data_id_selector(TARGET='synth',
-                     data_path = '/home/samariam/projects/synth/data/clean_data/small_synthDF_constant',
-                     num_iter = 100,
-                     test_ratio = 0.1,
-                     )
+data_id_selector()
 # %%
-data_id_selector(TARGET='synth',
-                     data_path = '/home/samariam/projects/synth/data/clean_data/small_synthDF_dynamic',
-                     test_ratio = 0.1,
-                     num_iter = 100,
-                     )
+
 # %%
 # data_id_selector(TARGET='alignn0_constant',
 #                      data_path = '/home/samariam/projects/synth/data/clean_data/small_synthDF_constant',
@@ -149,10 +149,11 @@ data_id_selector(TARGET='synth',
 #                      num_iter = 100,
 #                      test_ratio = 0.1
 #                      )
-split_id_dir = f"{experiment_target_match[experiment]}_{data_prefix}data"
-split_id_path = os.path.join(data_dir, split_id_dir)
-the above is from the current alignn_pu_learning
-also, want to call preparying_data_byfile as a function.
+# split_id_dir = f"{data_prefix}{experiment_target_match[experiment]}{prop}"
+# how about ehull/small?
+# split_id_path = os.path.join(data_dir, split_id_dir)
+# the above is from the current alignn_pu_learning
+# also, want to call preparying_data_byfile as a function.
 
 # # %%
 # import numpy as np

@@ -61,7 +61,6 @@ def exper_oxygen_query(MPID : str,
     
     with MPRester(MPID) as mpr:
         db_version = mpr.get_database_version()
-    # If you get error 404, try upgrading mp-api from the terminal.
         results = mpr.summary.search(
             elements=["O"],
             num_elements = (2,100),

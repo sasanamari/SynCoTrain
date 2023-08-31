@@ -33,31 +33,22 @@ experiment = args.experiment
 ehull_test = args.ehull
 small_data = args.small_data
 # %%
-cs = current_setup(ehull_test=ehull_test, small_data=small_data)
+cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
-
-# if small_data:
-#     propDFpath = '/data/clean_data/small_synthDF'
-#     result_dir = 'data/results/small_data_synth'
-# elif ehull_test:
-#     propDFpath = '/data/clean_data/stabilityDF' 
-#     result_dir = 'data/results/stability'
-# else:
-#     propDFpath = '/data/clean_data/synthDF'
-#     result_dir = 'data/results/synth'
-        
+TARGET = cs["TARGET"]
+data_prefix = cs["dataPrefix"]
 alignn_dir = "alignn"
 
 os.chdir(alignn_dir)
 
 # %%
 def pu_report_alignn(experiment: str = None, prop: str = None,
-              propDFpath='data/clean_data/synthDF',
+              propDFpath=propDFpath,
+              TARGET = TARGET,
               pseudo_label_threshold = 0.75,ehull_test = False,
-              small_data = False, ):
-    data_prefix = "small_" if small_data else ""
+              small_data = False, data_prefix = data_prefix):
     
     output_dir = os.path.join(alignn_dir, f'PUOutput_{data_prefix}{experiment}')
     if ehull_test:
@@ -82,31 +73,32 @@ def pu_report_alignn(experiment: str = None, prop: str = None,
     agg_df['prediction'] = agg_df['avg_prediction'].map(round)
     agg_df['new_labels'] = agg_df['avg_prediction'].map(lambda x: 1 if x >= pseudo_label_threshold else 0)
     agg_df['target'] = resdf.groupby('material_id').target.first()
+    #lowercase target is produced by ALIGNN
     
     agg_df = agg_df.merge(propDF[['material_id', prop]], on='material_id', how='left')
-    positive_data = agg_df[agg_df[prop]==1] #needs to change for cotrain?
+    experimental_data = agg_df[agg_df[prop]==1] #needs to change for cotrain?
     unlabeled_data = agg_df[agg_df[prop]==0]   
        
-    true_positive_rate = positive_data['prediction'].sum()/len(positive_data)
+    true_positive_rate = experimental_data['prediction'].sum()/len(experimental_data)
     predicted_positive_rate = unlabeled_data['prediction'].sum()/len(unlabeled_data)
     
     cotrain_df = propDF[['material_id', prop]].merge(
         agg_df[['material_id','new_labels']], on='material_id', how='left')
         # agg_df[['material_id','prediction']], on='material_id', how='left')
     # cotrain_df = cotrain_df.rename(columns={'prediction': 'new_labels'}) #for clarity
-    label_source = { #output_dir: training_label_column
-            'alignn0':prop,
-            'coAlSch1':'schnet0',
-            'coAlSch2':'coSchAl1',
-            'coAlSch3':'coSchAl2',
-            'coAlSch4':'coSchAl3',
-            'coAlSch5':'coSchAl4',
-    }
-    cotrain_index = propDF[propDF[prop]!=propDF[label_source[
-        output_dir.split('_')[-1]]]].index 
+    # label_source = { #output_dir: training_label_column
+    #         'alignn0':prop,
+    #         'coAlSch1':'schnet0',
+    #         'coAlSch2':'coSchAl1',
+    #         'coAlSch3':'coSchAl2',
+    #         'coAlSch4':'coSchAl3',
+    #         'coAlSch5':'coSchAl4',
+    # }
+    cotrain_index = propDF[propDF[prop]!=propDF[TARGET]].index 
+        # output_dir.split('_')[-1]]]].index 
     cotrain_df.loc[cotrain_index, 'new_labels'] = 1 #used in cotraining, not predicted. does nothing at step 0.
     cotrain_df.loc[cotrain_df[prop] == 1, 'new_labels'] = 1 #filling up the NaN used for training.
-    if output_dir.endswith('small'):
+    if small_data:
         cotrain_df = cotrain_df.dropna() #in small data set-up, there will be NaN values for unsed data.
     cotrain_df.new_labels = cotrain_df.new_labels.astype(np.int16)
        

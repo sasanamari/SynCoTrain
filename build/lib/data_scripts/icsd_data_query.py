@@ -26,8 +26,6 @@ args = parser.parse_args(sys.argv[1:])
 MPID = args.MPID 
 MPID="xOsYnlHNKBgOvQFhIthUJ68KAMxqrCBL"
 location = "data/raw"
-if not os.path.exists(location):
-    os.mkdir(location)
 destination_file = os.path.join(location, "experimental_raw_oxygen")
 database_text = os.path.join(location, "MP_db_version.txt")
 

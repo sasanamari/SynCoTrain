@@ -1,22 +1,13 @@
 # %%
-# for cotraining I need to produce the csv files.
-# I should probebly add a more unique way for multiple cotrainers.
-# Need to modify data_size for selecting test-set :/
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 from alignn_setup import *
 from jarvis.db.jsonutils import loadjson, dumpjson
 from synth.myjsonutil import loadjson, dumpjson
 import time
-import datetime
-from jarvis.core.atoms import Atoms
-# from alignn.data import get_train_val_loaders
-# from alignn.train import train_dgl
-from alignn.config import TrainingConfig
 import argparse
-import random
-import pandas as pd
 from experiment_setup import current_setup
+from alignn_configs.alignn_pu_config import alignn_pu_config_generator
 # %%
 parser = argparse.ArgumentParser(
     description="Semi-Supervised ML for Synthesizability Prediction"
@@ -40,46 +31,21 @@ args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment 
 ehull_test = args.ehull
 small_data = args.small_data
-cs = current_setup(ehull_test=ehull_test, small_data=small_data)
+cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
-data_prefix = "small_" if small_data else ""
+TARGET = cs["TARGET"]
+data_prefix = cs["dataPrefix"]
 
-data_dir = '/home/samariam/projects/synth/data/clean_data' #full path for now
-# changed the target match below, for the constant/dynamic experiment.
-experiment_target_match = { #output_dir: training_label_column
-            'alignn0':prop, 
-            'coAlSch1':'schnet0',
-            'coAlSch2':'coSchAl1',
-            'coAlSch3':'coSchAl2',
-            'coAlSch4':'coSchAl3',
-            'coAlSch5':'coSchAl4',
-            'final_class':'change_to_desired_label'
-    }
-
-split_id_dir = f"{data_prefix}{experiment_target_match[experiment]}{prop}"
+data_dir = os.path.dirname(propDFpath)
+split_id_dir = f"{data_prefix}{TARGET}{prop}"
 split_id_path = os.path.join(data_dir, split_id_dir)
     
 alignn_dir = "alignn"
 alignn_config_dir = os.path.join(alignn_dir,"alignn_configs")
-
-pu_config_name = os.path.join(alignn_config_dir, 
-                              f'pu_config_{data_prefix}{experiment}.json')
-
+pu_config_name = alignn_pu_config_generator(experiment, small_data, ehull_test)
 pu_setup = loadjson(pu_config_name)
-cotraining  =pu_setup['cotraining']
-id_prop_dat =pu_setup["id_prop_dat"] 
-# %%
-if cotraining:
-    reference_col = experiment_target_match[experiment]
-    csvPath = os.path.join(pu_setup['root_dir'], 
-                f"{data_prefix}{prop}_id_from_{reference_col}.csv")
-    print(f'You have selected {reference_col} as your reference column!!!!!!!!!')
-    
-else:
-    csvPath = os.path.join(pu_setup['root_dir'], 
-                f"{data_prefix}{prop}_ids.csv")
     
 # %%
 def config_generator(
@@ -108,6 +74,7 @@ def config_generator(
 
 print("Now we run calculations for iterations", 
       pu_setup['start_of_iterations']," till",pu_setup['max_num_of_iterations'])
+start_time = time.time()
 # %%
 for iterNum in range(pu_setup['start_of_iterations'], 
                      pu_setup['max_num_of_iterations']):
@@ -130,15 +97,36 @@ for iterNum in range(pu_setup['start_of_iterations'],
         epochs=pu_setup["epochs"],
         file_format=pu_setup["file_format"],
         ehull_test = ehull_test,
-        cotraining = cotraining,
         small_data = data_prefix,
         train_id_path = os.path.join(split_id_path, f'train_id_{iterNum}.txt'),
         test_id_path = os.path.join(split_id_path, f'test_id_{iterNum}.txt'),
-        id_prop_dat = id_prop_dat,
-        # test_strategy = test_strategy,
-        csvPath = csvPath, 
+        experiment = experiment, 
+        # ehull_test = ehull_test, 
+        # small_data = small_data,
+                    )
 
-    )
+
+    elapsed_time = time.time() - start_time
+    remaining_iterations = pu_setup['max_num_of_iterations'] - iterNum - 1
+    time_per_iteration = elapsed_time / (iterNum - pu_setup['start_of_iterations'] + 1)
+    estimated_remaining_time = remaining_iterations * time_per_iteration
+    remaining_days = int(estimated_remaining_time // (24 * 3600))
+    remaining_hours = int((estimated_remaining_time % (24 * 3600)) // 3600)
+
+    with open(f'alignn_remaining_time_{data_prefix}{experiment}_{prop}.txt', 'w') as file:
+        file.write(f"Iterations completed: {iterNum - pu_setup['start_of_iterations']}\n")
+        file.write(f"Iterations remaining: {remaining_iterations}\n")
+        file.write(f"Estimated remaining time: {remaining_days} days, {remaining_hours} hours\n")
+
+    print(f"Iteration {iterNum} completed. Remaining time: {remaining_days} days, {remaining_hours} hours")
 
 # %%
-print('PU Learning concluded.')
+# Final summary
+elapsed_days = int(elapsed_time // (24 * 3600))
+elapsed_hours = int((elapsed_time % (24 * 3600)) // 3600)
+
+with open(f'alignn_remaining_time_{data_prefix}{experiment}_{prop}.txt', 'w') as file:
+    file.write(f"Iterations completed: {pu_setup['max_num_of_iterations'] - pu_setup['start_of_iterations']}\n")
+    file.write(f"Total time taken: {elapsed_days} days, {elapsed_hours} hours\n")
+
+print(f"PU Learning completed. Total time taken: {elapsed_days} days, {elapsed_hours} hours")

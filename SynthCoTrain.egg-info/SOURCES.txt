@@ -6,13 +6,9 @@ SynthCoTrain.egg-info/SOURCES.txt
 SynthCoTrain.egg-info/dependency_links.txt
 SynthCoTrain.egg-info/top_level.txt
 data_scripts/__init__.py
-data_scripts/_experiment_data_featrizer.py
-data_scripts/_icsd_data_query.py
-data_scripts/_oqmd_pymatgen_cleaning.py
-data_scripts/_schnet_pu_data.py
-data_scripts/cotraining_labeling.py
 data_scripts/crystal_funcs.py
 data_scripts/crystal_structure_conversion.py
 data_scripts/icsd_data_query.py
 data_scripts/jarvis_oqmd_query.py
 data_scripts/pymatgen_oxide_clean.py
+data_scripts/stability_class.py

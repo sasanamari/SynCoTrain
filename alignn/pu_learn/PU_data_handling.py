@@ -14,22 +14,14 @@ import numpy as np
 import pandas as pd
 from jarvis.core.atoms import Atoms
 from alignn.graphs import Graph, StructureDataset
-# from myGraphs import Graph, StructureDataset
 
-# from jarvis.core.graphs import Graph, StructureDataset
 from jarvis.db.figshare import data as jdata
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import math
 from jarvis.db.jsonutils import dumpjson
-
-
 import pickle as pk
-
-# from sklearn.decomposition import PCA  # ,KernelPCA
 from sklearn.preprocessing import StandardScaler
-
-# use pandas progress_apply
 tqdm.pandas()
 
 
@@ -184,12 +176,7 @@ def get_train_val_loaders_PU(
     target_stress: str = "",
     atom_features: str = "cgcnn",
     neighbor_strategy: str = "k-nearest",
-    n_train=None,
-    n_val=None,
-    n_test=None,
-    train_ratio=None,
     val_ratio=0.1,
-    test_ratio=0.1,
     batch_size: int = 5,
     standardize: bool = False,
     line_graph: bool = True,
@@ -208,8 +195,6 @@ def get_train_val_loaders_PU(
     keep_data_order=False,
     output_features=1,
     output_dir=None,
-    data_portion_dict: dict = None,
-    small_data = False,
     train_id_path = 'data/clean_data/alignn0/train_id_1.txt',
     test_id_path ='data/clean_data/alignn0/test_id_1.txt',
 ):

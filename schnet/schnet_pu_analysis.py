@@ -34,10 +34,12 @@ small_data = args.small_data
 # experiment = 'coSchAl1'
 # ehull_test = False
 
-cs = current_setup(ehull_test=ehull_test, small_data=small_data)
+cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
+TARGET = cs["TARGET"]
+data_prefix = cs["dataPrefix"]
 
 # if small_data:
 #     propDFpath = '/data/clean_data/small_synthDF'
@@ -48,7 +50,7 @@ prop = cs["prop"]
 # else:
 #     propDFpath = '/data/clean_data/synthDF'
 #     result_dir = 'data/results/synth'
-    
+need to check on new_target vs TARGET; the rest might be cleaned already.
 def pu_report_schnet(experiment : str = None,
               propDFpath='data/clean_data/synthDF', 
               pseudo_label_threshold = 0.75,
