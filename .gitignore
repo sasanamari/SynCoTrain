@@ -1,5 +1,8 @@
-data/**/*
+# data/**/*
+data/raw/
+data/clean_data/*
 !data/clean_data/synthDF
+data/results/*.csv #might need to change with separate directories for 3 experiments.
 old_data/
 positive_data/
 theoretical_data/
