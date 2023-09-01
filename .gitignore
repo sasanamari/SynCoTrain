@@ -1,4 +1,5 @@
 data/**/*
+!data/clean_data/synthDF
 old_data/
 positive_data/
 theoretical_data/

@@ -1,12 +1,12 @@
 # %%
 import os
 from crystal_structure_conversion import jarvis_to_pymatgen,pymatgen_to_ase, jarvisP_to_ase
-import pickle
+# import pickle
 from pymatgen.core import Structure, Element
-from ase import Atoms as AseAtoms
-from pymatgen.io.ase import AseAtomsAdaptor as pase
+# from ase import Atoms as AseAtoms
+# from pymatgen.io.ase import AseAtomsAdaptor as pase
 from jarvis.core.atoms import Atoms as JarvisAtoms
-from pymatgen.analysis.structure_analyzer import OxideType
+# from pymatgen.analysis.structure_analyzer import OxideType
 from crystal_funcs import clean_oxide
 import numpy as np
 import pandas as pd
@@ -29,6 +29,8 @@ for material in theoretical_oxygens: #we prepare {'material_id', 'structure'} fo
     material["atoms"] = JarvisAtoms.from_dict(material["atoms"]) #build object from dict
     material["structure"] = jarvis_to_pymatgen(material["atoms"]) #convert to pymatgen
     material["material_id"] = material.pop('_oqmd_entry_id')
+for material in experimental_oxygens:
+    material["structure"] = Structure.from_dict(material["structure"]) 
 # %%
 good_experimental_data = clean_oxide(experimental_oxygens, reportBadData=False)
 # %%
@@ -75,10 +77,12 @@ full_data["coSchAl1"] = np.nan #cotraining SchNet on Alignn labels 1st time
 full_data["coAlSch1"] = np.nan #cotraining Alignn on SchNet labels 1st time
 full_data["coSchAl2"] = np.nan #cotraining SchNet on Alignn labels 2nd time
 full_data["coAlSch2"] = np.nan #cotraining Alignn on SchNet labels 2nd time
+full_data["coSchAl3"] = np.nan #cotraining SchNet on Alignn labels 3rd time
+full_data["coAlSch3"] = np.nan #cotraining Alignn on SchNet labels 3rd time
 # %%
 if not os.path.exists(clean_location):
     os.mkdir(clean_location)
-full_data.to_pickle(os.path.join(clean_location, "synthDF2"))
+full_data.to_pickle(os.path.join(clean_location, "synthDF"))
 # %%
 # #checking out the data
 # testdf = pd.read_pickle(os.path.join(clean_location, "synthDF"))
