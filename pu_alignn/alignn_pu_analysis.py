@@ -8,10 +8,10 @@ from jarvis.db.jsonutils import loadjson, dumpjson
 import matplotlib.pyplot as plt
 import sys
 import argparse
-from experiment_setup import current_setup
+from experiment_setup import current_setup, str_to_bool
 # %%
 parser = argparse.ArgumentParser(
-    description="PU-ALIGNN result analysis"
+    description="Semi-Supervised ML for Synthesizability Prediction"
 )
 parser.add_argument(
     "--experiment",
@@ -20,11 +20,13 @@ parser.add_argument(
 )
 parser.add_argument(
     "--ehull",
+    type=str_to_bool,
     default=False,
     help="Predicting stability to evaluate PU Learning's efficacy.",
 )
 parser.add_argument(
     "--small_data",
+    type=str_to_bool,
     default=False,
     help="This option selects a small subset of data for checking the workflow faster.",
 )
@@ -33,13 +35,16 @@ experiment = args.experiment
 ehull_test = args.ehull
 small_data = args.small_data
 # %%
+need to: read leave out test ids and report them separately.
+need to: separate stability columns for ehull, for report actual tpr and labeling the next cotraining.
+# %%
 cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
 TARGET = cs["TARGET"]
 data_prefix = cs["dataPrefix"]
-alignn_dir = "alignn"
+alignn_dir = "pu_alignn"
 
 os.chdir(alignn_dir)
 

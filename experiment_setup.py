@@ -1,17 +1,25 @@
+def str_to_bool(value):
+    if isinstance(value, bool):
+        return value
+    if value.lower() in ('true', 'false'):
+        return value.lower() == 'true'
+    raise ValueError(f'Boolean value expected for --small_data and --ehull. Insead we got {value} with type{type(value)}.')
+
+
 def current_setup(ehull_test, small_data, experiment):
-    if small_data and ehull_test:
+    if str_to_bool(ehull_test) and str_to_bool(small_data):
         error_message = "small_data and ehull_test are not allowed at the same time."
         raise Exception(error_message)
     if small_data:
-        propDFpath = '/data/clean_data/small_synthDF'
+        propDFpath = 'data/clean_data/small_synthDF'
         result_dir = 'data/results/small_data_synth'
         prop = 'synth'
     elif ehull_test:
-        propDFpath = '/data/clean_data/stabilityDF' 
+        propDFpath = 'data/clean_data/stabilityDF' 
         result_dir = 'data/results/stability'
         prop = 'stability'
     else:
-        propDFpath = '/data/clean_data/synthDF'
+        propDFpath = 'data/clean_data/synthDF'
         result_dir = 'data/results/synth'
         prop = 'synth'
         

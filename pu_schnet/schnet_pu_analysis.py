@@ -6,23 +6,25 @@ import pandas as pd
 import numpy as np
 import sys
 import argparse
-from experiment_setup import current_setup
+from experiment_setup import current_setup, str_to_bool
 # %%
 parser = argparse.ArgumentParser(
-    description="PU-Schnet result analysis"
+    description="Semi-Supervised ML for Synthesizability Prediction"
 )
 parser.add_argument(
     "--experiment",
-    default="schnet0",
+    default="alignn0",
     help="name of the experiment and corresponding config files.",
 )
 parser.add_argument(
     "--ehull",
+    type=str_to_bool,
     default=False,
     help="Predicting stability to evaluate PU Learning's efficacy.",
 )
 parser.add_argument(
     "--small_data",
+    type=str_to_bool,
     default=False,
     help="This option selects a small subset of data for checking the workflow faster.",
 )

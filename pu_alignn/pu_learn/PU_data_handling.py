@@ -313,8 +313,10 @@ def get_train_val_loaders_PU(
             id_val_train = [int(line.strip()) for line in f]
         with open(test_id_path, "r") as f2:
             id_test = [int(line.strip()) for line in f2]
+        # with open(os.path.join(os.path.dirname(test_id_path),'experimentalDataSize.txt' ), "r") as ff:
+        #     experimentalDataSize = [int(line.strip()) for line in ff][0]
             
-        valLength = int(val_ratio*(len(id_test)+len(id_val_train))) 
+        valLength = int(val_ratio*len(id_val_train))
         id_val = id_val_train[:valLength] #already shuffled.
         id_train = id_val_train[valLength:]
         

@@ -14,14 +14,19 @@ def prepare_alignn_data(experiment, ehull_test, small_data):
     prop = cs["prop"]
     TARGET = cs["TARGET"]
     data_prefix = cs["dataPrefix"]
-    print(f'You have selected {TARGET} as your reference column!!!!!!!!!')
+    print(f'You have selected {TARGET} as your training target!')
 
+    SynthCoTrain_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    propDFpath = os.path.join(SynthCoTrain_dir, propDFpath)
     # %%
     crysdf = pd.read_pickle(propDFpath)
     crysdf[prop] = crysdf[prop].astype('int16')
     # the order should be first postive, then unlabeld class.    
     # max_samples = 100
     data_dest = "data/clean_data/alignn_format"
+    data_dest = os.path.join(SynthCoTrain_dir, data_dest)
+    if not os.path.exists(data_dest):
+        os.mkdir(data_dest)
     f = open(os.path.join(data_dest, 
                     f"{data_prefix}{prop}_id_from_{TARGET}.csv"), "w")
 

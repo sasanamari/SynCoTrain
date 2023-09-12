@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 import os
 # %%
-data_dir = 'data/clean_data/'
+np.random.seed(42)
+data_dir = os.path.join(os.path.dirname(__file__),'../data/clean_data/')
 synthDF = pd.read_pickle(os.path.join(data_dir,'synthDF'))
 stabilityDF = synthDF.copy()
 
@@ -15,10 +16,17 @@ del synthDF
 # %%
 stabilityDF.loc[:, "stability"] = np.nan
 stabilityDF.loc[:, "stability"] = np.where(stabilityDF.energy_above_hull <= 0.1, 1, 0)
+stabilityDF["stability_GT"] = stabilityDF["stability"].copy()
+n_unlabel = stabilityDF["stability_GT"].sum() - len(experimental_df)
+# we leave the same number of positive class in the data as the synthesizability.
+materials_to_unlabel = stabilityDF[stabilityDF["stability_GT"]==1].sample(n_unlabel).index
+stabilityDF.loc[materials_to_unlabel, "stability"] = int(0)
+# we unlabel the same number of data points as the 
 stabilityDF.loc[:, "stability"] = stabilityDF.stability.astype(int)
+stabilityDF.loc[:, "stability_GT"] = stabilityDF.stability.astype(int)
+stabilityDF = stabilityDF.sample(frac=1) #to mix synthesizability values, just in case.
 stabilityDF = stabilityDF.sort_values(by='stability', ascending=False).reset_index(drop=True)
 stabilityDF = stabilityDF.drop(columns = 'synth')
-
 # %%
 stabilityDF.to_pickle(os.path.join(data_dir,'stabilityDF'))
 # %%
@@ -29,3 +37,5 @@ small_theoretical_df = theoretical_df.sample(frac = small_data_frac,
 small_df = pd.concat([small_experimental_df, small_theoretical_df],
                      ignore_index=True)
 small_df.to_pickle(os.path.join(data_dir, 'small_synthDF'))
+# %%
+print(f"stabilityDF was saved in {os.path.join(data_dir,'stabilityDF')}.")

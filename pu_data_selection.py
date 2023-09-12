@@ -4,15 +4,16 @@ import pandas as pd
 import os
 import sys
 import argparse
-from experiment_setup import current_setup
-from alignn.preparing_data_byFile import prepare_alignn_data
+from experiment_setup import current_setup, str_to_bool
+from pu_alignn.preparing_data_byFile import prepare_alignn_data
 # %%
 data_dir = 'data/clean_data/'
 
 # %%
 test_portion = 0.1
+leaveout_test_portion = test_portion*0.5
 parser = argparse.ArgumentParser(
-    description="Data preparation for ALIGNN"
+    description="Semi-Supervised ML for Synthesizability Prediction"
 )
 parser.add_argument(
     "--experiment",
@@ -21,13 +22,15 @@ parser.add_argument(
 )
 parser.add_argument(
     "--ehull",
-    default=False, #change this! manually defined cos lazy.
+    type=str_to_bool,
+    default=False,
     help="Predicting stability to evaluate PU Learning's efficacy.",
 )
 parser.add_argument(
     "--small_data",
-    default=False, #change this! manually defined cos lazy.
-    help="Run the synthesizability experiment with smaller data to check the pipeline.",
+    type=str_to_bool,
+    default=False,
+    help="This option selects a small subset of data for checking the workflow faster.",
 )
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment
@@ -39,7 +42,6 @@ result_dir = cs["result_dir"]
 prop = cs["prop"]
 TARGET = cs["TARGET"]
 data_prefix = cs["dataPrefix"]
-
 # %%
 def data_id_selector(TARGET = TARGET,
                      prop = prop,
@@ -57,24 +59,34 @@ def data_id_selector(TARGET = TARGET,
     df = df[~df[TARGET].isna()] #remving NaN values. for small_data
     data_dir = os.path.dirname(data_path)
     
-    split_id_dir = f"{data_prefix}{TARGET}{prop}"
+    split_id_dir = f"{data_prefix}{TARGET}_{prop}"
     dir_path = os.path.join(data_dir, split_id_dir)
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
     os.chdir(dir_path)
-    experimentalDataSize = df[prop].sum()
-    
-    with open(f"experimentalDataSize.txt", "w") as f:
-        f.write(str(experimentalDataSize))
     # select validation set inside alignn/schnet        
     alignn_experiment = experiment == "alignn0" or experiment.startswith("coAl")
-    positive_df = df[df[TARGET]==1]
     if alignn_experiment:
         alignn_data_log = prepare_alignn_data(experiment, ehull_test, small_data)
         print(alignn_data_log)
         
+    # if test_strategy == 'constant':
+    experimental_df = df[df[prop]==1]
+    positive_df = df[df[TARGET]==1]
+    print("The prop is ", prop)
+    leaveoutdf = experimental_df.sample(frac = leaveout_test_portion, random_state = 4242)   
+    positive_df = positive_df.drop(index=leaveoutdf.index) #remove leave-out test data
+    with open(f"leaveout_test_id.txt", "w") as f:
+            for test_id in leaveoutdf.index:
+                f.write(str(test_id) + "\n")        
+
+    experimentalDataSize = experimental_df[prop].sum()
+    with open(f"experimentalDataSize.txt", "w") as f:
+        f.write(str(experimentalDataSize))
+        
     for it in range(num_iter):
         testdf1 = positive_df.sample(frac = test_ratio, random_state =it)
+        testdf1 = pd.concat([leaveoutdf, testdf1])
         df_wo_test = df.drop(index=testdf1.index) #remove test data
         traindf1 = df_wo_test[df_wo_test[TARGET]==1].sample(frac=1, random_state = it+1)
         class_train_num = len(traindf1)
@@ -92,9 +104,11 @@ def data_id_selector(TARGET = TARGET,
         with open(f"test_id_{it}.txt", "w") as f:
             for it_test_id in it_testdf.index:
                 f.write(str(it_test_id) + "\n")
+                
+    
         # break
         # print(f'saving ids for iteration {it}.')
-    print(f"Train/Test splits for {experiment} experiment were produced in {data_prefix}{TARGET}{prop} directory.")
+    print(f"Train/Test splits for {experiment} experiment were produced in {data_prefix}{TARGET}_{prop} directory.")
     return 
 
 # %%

@@ -44,9 +44,17 @@ To replicate the results of this library, you need to run the scripts made for r
 
 First, the base experiment is run with each model. Next, each model can be trained on the additional psuedo-labels provided by the other model. 
 
-Please note that these experiments are rather long. Using a NVIDIA A100 80GB PCIe GPU, each experiment took an average of one week to conclude. So, for the full-data experiment, you may want to use the `nohup` command, as shown later.
+Please note that these experiments are rather long. Using a NVIDIA A100 80GB PCIe GPU, each experiment took an average of one week or more to conclude. So, for the full-data experiment, you may want to use the `nohup` command, as shown later.
 
 It is recommended not to run simultanous experiments on the same gpu, since you run the risk of overflowing the gpu memory and crashing the experiment mid-way.
+## Auxiliary exeperiments
+This package provides two auxiliary experiments. The first one includes running the regular experiments on only 5% of the available data. This is useful for checking the workflow of the code, without waiting for weeks for the computation to conclude. Please note that quality of results will suffer, as there is less data available for training.
+The second auxiliary experiment is consists of classifying the stability of crystals based on their energy above hull, through the same PU Learning and Co-training code. The utility of this experiment is that, unlike a real case of Positive and Unlabeled Learning, we have access to real label of the unlabeled class. As stability is highly related to synthesizability, the quality of this experiment can be used as a proxy to judge the quality of the main experiment. We are mainly interested to see whether the real-true-positive-rate of these experiments are close in value to the true-positive-rate produced by PU Learning.
+### Data preparation for auxiliary exeperiments
+The data-set needed for both auxilary experiemnts can be produced from the main data. Simple, run the data_scripts/auxiliary_data.py file to produce both data-sets:
+```
+python data_scripts/auxiliary_data.py
+```
 ### ALIGNN
 Before each experiment with ALIGNN, the the suitable data format and labels need to be produced. The `preparing_data_byFile.py` provides the correct data format. For the base experiment run the following command:
 ```

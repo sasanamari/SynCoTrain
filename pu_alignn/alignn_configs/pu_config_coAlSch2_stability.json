@@ -1,0 +1,16 @@
+{
+  "default_class_config": "pu_alignn/alignn_configs/default_class_config.json",
+  "pu_config_name": "pu_alignn/alignn_configs/pu_config_coAlSch2_stability.json",
+  "class_config_name": "pu_alignn/alignn_configs/class_config_coAlSch2_stability.json",
+  "data_dir": "data/clean_data",
+  "root_dir": "data/clean_data/alignn_format",
+  "file_format": "poscar",
+  "keep_data_order": false,
+  "classification_threshold": 0.5,
+  "batch_size": null,
+  "output_dir": null,
+  "epochs": 120,
+  "max_num_of_iterations": 100,
+  "start_of_iterations": 0,
+  "small_data": false
+}
