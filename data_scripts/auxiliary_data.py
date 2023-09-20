@@ -23,7 +23,7 @@ materials_to_unlabel = stabilityDF[stabilityDF["stability_GT"]==1].sample(n_unla
 stabilityDF.loc[materials_to_unlabel, "stability"] = int(0)
 # we unlabel the same number of data points as the 
 stabilityDF.loc[:, "stability"] = stabilityDF.stability.astype(int)
-stabilityDF.loc[:, "stability_GT"] = stabilityDF.stability.astype(int)
+stabilityDF.loc[:, "stability_GT"] = stabilityDF.stability_GT.astype(int)
 stabilityDF = stabilityDF.sample(frac=1) #to mix synthesizability values, just in case.
 stabilityDF = stabilityDF.sort_values(by='stability', ascending=False).reset_index(drop=True)
 stabilityDF = stabilityDF.drop(columns = 'synth')

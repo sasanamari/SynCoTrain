@@ -1,0 +1,11 @@
+nohup python pu_alignn/alignn_pu_learning.py --experiment alignn0 --ehull True > nohups/alignn0_stability.log &
+nohup python pu_alignn/alignn_pu_learning.py --experiment alignn0 --ehull False > nohups/alignn0_synth.log &
+
+nohup python pu_schnet/schnet_pu_learning.py --experiment schnet0 --ehull False > nohups/schnet0_synth.log &
+nohup python pu_schnet/schnet_pu_learning.py --experiment schnet0 --ehull True > nohups/schnet0_stability.log &
+
+nohup python pu_alignn/alignn_pu_learning.py --experiment coAlSch1 --ehull True > nohups/coAlSch1_stability.log &
+nohup python pu_alignn/alignn_pu_learning.py --experiment coAlSch1 --ehull False > nohups/coAlSch1_synth.log &
+
+nohup python pu_schnet/schnet_pu_learning.py --experiment coSchAl1 --ehull False > nohups/coSchAl1_synth.log &
+nohup python pu_schnet/schnet_pu_learning.py --experiment coSchAl1 --ehull True > nohups/coSchAl1_stability.log &

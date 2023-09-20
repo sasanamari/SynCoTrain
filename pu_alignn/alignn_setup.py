@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "2"
+os.environ['CUDA_VISIBLE_DEVICES'] = "3"
 
 """Module to train for a folder with formatted dataset."""
 import csv

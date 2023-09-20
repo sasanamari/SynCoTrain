@@ -36,3 +36,7 @@ readme_4me.log
 .pytest_cache/
 readme_4me
 alignn_remaining_time*
+schnet_remaining_time*
+pu_schnet/PUOutput*
+pu_schnet/PUehull*
+data/results/*/*_resdf.pkl

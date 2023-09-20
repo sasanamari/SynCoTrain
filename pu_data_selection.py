@@ -60,10 +60,10 @@ def data_id_selector(TARGET = TARGET,
     data_dir = os.path.dirname(data_path)
     
     split_id_dir = f"{data_prefix}{TARGET}_{prop}"
-    dir_path = os.path.join(data_dir, split_id_dir)
-    if not os.path.exists(dir_path):
-        os.mkdir(dir_path)
-    os.chdir(dir_path)
+    split_id_dir_path = os.path.join(data_dir, split_id_dir)
+    if not os.path.exists(split_id_dir_path):
+        os.mkdir(split_id_dir_path)
+    os.chdir(split_id_dir_path)
     # select validation set inside alignn/schnet        
     alignn_experiment = experiment == "alignn0" or experiment.startswith("coAl")
     if alignn_experiment:
@@ -108,7 +108,7 @@ def data_id_selector(TARGET = TARGET,
     
         # break
         # print(f'saving ids for iteration {it}.')
-    print(f"Train/Test splits for {experiment} experiment were produced in {data_prefix}{TARGET}_{prop} directory.")
+    print(f"Train/Test splits for {experiment} experiment were produced in {split_id_dir_path} directory.")
     return 
 
 # %%
