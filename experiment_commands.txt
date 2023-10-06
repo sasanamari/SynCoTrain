@@ -1,8 +1,10 @@
 nohup python pu_alignn/alignn_pu_learning.py --experiment alignn0 --ehull True > nohups/alignn0_stability.log &
 nohup python pu_alignn/alignn_pu_learning.py --experiment alignn0 --ehull False > nohups/alignn0_synth.log &
+nohup python pu_alignn/alignn_pu_learning.py --experiment alignn0 --ehull015 True > nohups/alignn0_stability015.log &
 
 nohup python pu_schnet/schnet_pu_learning.py --experiment schnet0 --ehull False --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
 nohup python pu_schnet/schnet_pu_learning.py --experiment schnet0 --ehull True --gpu_id 0 > nohups/schnet0_stability_gpu0.log &
+nohup python pu_schnet/schnet_pu_learning.py --experiment schnet0 --ehull015 True --gpu_id 3 > nohups/schnet0_stability015_gpu3.log &
 
 
 nohup python pu_alignn/alignn_pu_learning.py --experiment coAlSch1 --ehull True > nohups/coAlSch1_stability.log &
@@ -10,8 +12,20 @@ nohup python pu_alignn/alignn_pu_learning.py --experiment coAlSch1 --ehull False
 
 nohup python pu_schnet/schnet_pu_learning.py --experiment coSchAl1 --ehull False --gpu_id 0 > nohups/coSchAl1_synth_gpu0.log &
 nohup python pu_schnet/schnet_pu_learning.py --experiment coSchAl1 --ehull True --gpu_id 0 > nohups/coSchAl1_stability_gpu0.log &
+nohup python pu_schnet/schnet_pu_learning.py --experiment coSchAl1 --ehull True --hw True --gpu_id 3 > nohups/coSchAl1_stability_hw_gpu3.log &
+
 
 tensorboard --logdir=lightning_logs/
+
+alignn configs:
+python pu_alignn/alignn_configs/alignn_pu_config.py --experiment alignn0 --ehull015 True
+python pu_alignn/alignn_configs/alignn_pu_config.py --experiment coAlSch1 --ehull015 True
+
+python pu_data_selection.py --experiment alignn0 --ehull True
+python pu_data_selection.py --experiment schnet0 --ehull True
+
+python pu_data_selection.py --experiment alignn0 --ehull015 True
+python pu_data_selection.py --experiment schnet0 --ehull015 True
 
 python pu_data_selection.py --experiment coAlSch1 --ehull True
 python pu_data_selection.py --experiment coAlSch1 --ehull False
@@ -20,6 +34,8 @@ analysis commands:
 
 python pu_schnet/schnet_pu_analysis.py --experiment schnet0 --ehull True 
 python pu_schnet/schnet_pu_analysis.py --experiment schnet0 --ehull False 
+python pu_schnet/schnet_pu_analysis.py --experiment coSchAl1 --ehull True 
+python pu_schnet/schnet_pu_analysis.py --experiment coSchAl1 --ehull False 
 
 data selection commands:
 python pu_data_selection.py --experiment coAlSch1 --ehull True

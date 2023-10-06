@@ -23,6 +23,12 @@ parser.add_argument(
     help="Predicting stability to evaluate PU Learning's efficacy.",
 )
 parser.add_argument(
+    "--ehull015",
+    type=str_to_bool,
+    default=False,
+    help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
+)
+parser.add_argument(
     "--hw",
     type=str_to_bool,
     default=False,
@@ -42,12 +48,13 @@ parser.add_argument(
 )
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment 
+ehull015 = args.ehull015
 ehull_test = args.ehull
 small_data = args.small_data
 half_way_analysis = args.hw
 # schnettest = args.schnettest
 
-cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
+cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015=ehull015)
 # cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, schnettest=schnettest)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
@@ -105,7 +112,9 @@ def pu_report_schnet(experiment: str = None, prop=prop,
                 
     res_df_fileName = f'{data_prefix}{experiment}_{str(start_iter)}_{str(num_iter)}ep{str(epoch_num)}'
     save_dir = os.path.join(schnetDirectory,f'PUOutput_{data_prefix}{experiment}')
-    if ehull_test:
+    if ehull015:
+        save_dir = os.path.join(schnetDirectory,f'PUehull015_{experiment}')
+    elif ehull_test:
         save_dir = os.path.join(schnetDirectory,f'PUehull_{experiment}')
 
     if half_way_analysis:
@@ -201,7 +210,7 @@ else:
         f'{result_dir}',f'{experiment}.pkl'))
     report['resdf'].to_pickle(os.path.join( 
         f'{result_dir}',f'{experiment}_resdf.pkl'))
-    # %%
+    
     # print(propDF.head(3))
     # print(propDF.tail(3))
     propDF.to_pickle(propDFpath)

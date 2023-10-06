@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+os.environ['CUDA_VISIBLE_DEVICES'] = "2"
 
 """Module to train for a folder with formatted dataset."""
 import csv
@@ -35,12 +35,13 @@ def train_for_folder(
     output_dir=None,
     small_data = False,
     ehull_test = False,
+    ehull015 = False,
     train_id_path = 'data/clean_data/alignn0/train_id_1.txt',
     test_id_path ='data/clean_data/alignn0/test_id_1.txt',
 ):
     """Train for a folder."""
     # config_dat=os.path.join(root_dir,config_name)
-    cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
+    cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
     # propDFpath = cs["propDFpath"]
     # result_dir = cs["result_dir"]
     prop = cs["prop"]

@@ -6,10 +6,13 @@ def str_to_bool(value):
     raise ValueError(f'Boolean value expected for --small_data and --ehull. Insead we got {value} with type{type(value)}.')
 
 
-def current_setup(ehull_test, small_data, experiment):
+def current_setup(ehull_test, small_data, experiment, ehull015):
 # def current_setup(ehull_test, small_data, experiment, schnettest):
     if str_to_bool(ehull_test) and str_to_bool(small_data):
         error_message = "small_data and ehull_test are not allowed at the same time."
+        raise Exception(error_message)
+    if str_to_bool(ehull015) and str_to_bool(small_data):
+        error_message = "small_data and ehull015 are not allowed at the same time."
         raise Exception(error_message)
     # if small_data and schnettest:
     #     propDFpath = 'data/clean_data/small_synthDFTest'
@@ -23,6 +26,10 @@ def current_setup(ehull_test, small_data, experiment):
     #     propDFpath = 'data/clean_data/stabilityTest' 
     #     result_dir = 'data/results/stabilityTest'
     #     prop = 'stability'
+    elif ehull015:
+        propDFpath = 'data/clean_data/stabilityDF015' 
+        result_dir = 'data/results/stability015'
+        prop = 'stability'
     elif ehull_test:
         propDFpath = 'data/clean_data/stabilityDF' 
         result_dir = 'data/results/stability'
@@ -48,6 +55,7 @@ def current_setup(ehull_test, small_data, experiment):
             'final_class':'change_to_desired_label',
     }
     data_prefix = "small_" if small_data else ""
+    data_prefix = "15_" if ehull015 else ""
     
     
     return {"propDFpath":propDFpath, "result_dir":result_dir, "prop":prop, 

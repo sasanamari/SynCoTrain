@@ -7,8 +7,8 @@ from experiment_setup import current_setup
 # %%
 
 # %%
-def prepare_alignn_data(experiment, ehull_test, small_data):
-    cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
+def prepare_alignn_data(experiment, ehull_test, small_data, ehull015):
+    cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
     propDFpath = cs["propDFpath"]
     # result_dir = cs["result_dir"]
     prop = cs["prop"]

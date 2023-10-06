@@ -31,12 +31,19 @@ parser.add_argument(
     default=False,
     help="This option selects a small subset of data for checking the workflow faster.",
 )
+parser.add_argument(
+    "--ehull015",
+    type=str_to_bool,
+    default=False,
+    help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
+)
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment 
 ehull_test = args.ehull
+ehull015 = args.ehull015
 small_data = args.small_data
 
-cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
+cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
@@ -69,7 +76,10 @@ def config_generator(
     _config['epochs'] = epochNum
     _config['output_dir'] = os.path.join(alignn_dir,f'PUOutput_{data_prefix}{experiment}',
                                          f'{str(iterNum)}iter/')
-    if ehull_test:
+    if ehull015:
+        _config['output_dir'] = os.path.join(alignn_dir,f'PUehull015_{experiment}',
+                                         f'{str(iterNum)}iter/')
+    elif ehull_test:
         _config['output_dir'] = os.path.join(alignn_dir,f'PUehull_{experiment}',
                                          f'{str(iterNum)}iter/')
 
@@ -102,6 +112,7 @@ for iterNum in range(pu_setup['start_of_iterations'],
         epochs=pu_setup["epochs"],
         file_format=pu_setup["file_format"],
         ehull_test = ehull_test,
+        ehull015 = ehull015, 
         small_data = small_data,
         train_id_path = os.path.join(split_id_path, f'train_id_{iterNum}.txt'),
         test_id_path = os.path.join(split_id_path, f'test_id_{iterNum}.txt'),

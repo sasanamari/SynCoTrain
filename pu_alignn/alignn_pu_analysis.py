@@ -24,6 +24,12 @@ parser.add_argument(
     help="Predicting stability to evaluate PU Learning's efficacy.",
 )
 parser.add_argument(
+    "--ehull015",
+    type=str_to_bool,
+    default=False,
+    help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
+)
+parser.add_argument(
     "--small_data",
     type=str_to_bool,
     default=False,
@@ -31,10 +37,11 @@ parser.add_argument(
 )
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment 
+ehull015 = args.ehull015
 ehull_test = args.ehull
 small_data = args.small_data
 # %%
-cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
+cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
@@ -59,7 +66,9 @@ def pu_report_alignn(experiment: str = None, prop: str = None,
               small_data = False, data_prefix = data_prefix):
     print(f'experiment is {experiment}, ehull is {ehull_test} and small data is {small_data}.')
     output_dir = os.path.join(alignn_dir, f'PUOutput_{data_prefix}{experiment}')
-    if ehull_test:
+    if ehull015:
+        output_dir = os.path.join(alignn_dir, f'PUehull015_{experiment}')
+    elif ehull_test:
         output_dir = os.path.join(alignn_dir, f'PUehull_{experiment}')
     propDF = pd.read_pickle(propDFpath)
     res_df_list = []

@@ -26,6 +26,12 @@ parser.add_argument(
     default=False,
     help="Predicting stability to evaluate PU Learning's efficacy.",
 )
+parser.add_argument(
+    "--ehull015",
+    type=str_to_bool,
+    default=False,
+    help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
+)
 # parser.add_argument(
 #     "--schnettest",
 #     type=str_to_bool,
@@ -40,10 +46,11 @@ parser.add_argument(
 )
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment
+ehull015 = args.ehull015
 ehull_test = args.ehull
 small_data = args.small_data
 # schnettest = args.schnettest
-cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
+cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
 #, schnettest = schnettest)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
@@ -75,7 +82,7 @@ def data_id_selector(TARGET = TARGET,
     # select validation set inside alignn/schnet        
     alignn_experiment = experiment == "alignn0" or experiment.startswith("coAl")
     if alignn_experiment:
-        alignn_data_log = prepare_alignn_data(experiment, ehull_test, small_data)
+        alignn_data_log = prepare_alignn_data(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
         print(alignn_data_log)
         
     # if test_strategy == 'constant':

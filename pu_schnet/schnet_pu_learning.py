@@ -19,6 +19,12 @@ parser.add_argument(
     default=False,
     help="Predicting stability to evaluate PU Learning's efficacy.",
 )
+parser.add_argument(
+    "--ehull015",
+    type=str_to_bool,
+    default=False,
+    help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
+)
 # parser.add_argument(
 #     "--schnettest",
 #     type=str_to_bool,
@@ -38,6 +44,12 @@ parser.add_argument(
     help="This option selects a small subset of data for checking the workflow faster.",
 )
 parser.add_argument(
+    "--hw",
+    type=str_to_bool,
+    default=False,
+    help="Modify pu_config_schnetpack_hw.json manually if you don't want to start from iteration 0.",
+)
+parser.add_argument(
     "--gpu_id", 
     type=int, 
     default=0, 
@@ -46,8 +58,10 @@ parser.add_argument(
 args = parser.parse_args(sys.argv[1:])
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id) # use before loading lightning.gpu
 experiment = args.experiment 
+ehull015 = args.ehull015
 ehull_test = args.ehull
 small_data = args.small_data
+half_way_iteration = args.hw
 # schnettest  =args.schnettest
 # ntest = args.ntest
 
@@ -68,7 +82,8 @@ from pu_schnet.pu_learn.schnet_funcs  import directory_setup, predProb
 import time
 from pytorch_lightning.callbacks import EarlyStopping
 
-cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment,)
+cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment,#)
+                   ehull015 = ehull015)
                 #    schnettest=schnettest)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
@@ -79,6 +94,8 @@ print(f"Running the {data_prefix}{experiment} experiment for the {prop} property
 start_time = time.time()
 # %%
 config_path = 'pu_schnet/schnet_configs/pu_config_schnetpack.json'
+if half_way_iteration:
+    config_path = 'pu_schnet/schnet_configs/pu_config_schnetpack_hw.json'
 # if schnettest:
 #     config_path = 'pu_schnet/schnet_configs/pu_config_schnetpackTest.json'
 
@@ -102,7 +119,9 @@ res_df_fileName = f'{data_prefix}{experiment}_{str(start_iter)}_{str(num_iter)}e
 
 # save_dir = os.path.join(schnetDirectory,f'PUOutTest_{ntest}_{data_prefix}{experiment}')
 save_dir = os.path.join(schnetDirectory,f'PUOutput_{data_prefix}{experiment}')
-if ehull_test:
+if ehull015:
+    save_dir = os.path.join(schnetDirectory,f'PUehull015_{experiment}')
+elif ehull_test:
     save_dir = os.path.join(schnetDirectory,f'PUehull_{experiment}')
 data_dir = config["data_dir"]
 res_dir = os.path.join(save_dir,'res_df')

@@ -20,6 +20,12 @@ parser.add_argument(
     help="Predicting stability to evaluate PU Learning's efficacy.",
 )
 parser.add_argument(
+    "--ehull015",
+    type=str_to_bool,
+    default=False,
+    help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
+)
+parser.add_argument(
     "--small_data",
     type=str_to_bool,
     default=False,
@@ -28,12 +34,13 @@ parser.add_argument(
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment 
 ehull_test = args.ehull
+ehull015 = args.ehull015
 small_data = args.small_data
 current_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(os.path.join(current_dir,'../../'))
 # os.chdir("alignn/alignn_configs")
 def alignn_pu_config_generator(experiment, small_data, ehull_test):
-    cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
+    cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015=ehull015)
     # propDFpath = cs["propDFpath"]
     # result_dir = cs["result_dir"]
     prop = cs["prop"]
