@@ -23,6 +23,18 @@ parser.add_argument(
     help="Predicting stability to evaluate PU Learning's efficacy.",
 )
 parser.add_argument(
+    "--hw",
+    type=str_to_bool,
+    default=False,
+    help="Analysis before the final iteration.",
+)
+# parser.add_argument(
+#     "--schnettest",
+#     type=str_to_bool,
+#     default=False,
+#     help="Predicting stability and checking results.",
+# )
+parser.add_argument(
     "--small_data",
     type=str_to_bool,
     default=False,
@@ -32,8 +44,11 @@ args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment 
 ehull_test = args.ehull
 small_data = args.small_data
+half_way_analysis = args.hw
+# schnettest = args.schnettest
 
 cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
+# cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, schnettest=schnettest)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
@@ -67,7 +82,10 @@ def pu_report_schnet(experiment: str = None, prop=prop,
     
     
     schnet_config_dir = "pu_schnet/schnet_configs"
-    config_path = os.path.join(schnet_config_dir, f'pu_config_schnetpack.json')
+    config_path = os.path.join(schnet_config_dir, 'pu_config_schnetpack.json')
+    # if schnettest:
+    #     config_path = os.path.join(schnet_config_dir, 'pu_config_schnetpackTest.json')
+        
     with open(config_path, "r") as read_file:
         print("Read Experiment configuration")
         config = json.load(read_file)
@@ -90,7 +108,10 @@ def pu_report_schnet(experiment: str = None, prop=prop,
     if ehull_test:
         save_dir = os.path.join(schnetDirectory,f'PUehull_{experiment}')
 
-    crysdf=pd.read_pickle(os.path.join(save_dir,'res_df',res_df_fileName))
+    if half_way_analysis:
+        crysdf=pd.read_pickle(os.path.join(save_dir,'res_df',f'{res_df_fileName}tmp'))   #saving results at each iteration
+    else:
+        crysdf=pd.read_pickle(os.path.join(save_dir,'res_df',res_df_fileName))
     # crysdf = crysdf.loc[:, ~crysdf.columns.duplicated()] # drops duplicated props at round zero.
    
     pred_columns = []
@@ -98,6 +119,9 @@ def pu_report_schnet(experiment: str = None, prop=prop,
 
     for it in range(0, num_iter):  #always start at 0 because we want to average prediction over all the iterations.
         pred_col_name = 'pred_'+str(it)
+        if half_way_analysis:
+            if pred_col_name not in crysdf.columns:
+                continue
         pred_columns.append(pred_col_name)
         
         score_col_name = 'pred_score'+str(it)
@@ -161,8 +185,8 @@ def pu_report_schnet(experiment: str = None, prop=prop,
         false_positive_rate = GT_unstable['prediction'].mean()
         report['GT_true_positive_rate'] = round(GT_tpr, 4)
         report['false_positive_rate'] = round(false_positive_rate, 4)
-        print(f"The Groud Truth true-positive-rate was {report['GT_true_positive_rate']} and the "
-      f" False positive rate was {report['false_positive_rate']}.")
+        print(f"The Groud Truth true-positive-rate was {report['GT_true_positive_rate']*100}% and the "
+      f" False positive rate was {100*report['false_positive_rate']}%.")
         
     return report, propDF
 # %%
@@ -170,25 +194,30 @@ report, propDF = pu_report_schnet(experiment = experiment,
                                 TARGET = TARGET,
                                 propDFpath=propDFpath, ehull_test = ehull_test, 
                                 small_data = small_data)
-# need to use the correct result_dir
-report['agg_df'].to_pickle(os.path.join( #goes one directory up from schnet to main dir.
-    f'{result_dir}',f'{experiment}.pkl'))
-report['resdf'].to_pickle(os.path.join( 
-    f'{result_dir}',f'{experiment}_resdf.pkl'))
-# # %%
-propDF.to_pickle(propDFpath)
-# # %%
-csv_path =os.path.join(f'{result_dir}', 'results.csv')
-resultcsv = pd.read_csv(csv_path,
-                        index_col=0)
-new_rates = {'true_positive_rate':report['true_positive_rate'],
-             'LO_true_positive_rate':report['LO_true_positive_rate'],
-             'predicted_positive_rate':report['predicted_positive_rate'],
-             'GT_true_positive_rate':report['GT_true_positive_rate'],
-             'false_positive_rate':report['false_positive_rate']}
-resultcsv.loc[experiment] = new_rates
-# %%
-resultcsv.to_csv(csv_path)
+if half_way_analysis:
+    pass 
+else:
+    report['agg_df'].to_pickle(os.path.join( #goes one directory up from schnet to main dir.
+        f'{result_dir}',f'{experiment}.pkl'))
+    report['resdf'].to_pickle(os.path.join( 
+        f'{result_dir}',f'{experiment}_resdf.pkl'))
+    # %%
+    # print(propDF.head(3))
+    # print(propDF.tail(3))
+    propDF.to_pickle(propDFpath)
+    # # %%
+    csv_path =os.path.join(f'{result_dir}', 'results.csv')
+    resultcsv = pd.read_csv(csv_path,
+                            index_col=0)
+    new_rates = {'true_positive_rate':report['true_positive_rate'],
+                'LO_true_positive_rate':report['LO_true_positive_rate'],
+                'predicted_positive_rate':report['predicted_positive_rate'],
+                'GT_true_positive_rate':report['GT_true_positive_rate'],
+                'false_positive_rate':report['false_positive_rate']}
+    resultcsv.loc[experiment] = new_rates
+    # %%
+    resultcsv.to_csv(csv_path)
+    # print(resultcsv)
 # %%
 """
 schnet_config_dir = "schnet/schnet_configs"

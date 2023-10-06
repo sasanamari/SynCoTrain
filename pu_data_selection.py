@@ -26,6 +26,12 @@ parser.add_argument(
     default=False,
     help="Predicting stability to evaluate PU Learning's efficacy.",
 )
+# parser.add_argument(
+#     "--schnettest",
+#     type=str_to_bool,
+#     default=False,
+#     help="Predicting stability and testing the model.",
+# )
 parser.add_argument(
     "--small_data",
     type=str_to_bool,
@@ -36,7 +42,9 @@ args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment
 ehull_test = args.ehull
 small_data = args.small_data
+# schnettest = args.schnettest
 cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment)
+#, schnettest = schnettest)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
@@ -90,8 +98,20 @@ def data_id_selector(TARGET = TARGET,
         df_wo_test = df.drop(index=testdf1.index) #remove test data
         traindf1 = df_wo_test[df_wo_test[TARGET]==1].sample(frac=1, random_state = it+1)
         class_train_num = len(traindf1)
-        traindf0 = df_wo_test[df_wo_test[TARGET]==0].sample(n=class_train_num,random_state=it+2) #a different 'negative' train-set at each iteration.
-        testdf0 = df_wo_test[df_wo_test[TARGET]==0].drop(index=traindf0.index) #The remaining unlabeled data to be labeled.   
+        unlabeled_df = df_wo_test[df_wo_test[TARGET] == 0]
+        unlabeled_shortage = class_train_num - len(unlabeled_df)
+        if unlabeled_shortage > 0:
+            testdf0 = unlabeled_df.sample(n=int(test_ratio*max(len(unlabeled_df),len(experimental_df))), 
+                                          random_state=it+4)
+            unlabeled_df = unlabeled_df.drop(index=testdf0.index)
+
+            traindf0 = unlabeled_df.sample(frac=1,random_state=it+2) #a different 'negative' train-set at each iteration.
+            traindf0_0 = unlabeled_df.sample(n=unlabeled_shortage,replace = True,
+                                                                random_state=it+3)
+            traindf0 = pd.concat([traindf0,traindf0_0]) # Resampling is needed for co-training if more than half of all the data belongs to the positive class.
+        else:
+            traindf0 = unlabeled_df.sample(n=class_train_num,random_state=it+2) #a different 'negative' train-set at each iteration.
+            testdf0 = unlabeled_df.drop(index=traindf0.index) #The remaining unlabeled data to be labeled.   
         
         it_traindf = pd.concat([traindf0,traindf1])
         it_testdf = pd.concat([testdf0,testdf1]) #positive test and unlabled prediction.

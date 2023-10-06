@@ -1,5 +1,5 @@
 {
-  "epoch_num": 15,
+  "epoch_num": 150,
   "num_iter": 100,
   "batch_size": 32,
   "data_dir": "data/clean_data/",

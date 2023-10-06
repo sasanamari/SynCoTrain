@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "3"
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 """Module to train for a folder with formatted dataset."""
 import csv
@@ -211,6 +211,10 @@ def train_for_folder(
             prepare_batch,
         ],
     )
+    
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        
     t2 = time.time()
     print("Time taken (s):", t2 - t1)
 

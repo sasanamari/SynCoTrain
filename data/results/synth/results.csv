@@ -1,5 +1,5 @@
 ,true_positive_rate,predicted_positive_rate,LO_true_positive_rate,GT_true_positive_rate,false_positive_rate
-schnet0,0.9071,0.0894,0.8327,,
+schnet0,0.8068,0.1929,0.8385,,
 alignn0,0.8348,0.1787,0.8619,,
 coSchAl1,,,,,
 coAlSch1,,,,,

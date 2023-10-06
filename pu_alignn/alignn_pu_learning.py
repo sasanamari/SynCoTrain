@@ -9,6 +9,7 @@ import argparse
 from experiment_setup import current_setup, str_to_bool
 from pu_alignn.alignn_configs.alignn_pu_config import alignn_pu_config_generator
 # %%
+# make sure to run pu_data_selection again with the correct labels before running cotraining.
 # when running this script somehow the values go wrong in alignn_setup.
 parser = argparse.ArgumentParser(
     description="Semi-Supervised ML for Synthesizability Prediction"
@@ -114,8 +115,9 @@ for iterNum in range(pu_setup['start_of_iterations'],
     estimated_remaining_time = remaining_iterations * time_per_iteration
     remaining_days = int(estimated_remaining_time // (24 * 3600))
     remaining_hours = int((estimated_remaining_time % (24 * 3600)) // 3600)
-
-    with open(f'alignn_remaining_time_{data_prefix}{experiment}_{prop}.txt', 'w') as file:
+    
+    time_log_path = os.path.join('time_logs',f'alignn_remaining_time_{data_prefix}{experiment}_{prop}.txt')
+    with open(time_log_path, 'w') as file:
         file.write(f"Iterations completed: {iterNum - pu_setup['start_of_iterations']}\n")
         file.write(f"Iterations remaining: {remaining_iterations}\n")
         file.write(f"Estimated remaining time: {remaining_days} days, {remaining_hours} hours\n")
@@ -127,7 +129,7 @@ for iterNum in range(pu_setup['start_of_iterations'],
 elapsed_days = int(elapsed_time // (24 * 3600))
 elapsed_hours = int((elapsed_time % (24 * 3600)) // 3600)
 
-with open(f'alignn_remaining_time_{data_prefix}{experiment}_{prop}.txt', 'w') as file:
+with open(time_log_path, 'w') as file:
     file.write(f"Iterations completed: {pu_setup['max_num_of_iterations'] - pu_setup['start_of_iterations']}\n")
     file.write(f"Total time taken: {elapsed_days} days, {elapsed_hours} hours\n")
 
