@@ -1,8 +1,0 @@
-{
-  "epoch_num": 15,
-  "num_iter": 100,
-  "batch_size": 32,
-  "data_dir": "data/clean_data/",
-  "start_iter": 0,
-  "schnetDirectory": "pu_schnet"
-}

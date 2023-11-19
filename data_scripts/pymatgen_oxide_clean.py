@@ -84,32 +84,5 @@ if not os.path.exists(clean_location):
     os.mkdir(clean_location)
 full_data.to_pickle(os.path.join(clean_location, "synthDF"))
 # %%
-# #checking out the data
-# testdf = pd.read_pickle(os.path.join(clean_location, "synthDF"))
-# # %%
-# testdf["schnet0"] = np.nan
-# testdf["alignn0"] = np.nan
-# testdf["coSchAl1"] = np.nan #cotraining SchNet on Alignn labels 1st time
-# testdf["coAlSch1"] = np.nan #cotraining Alignn on SchNet labels 1st time
-# testdf["coSchAl2"] = np.nan #cotraining SchNet on Alignn labels 2nd time
-# testdf["coAlSch2"] = np.nan #cotraining Alignn on SchNet labels 2nd time
-# # # %%
-# ## testdf = testdf.loc[testdf.astype(str).drop_duplicates(keep = False).index]
-# ## # we use string because atome object is unhashable.
-# ## testdf = testdf.reset_index(drop = True)
-# # %%
-# ## testdf.to_pickle(os.path.join(clean_location, "synthDF"))
 
-# # %%
-# tardf = testdf[["material_id", "synth"]].copy()
-# # %%
-# tardf["schlab0"] = np.nan
-# tardf["aliglab0"] = np.nan
-# # %%
-# testdf= testdf.drop(columns = "synth")
-# # %%
-# # newdf = pd.merge(testdf, tardf, on="material_id")
-# # %%
-# newdf = pd.merge(testdf.drop_duplicates(subset='material_id'), 
-#                  tardf, on='material_id')
 # %%

@@ -44,3 +44,6 @@ pu_schnet/PUehull015*
 pu_schnet/PUOutTest_*
 data/results/*/*_resdf.pkl
 old_code/
+_heuristics_analysis/
+_figures/
+_experiment_commands.txt

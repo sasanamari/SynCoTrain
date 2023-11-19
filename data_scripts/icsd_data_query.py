@@ -39,14 +39,7 @@ pymatgenArray , db_version = exper_oxygen_query(MPID=MPID,
                 fields = "default",
                 # return_data=True
                 )
-# %%
-# not_oxide = []
-# for i,material in enumerate(pymatgenArray):
-#     s = material["structure"]
-#     if OxideType(s).oxide_type != "oxide":
-#         not_oxide.append(i)
-        
-# pymatgenArray = np.delete(pymatgenArray, not_oxide)
+
 
 # %%
 np.save(destination_file, pymatgenArray)
