@@ -48,7 +48,7 @@ python pu_schnet/schnet_pu_analysis.py --experiment coSchnet3
 
 
 -Train synthesizability predictor:
-conda activate alignn
+conda activate puAlignn
 python predict_target/label_by_average.py
 nohup python predict_target/train_folder.py > nohups/synth_predictor.log &
 
