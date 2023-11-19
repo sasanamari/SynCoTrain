@@ -34,12 +34,12 @@ def prepare_alignn_labels(prop='synth'):
     if not os.path.exists(data_dest):
         os.mkdir(data_dest)
     f = open(os.path.join(data_dest, 
-                    f"{prop}_id_from_cotrain.csv"), "w")
+                    f"{prop}_id_label_from_cotrain.csv"), "w")
 
     count = 0
 
     # %%
-    data_files_dir = os.path.join(data_dest,f"atomistic_{prop}_labels")
+    data_files_dir = os.path.join(data_dest,f"atomistic_{prop}_poscars")
     if not os.path.exists(data_files_dir):
         os.makedirs(data_files_dir)
     for _,row in labeldf.iterrows():

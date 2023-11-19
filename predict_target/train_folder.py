@@ -75,7 +75,7 @@ def train_for_folder(
     # config_dat=os.path.join(root_dir,config_name)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(os.path.dirname(current_dir))
-    id_prop_dat = os.path.join(root_dir, f"{prop}_id_from_cotrain.csv")
+    id_prop_dat = os.path.join(root_dir, f"{prop}_id_label_from_cotrain.csv")
     config = loadjson(config_name)
     if type(config) is dict:
         try:
@@ -103,7 +103,7 @@ def train_for_folder(
     for i in data:
         info = {}
         file_name = i[0]
-        file_path = os.path.join(root_dir,f"atomistic_{prop}_labels", file_name)
+        file_path = os.path.join(root_dir,f"atomistic_{prop}_poscars", file_name)
         if file_format == "poscar":
             atoms = Atoms.from_poscar(file_path)
         elif file_format == "cif":

@@ -11,7 +11,8 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from brokenaxes import brokenaxes
 # import seaborn as sns
 # %%
-df = pd.read_csv("../results/stability015/results_plot.csv")
+# df = pd.read_csv("../results/stability015/results_plot.csv")
+df = pd.read_csv("../results/synth/results_plot.csv")
 df = df.dropna()
 # %%
 # %%
@@ -19,12 +20,12 @@ df = df.dropna()
 x = range(len(df.exper))  # Create a range of numbers
 y = df.true_positive_rate  # Values for y-axis
 y2 = df.LO_true_positive_rate  # Create a range of numbers
-y3 = df.GT_true_positive_rate  # Create a range of numbers
+# y3 = df.GT_true_positive_rate  # Create a range of numbers
 
 plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
 plt.plot(x, y, marker='o',label = "TPR")  # Plot with markers for each point
 plt.plot(x, y2, marker='o',label = "LOTPR")  # Plot with markers for each point
-plt.plot(x, y3, marker='o',label = "GTTPR")  # Plot with markers for each point
+# plt.plot(x, y3, marker='o',label = "GTTPR")  # Plot with markers for each point
 
 # Set the x-axis tick labels to df.exper, rotated for readability
 plt.xticks(ticks=x, labels=df.exper, rotation=45)
@@ -33,9 +34,9 @@ plt.xlabel('Experiment')
 plt.ylabel('True Positive Rate')
 plt.grid(which='major', linestyle='-', linewidth='0.5', color='gray')
 # Optionally, you can add a title
-plt.title('True Positive Rate Over Experiments')
+plt.title('True Positive Rate Over Iterations')
 plt.legend()
-
+plt.savefig("tpr_iterations.png", dpi=350, transparent=True, bbox_inches='tight')
 plt.show()
 
 # %%
@@ -54,26 +55,29 @@ x_schnet = range(len(df_schnet.exper))
 plt.figure(figsize=(10, 6))
 plt.plot(x_alignn, df_alignn.true_positive_rate, marker='o', label="TPR")
 plt.plot(x_alignn, df_alignn.LO_true_positive_rate, marker='o', label="LOTPR")
-plt.plot(x_alignn, df_alignn.GT_true_positive_rate, marker='o', label="GTTPR")
+# plt.plot(x_alignn, df_alignn.GT_true_positive_rate, marker='o', label="GTTPR")
 plt.xticks(ticks=x_alignn, labels=df_alignn.exper, rotation=45)
 plt.xlabel('Experiment')
 plt.ylabel('True Positive Rate')
 plt.grid(which='major', linestyle='-', linewidth='0.5', color='gray')
-plt.title('True Positive Rate for ALIGNN Experiments')
+plt.title('True Positive Rate for ALIGNN Iterations')
 plt.legend()
+plt.savefig("tpr_alignn_iterations.png", dpi=350, transparent=True, bbox_inches='tight')
+
 plt.show()
 
 # Plot for the rest of the experiments
 plt.figure(figsize=(10, 6))
 plt.plot(x_schnet, df_schnet.true_positive_rate, marker='o', label="TPR")
 plt.plot(x_schnet, df_schnet.LO_true_positive_rate, marker='o', label="LOTPR")
-plt.plot(x_schnet, df_schnet.GT_true_positive_rate, marker='o', label="GTTPR")
+# plt.plot(x_schnet, df_schnet.GT_true_positive_rate, marker='o', label="GTTPR")
 plt.xticks(ticks=x_schnet, labels=df_schnet.exper, rotation=45)
 plt.xlabel('Experiment')
 plt.ylabel('True Positive Rate')
 plt.grid(which='major', linestyle='-', linewidth='0.5', color='gray')
-plt.title('True Positive Rate for SCHNET Experiments')
+plt.title('True Positive Rate for SCHNET Iterations')
 plt.legend()
+plt.savefig("tpr_schnet_iterations.png", dpi=350, transparent=True, bbox_inches='tight')
 plt.show()
 
 # %%

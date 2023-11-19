@@ -485,12 +485,105 @@ def midlabel_dist(codf, datadf, ehull=False,prop = prop,figtitle = None, filenam
 coschnet = pd.read_pickle('../results/synth/schnet0.pkl')
 # %%
 coalignn = pd.read_pickle('../results/synth/alignn0.pkl')
-coAl1 = pd.read_pickle('../results/synth/coAlSch1.pkl')
 # %%
+coschnet3 = pd.read_pickle('../results/synth/coSchAl3.pkl')
+
+coalignn3 = pd.read_pickle('../results/synth/coAlSch3.pkl')
+# %%
+
 midlabel_dist(coschnet, df, figtitle="Iteration '0' with SchNet", 
               filename="schnet0_prop_dist.png")
 # %%
 midlabel_dist(coalignn, df, figtitle="Iteration '0' with ALIGNN", 
               filename="alignn0_prop_dist.png")
             # )
+# %%
+midlabel_dist(coalignn3, df, figtitle="Iteration '3' with ALIGNN", 
+              filename="coalignn3_prop_dist.png")
+# %%
+midlabel_dist(coschnet3, df, figtitle="Iteration '3' with SchNet", 
+              filename="coschnet3_prop_dist.png")
+
+# %%
+finaldf = pd.read_pickle("/home/samariam/projects/SynthCoTrain/predict_target/final_df")
+# %%
+def final_labels(plot_df, ehull=False,prop = prop,figtitle = None, filename=None):
+    edf = plot_df[plot_df[prop] == 1]
+    tdf = plot_df[plot_df[prop] == 0]
+
+    true_positive_rate = edf.prediction.mean()
+    unlabeled_synth_frac = tdf.prediction.mean()
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(6,6))
+    prob = "prediction"
+
+    n, bins, patches = ax1.hist(edf[prob], bins=40)
+    max_height = n.max()
+    ax1.set_title('Probability Distribution for Experimental Data', fontsize=13.5, fontweight='bold')
+    ax1.vlines(.5, 0,max_height, 'r',linewidth=3)
+    ax1.arrow(.5,max_height*.7,.35,0, linewidth=3, color ='r', length_includes_head=True,
+            head_width=max_height*.08, head_length=0.05)
+    ax1.text(.55,max_height*.4, '{:.1f}% true- \npositive rate'.format(true_positive_rate*100), fontsize = 15);
+
+
+    plt.xlabel('Predicted Probability of Synthesizability', fontsize=14)
+
+    n, bins, patches = ax2.hist(tdf[prob],bins=40)
+    max_height = n.max()
+    ax2.vlines(.5, 0,max_height, 'r',linewidth=3)
+    ax2.arrow(.5,max_height*.7,.35,0, linewidth=3, color ='r', length_includes_head=True,
+            head_width=max_height*.08, head_length=0.05)
+    ax2.set_title('Probability Distribution for Theoretical Data', fontsize=13.5,fontweight='bold')
+    ax2.text(.55,max_height*.4, '{:.1f}% predicted \n synthesizable'.format(unlabeled_synth_frac*100), fontsize = 15);
+    if figtitle:
+        fig.suptitle(figtitle, fontsize = 25, y =1.02)
+    if filename:
+        save_plot(figure = fig, filename = filename)
+    plt.show()
+
+# %%
+synthlab = pd.read_pickle("/home/samariam/projects/SynthCoTrain/data/results/synth/synth_labels")
+# %%
+def scatter_hm_final(proplab,datadf, prop=prop, filename=None):
+    proplab = proplab.merge(datadf[["material_id", "formation_energy_per_atom", "energy_above_hull"]], on="material_id")
+    proplab = proplab.dropna()
+    colors, x, y = density_colors(proplab[f"{prop}_avg"], proplab.energy_above_hull)
+    # Plot first scatter plot
+    plt.scatter(x, y, c=colors, cmap='viridis', norm=LogNorm(), alpha=0.7, s=20)
+    plt.colorbar()
+    plt.xlabel('Predicted Probability of Synthesizability')
+    plt.ylabel('energy_above_hull')
+    plt.title('Density Scatter Plot')
+    if filename:
+        save_plot(plt.gcf(), filename)
+    plt.show()
+# %%
+def heatmap_final(codf, datadf,prop = prop, filename = None):
+    plot_df = codf.merge(datadf[["material_id", "formation_energy_per_atom", "energy_above_hull"]], on="material_id")
+    plot_df = plot_df.dropna()
+    x = plot_df.predScore
+    y = plot_df.energy_above_hull
+    # x = x[~np.isnan(x)]
+    # y = y[~np.isnan(y)]
+
+    xzoomed = plot_df[f"{prop}_avg"][plot_df.energy_above_hull <= 1]
+    yzoomed = plot_df.energy_above_hull[plot_df.energy_above_hull <= 1]
+    xzoomed = xzoomed[~np.isnan(xzoomed)]
+    yzoomed = yzoomed[~np.isnan(yzoomed)]
+
+    # Calculate the bins for the full dataset
+    hist_full, xedges, yedges = np.histogram2d(x, y, bins=(50, 50))
+
+    # Use the full data set to find the common vmin and vmax
+    vmin = 1  # Since you use cmin=1, we start the colorbar at 1
+    vmax = hist_full.max()  # The max count from the full data set
+
+    # First plot
+    plt.hist2d(x, y, bins=(50, 50), cmap='viridis', norm=LogNorm(vmin=vmin, vmax=vmax), cmin=1)
+    cbar = plt.colorbar()
+    plt.xlabel('Predicted Probability of Synthesizability')
+    plt.ylabel('energy_above_hull')
+    plt.title('Density Heatmap')
+    if filename:
+        save_plot(plt.gcf(), filename)
+    plt.show()
 # %%
