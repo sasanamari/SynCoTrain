@@ -104,6 +104,7 @@ nohup python predict_target/train_folder.py > nohups/synth_predictor.log &
 Finally we can predict synthesizability. You can use the checkpoint file `predict_target/synth_final_preds/checkpoint_120.pt` and follow the instructions on ALIGNN repository to use pretrained model.
 For a simpler use, you can deposite the POSCAR files of the crystals of your interest in the `predict_target/label_alignn_format/poscars_for_synth_prediction` directory. Then, provide a list of these files in the `predict_target/label_alignn_format/id_for_synth_pred.csv` file. The command below predicts the synthesizability of these crystals and saves them in `synth_pred.csv` in the same directory:
 ```
+conda activate puAlignn
 python predict_target/synthesizability_predictor.py 
 ```
 
