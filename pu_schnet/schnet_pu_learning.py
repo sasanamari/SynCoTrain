@@ -52,7 +52,7 @@ parser.add_argument(
 parser.add_argument(
     "--gpu_id", 
     type=int, 
-    default=0, 
+    default=3, 
     help="GPU ID to use for training.")
 
 args = parser.parse_args(sys.argv[1:])
@@ -136,8 +136,12 @@ crysdf["targets"] = crysdf[TARGET].map(lambda target: np.array(target).flatten()
 #we need the array to have the shape (1,), hence we use flatten()
 crysdf["targets"] = crysdf.targets.map(lambda target: {prop: np.array(target)})  
 #The above changes targets fromat from array to dict with array val
-iteration_results = crysdf[["material_id", prop, TARGET]]
-iteration_results = iteration_results.loc[:, ~iteration_results.columns.duplicated()] # drops duplicated props at round zero.
+if half_way_iteration:
+    iteration_results = pd.read_pickle(os.path.join(res_dir,f'{data_prefix}{experiment}_0_{str(num_iter)}ep{str(epoch_num)}'+'tmp'))
+    # iteration_results = pd.read_pickle(os.path.join(res_dir,f'schnet0_20_60ep150tmp'))
+else:
+    iteration_results = crysdf[["material_id", prop, TARGET]]
+    iteration_results = iteration_results.loc[:, ~iteration_results.columns.duplicated()] # drops duplicated props at round zero.
 # %%
 cutoff = 5
 n_rbf = 30
@@ -153,13 +157,15 @@ for it in range(start_iter, num_iter):
     np.random.seed(it) 
     # scheduler = {'scheduler_cls':None,'scheduler_args':None}
     scheduler = {'scheduler_cls':torch.optim.lr_scheduler.ReduceLROnPlateau,
-                 'scheduler_args':{"mode": "min",
+                 'scheduler_args':{"mode": "max", #mode is min for loss, max for merit
                                "factor": 0.5,
                                "patience": 15,
                                "threshold": 0.01,
                                "min_lr": 1e-6
                                },
-                 'scheduler_monitor':"val_loss"
+                #  'scheduler_monitor':f"val_{prop}_recalll" 
+                 'scheduler_monitor':f"val_{prop}_Accuracy"
+                #  'scheduler_monitor':"val_loss"
                 }
 
     save_it_dir = os.path.join(save_dir, f'iter_{it}')
@@ -192,7 +198,8 @@ for it in range(start_iter, num_iter):
         loss_fn=torch.nn.BCEWithLogitsLoss(), 
         loss_weight=1.,
         metrics={
-            "Accur": torchmetrics.Accuracy("binary")   #potential alternatives: AUROC(increases the area under ROC curve), AveragePrecision (summarises the precision-recall curve)
+            "Accuracy": torchmetrics.Accuracy("binary"),   #potential alternatives: AUROC(increases the area under ROC curve), AveragePrecision (summarises the precision-recall curve)
+            "recalll": torchmetrics.Recall("binary")   #potential alternatives: AUROC(increases the area under ROC curve), AveragePrecision (summarises the precision-recall curve)
         }
     )
 
@@ -316,10 +323,12 @@ for it in range(start_iter, num_iter):
     # This doesn't work when no test data is given.    
     early_stopping = EarlyStopping(
     verbose=2,
-    # monitor=f"val_{prop}_Accur",  #if it works, also change in ModelCheckpoint?
-    monitor="val_loss",  #if it works, also change in ModelCheckpoint?
+    mode= 'max', #min for loss, max for merit.
+    monitor=f"val_{prop}_Accuracy",  #if it works, also change in ModelCheckpoint?
+    # monitor=f"val_{prop}_recalll",  #if it works, also change in ModelCheckpoint?
+    # monitor="val_loss",  #if it works, also change in ModelCheckpoint?
     # rhe error says"Pass in or modify your `EarlyStopping` callback to use any of the following: `train_loss`, `val_loss`, `val_synth_Accur`, `train_synth_Accur`""
-    min_delta=0.05,
+    min_delta=0.02,
     patience=30,
 )    
     logger = pl.loggers.TensorBoardLogger(save_dir=save_dir)
@@ -328,8 +337,10 @@ for it in range(start_iter, num_iter):
     spk.train.ModelCheckpoint(
         inference_path=os.path.join(save_it_dir, "best_inference_model"),
         save_top_k=1,
-        monitor="val_loss"
-        # monitor=f"val_{prop}_Accur"
+        # monitor="nonesense2"
+        # monitor="val_loss"
+        monitor=f"val_{prop}_Accuracy"
+        # monitor=f"val_{prop}_recalll"
     )
     ]
        
@@ -348,8 +359,8 @@ for it in range(start_iter, num_iter):
     trainer.fit(task, datamodule=crysData)
     
     # myaccuracy = trainer.callback_metrics[f"val_{prop}_Accur"]
-    myloss = trainer.callback_metrics["val_loss"]
-    print(myloss)
+    # myloss = trainer.callback_metrics["val_loss"]
+    # print(myloss)
     
     predictions = trainer.predict(model=task, 
                     dataloaders= crysTest.predict_dataloader(),

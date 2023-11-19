@@ -8,7 +8,10 @@ import matplotlib.pyplot as plt
 import sys
 import argparse
 from experiment_setup import current_setup, str_to_bool
+import warnings
 # %%
+# For each round, we need a separate prediction column and a cotrain label.
+# The final round only gets a prediction label.
 parser = argparse.ArgumentParser(
     description="Semi-Supervised ML for Synthesizability Prediction"
 )
@@ -63,7 +66,8 @@ def pu_report_alignn(experiment: str = None, prop: str = None,
               TARGET = TARGET,
               id_LOtest = id_LOtest,
               pseudo_label_threshold = 0.75,ehull_test = False,
-              small_data = False, data_prefix = data_prefix):
+              small_data = False, data_prefix = data_prefix, 
+              max_iter=60):
     print(f'experiment is {experiment}, ehull is {ehull_test} and small data is {small_data}.')
     output_dir = os.path.join(alignn_dir, f'PUOutput_{data_prefix}{experiment}')
     if ehull015:
@@ -73,7 +77,9 @@ def pu_report_alignn(experiment: str = None, prop: str = None,
     propDF = pd.read_pickle(propDFpath)
     res_df_list = []
     res_dir_list = []
-    for PUiter in os.listdir(output_dir):
+    for iter, PUiter in enumerate(os.listdir(output_dir)):
+        if iter>max_iter:
+            break
         resdir = os.path.join(output_dir,PUiter)
         try:   #for incomplete experiments, when the last prediction is not ready.
             res_dir_list.append(resdir)
@@ -106,22 +112,21 @@ def pu_report_alignn(experiment: str = None, prop: str = None,
     
     cotrain_df = propDF[['material_id', prop]].merge(
         agg_df[['material_id','new_labels']], on='material_id', how='left')
-        # agg_df[['material_id','prediction']], on='material_id', how='left')
-    # cotrain_df = cotrain_df.rename(columns={'prediction': 'new_labels'}) #for clarity
-    # label_source = { #output_dir: training_label_column
-    #         'alignn0':prop,
-    #         'coAlSch1':'schnet0',
-    #         'coAlSch2':'coSchAl1',
-    #         'coAlSch3':'coSchAl2',
-    #         'coAlSch4':'coSchAl3',
-    #         'coAlSch5':'coSchAl4',
-    # }
+
     cotrain_index = propDF[propDF[prop]!=propDF[TARGET]].index 
         # output_dir.split('_')[-1]]]].index 
     cotrain_df.loc[cotrain_index, 'new_labels'] = 1 #used in cotraining, not predicted. does nothing at step 0.
     cotrain_df.loc[cotrain_df[prop] == 1, 'new_labels'] = 1 #filling up the NaN used for training.
-    if small_data:
-        cotrain_df = cotrain_df.dropna() #in small data set-up, there will be NaN values for unsed data.
+    # if small_data:
+        # cotrain_df = cotrain_df.dropna() #in small data set-up, there will be NaN values for unsed data.
+    # if cotrain_df['new_labels'].isna().mean() > 0.02:
+    #     raise ValueError("Too many NaN values remaining in 'new_labels'.")
+    # else:
+    if cotrain_df['new_labels'].isna().mean() > 0.02:
+        warn_str = f"{round(cotrain_df['new_labels'].isna().mean(),3)*100}% of the 'new_labels' are NaN."
+        warnings.warn(warn_str, RuntimeWarning)
+    cotrain_df['new_labels'].fillna(cotrain_df[prop], inplace=True)
+            
     cotrain_df.new_labels = cotrain_df.new_labels.astype(np.int16)
        
     report = {'res_dir_list':res_dir_list, 'resdf':resdf,
@@ -132,7 +137,7 @@ def pu_report_alignn(experiment: str = None, prop: str = None,
               'false_positive_rate':'',
               'agg_df':agg_df,
               'cotrain_df': cotrain_df} 
-    if ehull_test:
+    if ehull_test or ehull015:
         GT_stable = propDF[propDF["stability_GT"]==1] 
         GT_stable = pd.merge(GT_stable, agg_df, on='material_id', how="inner")
         GT_unstable = propDF[propDF["stability_GT"]==0]
@@ -165,6 +170,7 @@ report['resdf'].to_pickle(os.path.join(
 propDF[experiment]=report['cotrain_df'].new_labels #just need the labels
 # %%
 propDF.to_pickle(propDFpath)
+print(propDFpath)
 # %%
 resultcsv = pd.read_csv(os.path.join(result_dir, 'results.csv'),
                         index_col=0)
@@ -177,7 +183,9 @@ resultcsv.loc[experiment.split('PUOutput_')[-1]] = new_rates
 
 # %%
 resultcsv.to_csv(os.path.join(result_dir, 'results.csv'))
-   
+print(new_rates)
+print(resultcsv)
+
 # %%
 # ht = loadjson(os.path.join(PUiter,'history_val.json' ))
 # plt.plot(ht["rocauc"])

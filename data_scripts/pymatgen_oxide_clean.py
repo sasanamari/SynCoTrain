@@ -53,7 +53,7 @@ for material in good_experimental_data:
 # %%
 for material in good_theoretical_data:
     material["atoms"] = jarvisP_to_ase(material["atoms"])
-    material['formation_energy_per_atom'] = material.pop('_oqmd_delta_e')/material["atoms"].get_global_number_of_atoms()
+    material['formation_energy_per_atom'] = material.pop('_oqmd_delta_e') #https://static.oqmd.org/static/docs/analysis.html
     material['energy_above_hull'] = material.pop('_oqmd_stability')
     for key in key_exclusion_theo:
         material.pop(key, None)

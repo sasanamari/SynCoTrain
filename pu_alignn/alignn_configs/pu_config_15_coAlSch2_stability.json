@@ -10,7 +10,7 @@
   "batch_size": null,
   "output_dir": null,
   "epochs": 120,
-  "max_num_of_iterations": 100,
+  "max_num_of_iterations": 60,
   "start_of_iterations": 0,
   "small_data": false
 }

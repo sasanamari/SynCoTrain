@@ -1,6 +1,6 @@
 {
   "epoch_num": 150,
-  "num_iter": 100,
+  "num_iter": 60,
   "batch_size": 32,
   "data_dir": "data/clean_data/",
   "start_iter": 0,

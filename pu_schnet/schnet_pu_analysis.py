@@ -8,6 +8,8 @@ import sys
 import argparse
 from experiment_setup import current_setup, str_to_bool
 # %%
+# For each round, we need a separate prediction column and a cotrain label.
+# The final round only gets a prediction label.
 parser = argparse.ArgumentParser(
     description="Semi-Supervised ML for Synthesizability Prediction"
 )
@@ -77,7 +79,8 @@ def pu_report_schnet(experiment: str = None, prop=prop,
               TARGET = TARGET,
               id_LOtest = id_LOtest,
               pseudo_label_threshold = 0.75,
-              ehull_test = False, small_data = False, data_prefix = data_prefix):
+              ehull_test = False, small_data = False, data_prefix = data_prefix,
+              max_iteration = 60):
     
     def scoreFunc(x):
         trial_num = sum(x.notna())
@@ -90,6 +93,9 @@ def pu_report_schnet(experiment: str = None, prop=prop,
     
     schnet_config_dir = "pu_schnet/schnet_configs"
     config_path = os.path.join(schnet_config_dir, 'pu_config_schnetpack.json')
+    # if half_way_analysis:
+    #     config_path = os.path.join(schnet_config_dir, 'pu_config_schnetpack_hw.json')
+
     # if schnettest:
     #     config_path = os.path.join(schnet_config_dir, 'pu_config_schnetpackTest.json')
         
@@ -106,6 +112,8 @@ def pu_report_schnet(experiment: str = None, prop=prop,
     epoch_num = config["epoch_num"]
     start_iter = config["start_iter"] #not sure about  directory setup for starting after 0.
     num_iter = config["num_iter"]
+    # start_iter = 20 #fix later
+    # num_iter = 100 #fix later
 
     if small_data:
         epoch_num = int(epoch_num*0.5)
@@ -121,20 +129,26 @@ def pu_report_schnet(experiment: str = None, prop=prop,
         crysdf=pd.read_pickle(os.path.join(save_dir,'res_df',f'{res_df_fileName}tmp'))   #saving results at each iteration
     else:
         crysdf=pd.read_pickle(os.path.join(save_dir,'res_df',res_df_fileName))
+        # crysdf=pd.read_pickle('pu_schnet/PUOutput_coSchAl1/res_df/coSchAl1_17_60ep150')
+        
     # crysdf = crysdf.loc[:, ~crysdf.columns.duplicated()] # drops duplicated props at round zero.
    
     pred_columns = []
     score_columns = []
+    excess_iters = []
 
     for it in range(0, num_iter):  #always start at 0 because we want to average prediction over all the iterations.
         pred_col_name = 'pred_'+str(it)
         if half_way_analysis:
             if pred_col_name not in crysdf.columns:
                 continue
-        pred_columns.append(pred_col_name)
-        
-        score_col_name = 'pred_score'+str(it)
-        score_columns.append(score_col_name)
+        if it>max_iteration:
+            excess_iters.append(pred_col_name)
+        else:            
+            pred_columns.append(pred_col_name)
+            
+            score_col_name = 'pred_score'+str(it)
+            score_columns.append(score_col_name)
 
     Preds = crysdf[pred_columns]
     crysdf['predScore'] = Preds.apply(scoreFunc, axis=1)
@@ -147,6 +161,9 @@ def pu_report_schnet(experiment: str = None, prop=prop,
     res_df = res_df.loc[:, ~res_df.columns.duplicated()] # drops duplicated props at round zero.
 
     crysdf = crysdf.drop(columns=Preds)
+    crysdf = crysdf.drop(columns=excess_iters) #might require a df like Preds
+    
+    
 
     experimental_df = res_df[res_df[prop]==1]
     theoretical_df = res_df[res_df[prop]==0]
@@ -185,7 +202,7 @@ def pu_report_schnet(experiment: str = None, prop=prop,
               'predicted_positive_rate': round(predicted_positive_rate, 4),
               'GT_true_positive_rate':'',
               'false_positive_rate':'',}
-    if ehull_test:
+    if ehull_test or ehull015:
         GT_stable = propDF[propDF["stability_GT"]==1] 
         GT_stable = pd.merge(GT_stable, crysdf, on='material_id', how="inner")
         GT_unstable = propDF[propDF["stability_GT"]==0]
@@ -214,6 +231,7 @@ else:
     # print(propDF.head(3))
     # print(propDF.tail(3))
     propDF.to_pickle(propDFpath)
+    print(propDFpath)
     # # %%
     csv_path =os.path.join(f'{result_dir}', 'results.csv')
     resultcsv = pd.read_csv(csv_path,
@@ -226,7 +244,7 @@ else:
     resultcsv.loc[experiment] = new_rates
     # %%
     resultcsv.to_csv(csv_path)
-    # print(resultcsv)
+    print(resultcsv)
 # %%
 """
 schnet_config_dir = "schnet/schnet_configs"

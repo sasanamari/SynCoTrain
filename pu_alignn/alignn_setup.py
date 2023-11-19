@@ -1,29 +1,29 @@
 #!/usr/bin/env python
-import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "2"
-
 """Module to train for a folder with formatted dataset."""
-import csv
-import sys
-import time
-from jarvis.core.atoms import Atoms
-### from alignn.data import get_train_val_loaders
-from pu_alignn.pu_learn.PU_data_handling import get_train_val_loaders_PU
-### from alignn.train import train_dgl
-from pu_alignn.pu_learn.Train_stop import train_dgl
-from alignn.config import TrainingConfig
-from jarvis.db.jsonutils import loadjson
-import argparse
-import torch 
-import numpy as np
-from experiment_setup import current_setup
-# %%
-device = "cpu"
-if torch.cuda.is_available():
-    device = torch.device("cuda")
+# import os
+# os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+
+# import csv
+# import sys
+# import time
+# from jarvis.core.atoms import Atoms
+# ### from alignn.data import get_train_val_loaders
+# from pu_alignn.pu_learn.PU_data_handling import get_train_val_loaders_PU
+# ### from alignn.train import train_dgl
+# from pu_alignn.pu_learn.Train_stop import train_dgl
+# from alignn.config import TrainingConfig
+# from jarvis.db.jsonutils import loadjson
+# import argparse
+# import torch 
+# import numpy as np
+# from experiment_setup import current_setup
+# # %%
+# device = "cpu"
+# if torch.cuda.is_available():
+#     device = torch.device("cuda")
 
 
-def train_for_folder(
+def train_for_folder(gpu_id,
     experiment,
     root_dir="examples/sample_data",
     config_name="config.json",
@@ -40,6 +40,29 @@ def train_for_folder(
     test_id_path ='data/clean_data/alignn0/test_id_1.txt',
 ):
     """Train for a folder."""
+    import os
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
+
+    import csv
+    import sys
+    import time
+    from jarvis.core.atoms import Atoms
+    ### from alignn.data import get_train_val_loaders
+    from pu_alignn.pu_learn.PU_data_handling import get_train_val_loaders_PU
+    ### from alignn.train import train_dgl
+    from pu_alignn.pu_learn.Train_stop import train_dgl
+    from alignn.config import TrainingConfig
+    from jarvis.db.jsonutils import loadjson
+    import argparse
+    import torch 
+    import numpy as np
+    from experiment_setup import current_setup
+    
+    device = "cpu"
+    if torch.cuda.is_available():
+        device = torch.device("cuda")    
+    # if torch.cuda.is_available():
+        torch.cuda.empty_cache()
     # config_dat=os.path.join(root_dir,config_name)
     cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
     # propDFpath = cs["propDFpath"]
@@ -201,7 +224,9 @@ def train_for_folder(
         
     # else:
     model=None
-    
+    print(f"The length of train data is {len(train_loader.dataset)},")
+    print(f"The length of val data is {len(val_loader.dataset)},")
+    print(f"The length of test data is {len(test_loader.dataset)}.")
     train_dgl(
         config,
         model = model,
@@ -213,8 +238,7 @@ def train_for_folder(
         ],
     )
     
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+
         
     t2 = time.time()
     print("Time taken (s):", t2 - t1)

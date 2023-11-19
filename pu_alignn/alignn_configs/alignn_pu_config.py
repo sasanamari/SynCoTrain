@@ -5,48 +5,48 @@ import json
 import argparse
 from experiment_setup import current_setup, str_to_bool
 # %%
-parser = argparse.ArgumentParser(
-    description="Semi-Supervised ML for Synthesizability Prediction"
-)
-parser.add_argument(
-    "--experiment",
-    default="alignn0",
-    help="name of the experiment and corresponding config files.",
-)
-parser.add_argument(
-    "--ehull",
-    type=str_to_bool,
-    default=False,
-    help="Predicting stability to evaluate PU Learning's efficacy.",
-)
-parser.add_argument(
-    "--ehull015",
-    type=str_to_bool,
-    default=False,
-    help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
-)
-parser.add_argument(
-    "--small_data",
-    type=str_to_bool,
-    default=False,
-    help="This option selects a small subset of data for checking the workflow faster.",
-)
-args = parser.parse_args(sys.argv[1:])
-experiment = args.experiment 
-ehull_test = args.ehull
-ehull015 = args.ehull015
-small_data = args.small_data
+# parser = argparse.ArgumentParser(
+#     description="Semi-Supervised ML for Synthesizability Prediction"
+# )
+# parser.add_argument(
+#     "--experiment",
+#     default="alignn0",
+#     help="name of the experiment and corresponding config files.",
+# )
+# parser.add_argument(
+#     "--ehull",
+#     type=str_to_bool,
+#     default=False,
+#     help="Predicting stability to evaluate PU Learning's efficacy.",
+# )
+# parser.add_argument(
+#     "--ehull015",
+#     type=str_to_bool,
+#     default=False,
+#     help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
+# )
+# parser.add_argument(
+#     "--small_data",
+#     type=str_to_bool,
+#     default=False,
+#     help="This option selects a small subset of data for checking the workflow faster.",
+# )
+# args = parser.parse_args(sys.argv[1:])
+# experiment = args.experiment 
+# ehull_test = args.ehull
+# ehull015 = args.ehull015
+# small_data = args.small_data
 current_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(os.path.join(current_dir,'../../'))
 # os.chdir("alignn/alignn_configs")
-def alignn_pu_config_generator(experiment, small_data, ehull_test):
+def alignn_pu_config_generator(experiment, small_data, ehull_test, ehull015):
     cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015=ehull015)
     # propDFpath = cs["propDFpath"]
     # result_dir = cs["result_dir"]
     prop = cs["prop"]
     # TARGET = cs["TARGET"]
     data_prefix = cs["dataPrefix"]
-    max_num_of_iterations = 100
+    max_num_of_iterations = 60#100
     start_of_iterations = 0  
     data_dir = "data/clean_data"
     root_dir = os.path.join(data_dir,"alignn_format")
@@ -76,11 +76,12 @@ def alignn_pu_config_generator(experiment, small_data, ehull_test):
         json.dump(pu_setup, configJson, indent=2)
 
     print(f'New PU Alignn pu_config_{data_prefix}{experiment}_{prop}.json was generated.')
+        
     return pu_config_name
 
-alignn_pu_config_generator(experiment = experiment, 
-                           small_data = small_data,
-                           ehull_test = ehull_test)
+# alignn_pu_config_generator(experiment = experiment, 
+#                            small_data = small_data,
+#                            ehull_test = ehull_test)
 
 # need to update this with experiment_setup.py
 # also, don't need the id_prop_dat anymore.

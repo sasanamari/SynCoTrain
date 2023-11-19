@@ -1,0 +1,9 @@
+exper,true_positive_rate,predicted_positive_rate,LO_true_positive_rate
+schnet0,0.7912,0.1896,0.8288
+alignn0,0.8348,0.1787,0.8619
+coSch1,0.871,0.1972,0.8424
+coAl1,0.9196,0.2447,0.8696
+coSch2,0.9401,0.2623,0.8794
+coAl2,0.9369,0.2495,0.893
+coSch3,0.9391,0.2615,0.8872
+coAl3,0.9533,0.2946,0.9066

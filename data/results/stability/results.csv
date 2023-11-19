@@ -1,7 +1,7 @@
 ,true_positive_rate,predicted_positive_rate,LO_true_positive_rate,GT_true_positive_rate,false_positive_rate
 schnet0,0.7376,0.462,0.7996,0.7756,0.0968
 alignn0,0.7003,0.4275,0.7665,0.7316,0.0772
-coSchAl1,,,,,
+coSchAl1,0.8259,0.3656,0.7198,0.7179,0.0587
 coAlSch1,,,,,
 coSchAl2,,,,,
 coAlSch2,,,,,

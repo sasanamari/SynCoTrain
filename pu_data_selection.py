@@ -5,7 +5,6 @@ import os
 import sys
 import argparse
 from experiment_setup import current_setup, str_to_bool
-from pu_alignn.preparing_data_byFile import prepare_alignn_data
 # %%
 data_dir = 'data/clean_data/'
 
@@ -82,6 +81,8 @@ def data_id_selector(TARGET = TARGET,
     # select validation set inside alignn/schnet        
     alignn_experiment = experiment == "alignn0" or experiment.startswith("coAl")
     if alignn_experiment:
+        from pu_alignn.preparing_data_byFile import prepare_alignn_data
+        
         alignn_data_log = prepare_alignn_data(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
         print(alignn_data_log)
         

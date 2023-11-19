@@ -1,16 +1,16 @@
 # %%
 import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+import sys
 from alignn_setup import *
 from jarvis.db.jsonutils import loadjson, dumpjson
 from synth.myjsonutil import loadjson, dumpjson
 import time
 import argparse
-from experiment_setup import current_setup, str_to_bool
+from experiment_setup import current_setup, str_to_bool, str_to_int
 from pu_alignn.alignn_configs.alignn_pu_config import alignn_pu_config_generator
 # %%
 # make sure to run pu_data_selection again with the correct labels before running cotraining.
-# when running this script somehow the values go wrong in alignn_setup.
+# HARD CODING FOR STARTING AT OTERATION 45!
 parser = argparse.ArgumentParser(
     description="Semi-Supervised ML for Synthesizability Prediction"
 )
@@ -37,11 +37,25 @@ parser.add_argument(
     default=False,
     help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
 )
+parser.add_argument(
+    "--startIt", 
+    type=int, 
+    default=0, 
+    help="Starting itteration No.")
+
+parser.add_argument(
+    "--gpu_id", 
+    type=int, 
+    default=3, 
+    help="GPU ID to use for training.")
+
+
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment 
 ehull_test = args.ehull
 ehull015 = args.ehull015
 small_data = args.small_data
+startIt = args.startIt
 
 cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
 propDFpath = cs["propDFpath"]
@@ -56,22 +70,24 @@ split_id_path = os.path.join(data_dir, split_id_dir)
     
 alignn_dir = "pu_alignn"
 alignn_config_dir = os.path.join(alignn_dir,"alignn_configs")
-pu_config_name = alignn_pu_config_generator(experiment, small_data, ehull_test)
+pu_config_name = alignn_pu_config_generator(experiment, small_data, ehull_test, ehull015)
 pu_setup = loadjson(pu_config_name)
+pu_setup['start_of_iterations'] = startIt
     
 # %%
 def config_generator(
     newConfigName,
     iterNum = 3,
     epochNum = 10,
-    class_config='pu_alignn/default_class_config.json',
+    class_config='pu_alignn/alignn_configs/default_class_config.json',
     alignn_dir = alignn_dir,
     ehull_test = ehull_test
                      ):
-    class_config_path = os.path.join(alignn_dir, 'alignn_configs',
-                                    f'class_config_{data_prefix}{experiment}_{prop}.json')
+    # class_config_path = os.path.join(alignn_dir, 'alignn_configs',
+    #                                 f'class_config_{data_prefix}{experiment}_{prop}.json')
                                     #  class_config+'.json')
-    _config = loadjson(class_config_path)
+    # _config = loadjson(class_config_path)
+    _config = loadjson(class_config)
     _config['random_seed'] = iterNum
     _config['epochs'] = epochNum
     _config['output_dir'] = os.path.join(alignn_dir,f'PUOutput_{data_prefix}{experiment}',
@@ -97,11 +113,12 @@ for iterNum in range(pu_setup['start_of_iterations'],
     config_generator(newConfigName =pu_setup["class_config_name"],
                      iterNum = iterNum,
                      epochNum= pu_setup['epochs'],
-                     class_config='class_config_'+experiment,
+                    #  class_config='class_config_'+experiment,
                     alignn_dir = alignn_dir,
                                     )
        
     train_for_folder(
+        gpu_id = args.gpu_id,
         root_dir=pu_setup["root_dir"],
         config_name=pu_setup["class_config_name"],
         keep_data_order=pu_setup["keep_data_order"],

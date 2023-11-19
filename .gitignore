@@ -15,6 +15,7 @@ PUClass.txt
 pu_alignn/sample_synth
 pu_alignn/PUOutput*
 pu_alignn/PUehull*
+pu_alignn/PUehull015*
 pu_alignn/pretrain_test
 pu_alignn/checking_datasets
 nohup_texts/
@@ -39,5 +40,7 @@ alignn_remaining_time*
 schnet_remaining_time*
 pu_schnet/PUOutput*
 pu_schnet/PUehull*
+pu_schnet/PUehull015*
 pu_schnet/PUOutTest_*
 data/results/*/*_resdf.pkl
+old_code/

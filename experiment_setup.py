@@ -5,6 +5,13 @@ def str_to_bool(value):
         return value.lower() == 'true'
     raise ValueError(f'Boolean value expected for --small_data and --ehull. Insead we got {value} with type{type(value)}.')
 
+def str_to_int(value):
+    try:
+        return int(value)
+    except ValueError:
+        raise ValueError(f'Integer value expected, but received {value} with type {type(value)}.')
+
+
 
 def current_setup(ehull_test, small_data, experiment, ehull015):
 # def current_setup(ehull_test, small_data, experiment, schnettest):
@@ -52,10 +59,11 @@ def current_setup(ehull_test, small_data, experiment, ehull015):
             'coSchAl3':'coAlSch2',
             'coSchAl4':'coAlSch3',
             'coSchAl5':'coAlSch4',
-            'final_class':'change_to_desired_label',
+            'final_avg':'final_label',
     }
     data_prefix = "small_" if small_data else ""
-    data_prefix = "15_" if ehull015 else ""
+    if ehull015:
+        data_prefix = "15_"
     
     
     return {"propDFpath":propDFpath, "result_dir":result_dir, "prop":prop, 
