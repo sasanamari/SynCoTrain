@@ -1,7 +1,7 @@
-# SynthCoTrain 
+# SynCoTrain 
 Co-Training for Crystal Synthesizability Prediction
 ## Intoroduction
-SynthCoTrain is a materials-informatics package which predicts the synthesizability of crystals. The nature of the problem is a semi-supervised classification, in which we access only to positively labeled and unlabeled data points. SynthCoTrain does this classification task by combining two semi-supervised classification methods: **Positive and Unlabeled (PU) Learning** and **Co-training**. The classifiers used in this package are the ALIGNN https://github.com/usnistgov/alignn and the SchNetPack https://github.com/atomistic-machine-learning/schnetpack.
+SynthCoTrain is a materials-informatics package which predicts the synthesizability of crystals. The nature of the problem is a semi-supervised classification, in which we access only to positively labeled and unlabeled data points. SynCoTrain does this classification task by combining two semi-supervised classification methods: **Positive and Unlabeled (PU) Learning** and **Co-training**. The classifiers used in this package are the ALIGNN https://github.com/usnistgov/alignn and the SchNetPack https://github.com/atomistic-machine-learning/schnetpack.
 
 <!-- ![cotraining scheme](figures/cotraining_scheme.jpg) -->
 <div style="text-align:center">
@@ -21,18 +21,18 @@ Then, you can install the required packages for ALIGNN from the Inline code `req
 pip install -r requirements_alignn.txt
 ```
 If `requirements_alignn.txt` doe not work, you can also try `alignn_pipfreee.txt` instead.
-After installing the required packges, you can install SynthCoTrain by
+After installing the required packges, you can install SynCoTrain by
 ```
-cd /path/to/SynthCoTrain
+cd /path/to/SynCoTrain
 pip install .
 ```
 
-Now you have installed ALIGNN and SynthCoTrain in your new puAlignn env. Similarly, you can create a separate conda env for the SchNetPack and install the corresponding packages there:
+Now you have installed ALIGNN and SynCoTrain in your new puAlignn env. Similarly, you can create a separate conda env for the SchNetPack and install the corresponding packages there:
 ```bash
 conda create -n puSchnet python=3.9
 conda activate puSchnet
 pip install -r requirements_schnet.txt
-cd /path/to/SynthCoTrain
+cd /path/to/SynCoTrain
 pip install .
 ```
 

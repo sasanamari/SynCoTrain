@@ -34,6 +34,8 @@ labeldf = labeldf.drop(columns=[f"{prop}_x",f"{prop}_y"])
 labeldf[f"{prop}_avg"]=labeldf[['avg_prediction','predScore']].apply(lambda x: np.nanmean(x), axis=1)
 labeldf[f"{prop}_preds"]=labeldf[f"{prop}_avg"].map(lambda x: 0 if x<0.5 else 1)
 labeldf[f"{prop}_labels"]=labeldf.apply(lambda x: 1 if x[prop] == 1 else x[f"{prop}_preds"], axis=1)
+# the last line corrects for the false negative data, to have healthy labels for training a 
+# synthesizability predictor (all the experimental data will be labeled as class 1.)
 
 # %%
 crysdf = pd.read_pickle(propDFpath)
