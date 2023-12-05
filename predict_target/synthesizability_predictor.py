@@ -244,35 +244,24 @@ if __name__ == "__main__":
     config_name = args.config_name
     
     
-    
-    data_csv_path = os.path.join(directory_path,"id_for_synth_pred.csv")
-    with open(data_csv_path, "r") as f:
-        reader = csv.reader(f)
-        data = [row for row in reader]
         
-
-    # dataset = []
-    # n_outputs = []
-    # multioutput = False
-    # lists_length_equal = True
+    poscars_dir = os.path.join(directory_path, 'poscars_for_synth_prediction')
     synth_preds = []
-    for i in data:
-        info = {}
-        file_name = i[0]
-        # file_path = os.path.join(root_dir, file_name)  
-        file_path = os.path.join(directory_path, 'poscars_for_synth_prediction', file_name)
-        atoms = Atoms.from_poscar(file_path)
-
-        out_class = get_prediction(
-            model_name=model_name,
-            cutoff=float(cutoff),
-            max_neighbors=int(max_neighbors),
-            atoms=atoms,
-        )
-        synth_preds.append([file_name, out_class])
-
-    # print("Predicted value:", model_name, file_path, out_data)
+    # Iterate over all files in the poscars_for_synth_prediction directory
+    for file_name in os.listdir(poscars_dir):
+        file_path = os.path.join(poscars_dir, file_name)
+        if os.path.isfile(file_path):  # Check if it's a file
+            atoms = Atoms.from_poscar(file_path)
+            out_class = get_prediction(
+                model_name=model_name,
+                cutoff=float(cutoff),
+                max_neighbors=int(max_neighbors),
+                atoms=atoms,
+            )
+            synth_preds.append([file_name, out_class])
         print("Predicted value:", model_name, file_name, out_class)
+        
+        
 
     csv_path = os.path.join(directory_path,'synth_preds.csv')
 

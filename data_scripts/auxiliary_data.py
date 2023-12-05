@@ -1,3 +1,4 @@
+# This is the old version for producing stability (ehull) verification. Please use the auxiliary_data_015.py instead to produce ehull015 data.
 # Run this script to produce the data required for ehull_test and small_data runs.
 # %%
 import numpy as np
