@@ -529,18 +529,42 @@ midlabel_dist(coschnet3, df, figtitle="Iteration '3' with SchNet",
               filename="coschnet3_prop_dist.png")
 
 # %%
-finaldf = pd.read_pickle("/home/samariam/projects/SynthCoTrain/predict_target/final_df")
+# finaldf = pd.read_pickle("/home/samariam/projects/SynthCoTrain/predict_target/final_df")
+# this only has about 4k data (test set)
+# write dynamic path.
+# %%
+# with open(f"leaveout_test_material_id.txt", "w") as f:
+#     for test_material_id in mdf.loc[id_LOtest].material_id:
+#         f.write(str(test_material_id) + "\n") 
+# #mdf is synthdf or schnet0 or coSchnet...
 # %%
 def final_labels(plot_df, ehull=False,prop = prop,figtitle = None, filename=None):
     edf = plot_df[plot_df[prop] == 1]
     tdf = plot_df[plot_df[prop] == 0]
     # prob = "prediction"
-    prob_col = "synth_avg"
-    prob_col = "synth_labels"
+    # prob_col = "synth_avg"
+    prob_col = "synth_preds"
 
-    true_positive_rate = edf[prob_col].mean()
+
+    LOTestPath = "leaveout_test_material_id.txt"
+    # edf = plot_df[plot_df[prop] == 1]
+    # tdf = plot_df[plot_df[prop] == 0]
+    with open(LOTestPath, "r") as ff:
+        id_LOtest_mat = [line.strip() for line in ff]
+        # id_LOtest = [int(line.strip()) for line in ff]
+    edf.set_index('material_id', inplace=True)
+    LO_testSet = edf.loc[id_LOtest_mat]
+    testSet = edf.drop(index = LO_testSet.index)
+    LO_true_positive_rate = LO_testSet[prob_col].mean()
+    true_positive_rate = testSet[prob_col].mean()
+    # LO_true_positive_rate = LO_testSet.prediction.mean()
+    # true_positive_rate = testSet.prediction.mean()
+    print(f"LO_true_positive_rate is {LO_true_positive_rate} and True_positive_rate is {true_positive_rate}")
+    # tpr_mean = np.mean([LO_true_positive_rate, true_positive_rate])
     unlabeled_synth_frac = tdf[prob_col].mean()
-    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(6,6))
+    # unlabeled_synth_frac = tdf.prediction.mean()
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(8,8))
 
     n, bins, patches = ax1.hist(edf[prob_col], bins=40)
     max_height = n.max()
@@ -548,10 +572,12 @@ def final_labels(plot_df, ehull=False,prop = prop,figtitle = None, filename=None
     ax1.vlines(.5, 0,max_height, 'r',linewidth=3)
     ax1.arrow(.5,max_height*.7,.35,0, linewidth=3, color ='r', length_includes_head=True,
             head_width=max_height*.08, head_length=0.05)
-    ax1.text(.55,max_height*.4, '{:.1f}% true- \npositive rate'.format(true_positive_rate*100), fontsize = 15);
+    ax1.text(.53,max_height*.6, '{:.1f}% Recall'.format(true_positive_rate*100), fontsize = 14);
+    ax1.text(.53,max_height*.4, '{:.1f}% Leave-out Recall'.format(LO_true_positive_rate*100), fontsize = 14);
+    # ax1.text(.55,max_height*.4, '{:.1f}% true- \npositive rate'.format(true_positive_rate*100), fontsize = 15);
 
 
-    plt.xlabel('Predicted Classes of Synthesizability', fontsize=14)
+    plt.xlabel('Predicted Classes of Synthesizability', fontsize=14, labelpad=10)
 
     n, bins, patches = ax2.hist(tdf[prob_col],bins=40)
     max_height = n.max()
@@ -559,7 +585,7 @@ def final_labels(plot_df, ehull=False,prop = prop,figtitle = None, filename=None
     ax2.arrow(.5,max_height*.7,.35,0, linewidth=3, color ='r', length_includes_head=True,
             head_width=max_height*.08, head_length=0.05)
     ax2.set_title('Probability Distribution for Theoretical Data', fontsize=13.5,fontweight='bold')
-    ax2.text(.55,max_height*.4, '{:.1f}% predicted \n synthesizable'.format(unlabeled_synth_frac*100), fontsize = 15);
+    ax2.text(.53,max_height*.4, '{:.1f}% predicted \n synthesizable'.format(unlabeled_synth_frac*100), fontsize = 14);
     if figtitle:
         fig.suptitle(figtitle, fontsize = 25, y =1.02)
     if filename:

@@ -1,4 +1,4 @@
-# Run this script to produce the data required for ehull_test and small_data runs.
+# Run this script to produce the data required for ehull015 and small_data runs.
 # %%
 import numpy as np
 import pandas as pd
@@ -19,7 +19,7 @@ stabilityDF.loc[:, "stability"] = np.where(stabilityDF.energy_above_hull <= 0.01
 stabilityDF["stability_GT"] = stabilityDF["stability"].copy()
 n_unlabel = stabilityDF["stability_GT"].sum() - len(experimental_df)
 # we leave the same number of positive class in the data as the synthesizability.
-materials_to_unlabel = stabilityDF[stabilityDF["stability_GT"]==1].sample(n_unlabel).index
+materials_to_unlabel = stabilityDF[stabilityDF["stability_GT"]==1].sample(int(n_unlabel)).index
 stabilityDF.loc[materials_to_unlabel, "stability"] = int(0)
 # we unlabel the same number of data points as the 
 stabilityDF.loc[:, "stability"] = stabilityDF.stability.astype(int)

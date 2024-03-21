@@ -3,7 +3,7 @@ def str_to_bool(value):
         return value
     if value.lower() in ('true', 'false'):
         return value.lower() == 'true'
-    raise ValueError(f'Boolean value expected for --small_data and --ehull. Insead we got {value} with type{type(value)}.')
+    raise ValueError(f'Boolean value expected for --small_data and --ehull015. Insead we got {value} with type{type(value)}.')
 
 def str_to_int(value):
     try:
@@ -13,11 +13,7 @@ def str_to_int(value):
 
 
 
-def current_setup(ehull_test, small_data, experiment, ehull015):
-# def current_setup(ehull_test, small_data, experiment, schnettest):
-    if str_to_bool(ehull_test) and str_to_bool(small_data):
-        error_message = "small_data and ehull_test are not allowed at the same time."
-        raise Exception(error_message)
+def current_setup(small_data, experiment, ehull015):
     if str_to_bool(ehull015) and str_to_bool(small_data):
         error_message = "small_data and ehull015 are not allowed at the same time."
         raise Exception(error_message)
@@ -29,10 +25,6 @@ def current_setup(ehull_test, small_data, experiment, ehull015):
     elif ehull015:
         propDFpath = 'data/clean_data/stabilityDF015' 
         result_dir = 'data/results/stability015'
-        prop = 'stability'
-    elif ehull_test:
-        propDFpath = 'data/clean_data/stabilityDF' 
-        result_dir = 'data/results/stability'
         prop = 'stability'
     else:
         propDFpath = 'data/clean_data/synthDF'

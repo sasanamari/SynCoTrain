@@ -9,21 +9,34 @@ import argparse
 from experiment_setup import current_setup, str_to_bool
 import warnings
 # %%
-resdf = pd.read_csv('prediction_results_test_set.csv')
+experiment = 'final_avg'
+ehull015 = False
+small_data = False
+cs = current_setup(small_data=small_data, experiment=experiment, ehull015 = ehull015)
+propDFpath = cs["propDFpath"]
+# %%
+current_dir = os.path.dirname(os.path.abspath(__file__))
+resfile = 'prediction_results_test_set.csv'
+respath = os.path.join(current_dir, resfile)
+resdf = pd.read_csv(respath)
 # %%
 resdf.reset_index(inplace=True, drop=True)
 resdf['material_id'] = resdf['id'].map(lambda material_id: re.split('CAR-|.vas', material_id)[1])
 # %%
-propdf = pd.read_pickle("/home/samariam/projects/SynthCoTrain/data/clean_data/synthDF")
+# propdf = pd.read_pickle("/home/samariam/projects/SynthCoTrain/data/clean_data/synthDF")
+project_root = os.path.dirname(os.path.dirname(current_dir))
+propdf = pd.read_pickle(os.path.join(project_root, propDFpath))
+# change this to dynamic address!
 # %%
 finaldf= pd.merge(propdf[["material_id", "synth"]], resdf, on="material_id", how="inner")
 # %%
 edf = finaldf[finaldf.synth==1]
 tdf = finaldf[finaldf.synth==0]
 # %%
-edf.prediction.mean()
+print(edf.prediction.mean())
 # %%
-tdf.prediction.mean()
+print(tdf.prediction.mean())
 # %%
-# finaldf.to_pickle("/home/samariam/projects/SynthCoTrain/predict_target/final_df")
+# finaldf.to_pickle("~/projects/SynthCoTrain/predict_target/final_df")
+finaldf.to_pickle(os.path.join(os.path.dirname(current_dir), 'final_df'))
 # %%

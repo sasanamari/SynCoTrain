@@ -34,10 +34,12 @@
     "use_canonize": true,
     "num_workers": 4,
     "cutoff": 8.0,
+    "cutoff_extra": 3.0,
     "max_neighbors": 12,
     "keep_data_order": false,
     "normalize_graph_level_loss": false,
     "distributed": false,
+    "data_parallel": false,
     "n_early_stopping": null,
     "output_dir": "predict_target/synth_final_preds",
     "model": {
@@ -53,6 +55,7 @@
         "link": "identity",
         "zero_inflated": false,
         "classification": true,
-        "num_classes": 2
+        "num_classes": 2,
+        "extra_features": 0
     }
 }

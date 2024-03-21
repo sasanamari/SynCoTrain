@@ -14,29 +14,11 @@ parser.add_argument(
     help="name of the experiment and corresponding config files.",
 )
 parser.add_argument(
-    "--ehull",
-    type=str_to_bool,
-    default=False,
-    help="Predicting stability to evaluate PU Learning's efficacy.",
-)
-parser.add_argument(
     "--ehull015",
     type=str_to_bool,
     default=False,
     help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
 )
-# parser.add_argument(
-#     "--schnettest",
-#     type=str_to_bool,
-#     default=False,
-#     help="Predicting stability and testing the model.",
-# )
-# parser.add_argument(
-#     "--ntest",
-#     type=str,
-#     default='0',
-#     help="test number.",
-# )
 parser.add_argument(
     "--small_data",
     type=str_to_bool,
@@ -44,11 +26,10 @@ parser.add_argument(
     help="This option selects a small subset of data for checking the workflow faster.",
 )
 parser.add_argument(
-    "--hw",
-    type=str_to_bool,
-    default=False,
-    help="Modify pu_config_schnetpack_hw.json manually if you don't want to start from iteration 0.",
-)
+    "--startIt", 
+    type=int, 
+    default=0, 
+    help="Starting iteration No.")
 parser.add_argument(
     "--gpu_id", 
     type=int, 
@@ -59,9 +40,8 @@ args = parser.parse_args(sys.argv[1:])
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id) # use before loading lightning.gpu
 experiment = args.experiment 
 ehull015 = args.ehull015
-ehull_test = args.ehull
 small_data = args.small_data
-half_way_iteration = args.hw
+startIt = args.startIt
 # schnettest  =args.schnettest
 # ntest = args.ntest
 
@@ -82,8 +62,7 @@ from pu_schnet.pu_learn.schnet_funcs  import directory_setup, predProb
 import time
 from pytorch_lightning.callbacks import EarlyStopping
 
-cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment,#)
-                   ehull015 = ehull015)
+cs = current_setup(small_data=small_data, experiment=experiment, ehull015 = ehull015)
                 #    schnettest=schnettest)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
@@ -94,8 +73,8 @@ print(f"Running the {data_prefix}{experiment} experiment for the {prop} property
 start_time = time.time()
 # %%
 config_path = 'pu_schnet/schnet_configs/pu_config_schnetpack.json'
-if half_way_iteration:
-    config_path = 'pu_schnet/schnet_configs/pu_config_schnetpack_hw.json'
+# if half_way_iteration:
+#     config_path = 'pu_schnet/schnet_configs/pu_config_schnetpack_hw.json'
 # if schnettest:
 #     config_path = 'pu_schnet/schnet_configs/pu_config_schnetpackTest.json'
 
@@ -111,7 +90,8 @@ print(Path(__file__).parent.resolve()) #file path (dcript directory) path in a p
 epoch_num = config["epoch_num"]
 if small_data:
     epoch_num = int(epoch_num*0.5)
-start_iter = config["start_iter"] #not sure about  directory setup for starting after 0.
+config["start_iter"] = startIt #For consistency 
+start_iter = config["start_iter"] 
 num_iter = config["num_iter"]
 batch_size = config["batch_size"]
 
@@ -121,8 +101,6 @@ res_df_fileName = f'{data_prefix}{experiment}_{str(start_iter)}_{str(num_iter)}e
 save_dir = os.path.join(schnetDirectory,f'PUOutput_{data_prefix}{experiment}')
 if ehull015:
     save_dir = os.path.join(schnetDirectory,f'PUehull015_{experiment}')
-elif ehull_test:
-    save_dir = os.path.join(schnetDirectory,f'PUehull_{experiment}')
 data_dir = config["data_dir"]
 res_dir = os.path.join(save_dir,'res_df')
 # %%
@@ -136,9 +114,9 @@ crysdf["targets"] = crysdf[TARGET].map(lambda target: np.array(target).flatten()
 #we need the array to have the shape (1,), hence we use flatten()
 crysdf["targets"] = crysdf.targets.map(lambda target: {prop: np.array(target)})  
 #The above changes targets fromat from array to dict with array val
-if half_way_iteration:
+# if half_way_iteration:    
+if startIt != 0:
     iteration_results = pd.read_pickle(os.path.join(res_dir,f'{data_prefix}{experiment}_0_{str(num_iter)}ep{str(epoch_num)}'+'tmp'))
-    # iteration_results = pd.read_pickle(os.path.join(res_dir,f'schnet0_20_60ep150tmp'))
 else:
     iteration_results = crysdf[["material_id", prop, TARGET]]
     iteration_results = iteration_results.loc[:, ~iteration_results.columns.duplicated()] # drops duplicated props at round zero.
@@ -229,7 +207,7 @@ for it in range(start_iter, num_iter):
         id_test = [int(line.strip()) for line in f2]
         
     with open(experimentalDataSize_path, "r") as f3:
-        experimentalDataSize = [int(line.strip()) for line in f3][0]        
+        experimentalDataSize = [int(float(line.strip())) for line in f3][0]        
     
     it_traindf = crysdf.loc[id_val_train]
     it_testdf = crysdf.loc[id_test]

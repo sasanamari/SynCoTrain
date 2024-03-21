@@ -34,7 +34,6 @@ def train_for_folder(gpu_id,
     file_format="poscar",
     output_dir=None,
     small_data = False,
-    ehull_test = False,
     ehull015 = False,
     train_id_path = 'data/clean_data/alignn0/train_id_1.txt',
     test_id_path ='data/clean_data/alignn0/test_id_1.txt',
@@ -64,7 +63,7 @@ def train_for_folder(gpu_id,
     # if torch.cuda.is_available():
         torch.cuda.empty_cache()
     # config_dat=os.path.join(root_dir,config_name)
-    cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
+    cs = current_setup(small_data=small_data, experiment=experiment, ehull015 = ehull015)
     # propDFpath = cs["propDFpath"]
     # result_dir = cs["result_dir"]
     prop = cs["prop"]
@@ -101,7 +100,7 @@ def train_for_folder(gpu_id,
             
     with open(os.path.join(os.path.dirname(train_id_path), 
                            'experimentalDataSize.txt')) as eds:
-        experimentalDataSize = int(eds.read().strip())
+        experimentalDataSize = int(float(eds.read().strip()))
     
     data_csv_path = os.path.join(root_dir, 
                     f"{data_prefix}{prop}_id_from_{TARGET}.csv")

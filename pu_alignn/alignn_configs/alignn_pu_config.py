@@ -5,6 +5,7 @@ import json
 import argparse
 from experiment_setup import current_setup, str_to_bool
 # %%
+# Do not uncomment (this is for running this script as a standalone, not for importing).
 # parser = argparse.ArgumentParser(
 #     description="Semi-Supervised ML for Synthesizability Prediction"
 # )
@@ -12,12 +13,6 @@ from experiment_setup import current_setup, str_to_bool
 #     "--experiment",
 #     default="alignn0",
 #     help="name of the experiment and corresponding config files.",
-# )
-# parser.add_argument(
-#     "--ehull",
-#     type=str_to_bool,
-#     default=False,
-#     help="Predicting stability to evaluate PU Learning's efficacy.",
 # )
 # parser.add_argument(
 #     "--ehull015",
@@ -33,14 +28,13 @@ from experiment_setup import current_setup, str_to_bool
 # )
 # args = parser.parse_args(sys.argv[1:])
 # experiment = args.experiment 
-# ehull_test = args.ehull
 # ehull015 = args.ehull015
 # small_data = args.small_data
 current_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(os.path.join(current_dir,'../../'))
 # os.chdir("alignn/alignn_configs")
-def alignn_pu_config_generator(experiment, small_data, ehull_test, ehull015):
-    cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015=ehull015)
+def alignn_pu_config_generator(experiment, small_data, ehull015):
+    cs = current_setup(small_data=small_data, experiment=experiment, ehull015=ehull015)
     # propDFpath = cs["propDFpath"]
     # result_dir = cs["result_dir"]
     prop = cs["prop"]

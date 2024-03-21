@@ -127,7 +127,7 @@ def oxide_check(initStruc : Structure) -> Tuple[bool, bool, bool, Structure]:
 
 
 
-def clean_oxide(pymatgenArray : np.ndarray, reportBadData : bool = False) -> np.ndarray:
+def clean_oxide(experimental : bool, pymatgenArray : np.ndarray, reportBadData : bool = False, ) -> np.ndarray:
     '''Filters undesired data points from the pymatgen data.
     Undesired data here include: 1- structures which cannot be converted to primitive cell. 
     2- data the oxidation states of which cannot be analyzed. 
@@ -149,11 +149,16 @@ def clean_oxide(pymatgenArray : np.ndarray, reportBadData : bool = False) -> np.
     other_oxidation_IDs = []
     valence_problem_IDs = []
     bad_structure_IDs = []
+    ustable_experimental_IDs = []
 
     for j, material in enumerate(pymatgenArray):        
         if OxideType(material["structure"]).oxide_type != "oxide":
             other_oxidation_IDs.append([j,material['material_id']])
             continue
+        if experimental:
+            if material['energy_above_hull']>1:
+                ustable_experimental_IDs.append([j,material['material_id']])
+                continue
         try:
             other_anion, other_oxidation, bad_structure, primStruc = oxide_check(initStruc=material["structure"])
             if other_anion:
@@ -174,11 +179,12 @@ def clean_oxide(pymatgenArray : np.ndarray, reportBadData : bool = False) -> np.
     print("The number of entries where the primitive structure could not be calculated were", len(bad_structure_IDs))
 
     anion_ind = [i[0] for i in other_anion_IDs]
+    unstable_ind = [i[0] for i in ustable_experimental_IDs]
     oxid_ind = [i[0] for i in other_oxidation_IDs]
     valence_ind = [i[0] for i in valence_problem_IDs]
     structure_ind = [i[0] for i in bad_structure_IDs]
                         
-    goodata = np.delete(pymatgenArray, [*anion_ind, *oxid_ind, *valence_ind, *structure_ind])
+    goodata = np.delete(pymatgenArray, [*anion_ind, *unstable_ind, *oxid_ind, *valence_ind, *structure_ind])
     # del pymatgenArray
     print("The length of data after removing undesired entries is ",len(goodata))   
     
@@ -190,5 +196,5 @@ def clean_oxide(pymatgenArray : np.ndarray, reportBadData : bool = False) -> np.
     valence_problem_IDs = [i[1] for i in valence_problem_IDs]
     bad_structure_IDs = [i[1] for i in bad_structure_IDs]
 
-    return goodata, other_anion_IDs, other_oxidation_IDs, valence_problem_IDs, bad_structure_IDs
+    return goodata, other_anion_IDs, ustable_experimental_IDs, other_oxidation_IDs, valence_problem_IDs, bad_structure_IDs
 

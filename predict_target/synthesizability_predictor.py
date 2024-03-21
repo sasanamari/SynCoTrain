@@ -47,9 +47,9 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--directory_path",
+    "--directory_name",
     # default="alignn/examples/sample_data/POSCAR-JVASP-10.vasp",
-    default="predict_target/label_alignn_format",
+    default="predictor_toy_data",
     help="Path to file.",
 )
 
@@ -88,7 +88,7 @@ def get_config(config_name = "predict_target/config.json"):
             print("Check this expection here", exp)
     return config
 
-def load_model_from_checkpoint(checkpoint_file = "predict_target/synth_final_preds/checkpoint_120.pt",  
+def load_model_from_checkpoint(checkpoint_file = "predict_target/synth_final_preds/best_model.pt",  
                                output_features=1):
     config = get_config()
     model = ALIGNN(config=config.model)
@@ -237,15 +237,15 @@ def get_multiple_predictions(
 if __name__ == "__main__":
     args = parser.parse_args(sys.argv[1:])
     model_name = args.model_name
-    directory_path = args.directory_path
+    directory_name = args.directory_name
     file_format = args.file_format
     cutoff = args.cutoff
     max_neighbors = args.max_neighbors
     config_name = args.config_name
     
     
-        
-    poscars_dir = os.path.join(directory_path, 'poscars_for_synth_prediction')
+    directory_path = "predict_target/label_alignn_format/poscars_for_synth_prediction"    
+    poscars_dir = os.path.join(directory_path, directory_name)
     synth_preds = []
     # Iterate over all files in the poscars_for_synth_prediction directory
     for file_name in os.listdir(poscars_dir):
@@ -263,7 +263,7 @@ if __name__ == "__main__":
         
         
 
-    csv_path = os.path.join(directory_path,'synth_preds.csv')
+    csv_path = os.path.join(os.path.dirname(directory_path),'synth_preds.csv')
 
 # Open the file in write mode
     with open(csv_path, 'w', newline='') as file:

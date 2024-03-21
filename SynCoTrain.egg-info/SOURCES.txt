@@ -1,0 +1,14 @@
+LICENSE
+README.md
+setup.py
+SynCoTrain.egg-info/PKG-INFO
+SynCoTrain.egg-info/SOURCES.txt
+SynCoTrain.egg-info/dependency_links.txt
+SynCoTrain.egg-info/top_level.txt
+data_scripts/__init__.py
+data_scripts/auxiliary_data_015.py
+data_scripts/crystal_funcs.py
+data_scripts/crystal_structure_conversion.py
+data_scripts/icsd_data_query.py
+data_scripts/jarvis_oqmd_query.py
+data_scripts/pymatgen_oxide_clean.py

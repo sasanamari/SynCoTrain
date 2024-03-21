@@ -32,9 +32,9 @@ for material in theoretical_oxygens: #we prepare {'material_id', 'structure'} fo
 for material in experimental_oxygens:
     material["structure"] = Structure.from_dict(material["structure"]) 
 # %%
-good_experimental_data = clean_oxide(experimental_oxygens, reportBadData=False)
+good_experimental_data = clean_oxide(experimental=True, pymatgenArray = experimental_oxygens, reportBadData=False)
 # %%
-good_theoretical_data = clean_oxide(theoretical_oxygens, reportBadData=False)
+good_theoretical_data = clean_oxide(experimental=False, pymatgenArray = theoretical_oxygens, reportBadData=False)
 # %%
 # now we need to fix the fields.
 keys_to_keep = ["material_id", "atoms", 
@@ -73,12 +73,12 @@ full_data = full_data.reset_index(drop = True)
 # %%
 full_data["schnet0"] = np.nan
 full_data["alignn0"] = np.nan
-full_data["coSchAl1"] = np.nan #cotraining SchNet on Alignn labels 1st time
-full_data["coAlSch1"] = np.nan #cotraining Alignn on SchNet labels 1st time
-full_data["coSchAl2"] = np.nan #cotraining SchNet on Alignn labels 2nd time
-full_data["coAlSch2"] = np.nan #cotraining Alignn on SchNet labels 2nd time
-full_data["coSchAl3"] = np.nan #cotraining SchNet on Alignn labels 3rd time
-full_data["coAlSch3"] = np.nan #cotraining Alignn on SchNet labels 3rd time
+full_data["coSchnet1"] = np.nan #cotraining SchNet on Alignn labels 1st time
+full_data["coAlignn1"] = np.nan #cotraining Alignn on SchNet labels 1st time
+full_data["coSchnet2"] = np.nan #cotraining SchNet on Alignn labels 2nd time
+full_data["coAlignn2"] = np.nan #cotraining Alignn on SchNet labels 2nd time
+full_data["coSchnet3"] = np.nan #cotraining SchNet on Alignn labels 3rd time
+full_data["coAlignn3"] = np.nan #cotraining Alignn on SchNet labels 3rd time
 # %%
 if not os.path.exists(clean_location):
     os.mkdir(clean_location)

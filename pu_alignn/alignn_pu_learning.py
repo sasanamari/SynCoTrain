@@ -3,7 +3,7 @@ import os
 import sys
 from alignn_setup import *
 from jarvis.db.jsonutils import loadjson, dumpjson
-from synth.myjsonutil import loadjson, dumpjson
+from jarvis.db.jsonutils import loadjson, dumpjson
 import time
 import argparse
 from experiment_setup import current_setup, str_to_bool, str_to_int
@@ -18,12 +18,6 @@ parser.add_argument(
     "--experiment",
     default="alignn0",
     help="name of the experiment and corresponding config files.",
-)
-parser.add_argument(
-    "--ehull",
-    type=str_to_bool,
-    default=False,
-    help="Predicting stability to evaluate PU Learning's efficacy.",
 )
 parser.add_argument(
     "--small_data",
@@ -41,7 +35,7 @@ parser.add_argument(
     "--startIt", 
     type=int, 
     default=0, 
-    help="Starting itteration No.")
+    help="Starting iteration No.")
 
 parser.add_argument(
     "--gpu_id", 
@@ -52,12 +46,11 @@ parser.add_argument(
 
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment 
-ehull_test = args.ehull
 ehull015 = args.ehull015
 small_data = args.small_data
 startIt = args.startIt
 
-cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
+cs = current_setup(small_data=small_data, experiment=experiment, ehull015 = ehull015)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
@@ -70,7 +63,7 @@ split_id_path = os.path.join(data_dir, split_id_dir)
     
 alignn_dir = "pu_alignn"
 alignn_config_dir = os.path.join(alignn_dir,"alignn_configs")
-pu_config_name = alignn_pu_config_generator(experiment, small_data, ehull_test, ehull015)
+pu_config_name = alignn_pu_config_generator(experiment, small_data, ehull015)
 pu_setup = loadjson(pu_config_name)
 pu_setup['start_of_iterations'] = startIt
     
@@ -81,7 +74,7 @@ def config_generator(
     epochNum = 10,
     class_config='pu_alignn/alignn_configs/default_class_config.json',
     alignn_dir = alignn_dir,
-    ehull_test = ehull_test
+    ehull015 = ehull015
                      ):
     # class_config_path = os.path.join(alignn_dir, 'alignn_configs',
     #                                 f'class_config_{data_prefix}{experiment}_{prop}.json')
@@ -94,9 +87,6 @@ def config_generator(
                                          f'{str(iterNum)}iter/')
     if ehull015:
         _config['output_dir'] = os.path.join(alignn_dir,f'PUehull015_{experiment}',
-                                         f'{str(iterNum)}iter/')
-    elif ehull_test:
-        _config['output_dir'] = os.path.join(alignn_dir,f'PUehull_{experiment}',
                                          f'{str(iterNum)}iter/')
 
     dumpjson(_config, filename=newConfigName)
@@ -128,7 +118,6 @@ for iterNum in range(pu_setup['start_of_iterations'],
         batch_size=None,#this is read separately for each iteration from the generated config file.
         epochs=pu_setup["epochs"],
         file_format=pu_setup["file_format"],
-        ehull_test = ehull_test,
         ehull015 = ehull015, 
         small_data = small_data,
         train_id_path = os.path.join(split_id_path, f'train_id_{iterNum}.txt'),

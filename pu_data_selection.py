@@ -20,12 +20,6 @@ parser.add_argument(
     help="name of the experiment and corresponding config files.",
 )
 parser.add_argument(
-    "--ehull",
-    type=str_to_bool,
-    default=False,
-    help="Predicting stability to evaluate PU Learning's efficacy.",
-)
-parser.add_argument(
     "--ehull015",
     type=str_to_bool,
     default=False,
@@ -41,11 +35,8 @@ parser.add_argument(
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment
 ehull015 = args.ehull015
-ehull_test = args.ehull
 small_data = args.small_data
-# schnettest = args.schnettest
-cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
-#, schnettest = schnettest)
+cs = current_setup(small_data=small_data, experiment=experiment, ehull015 = ehull015)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
@@ -56,7 +47,7 @@ def data_id_selector(TARGET = TARGET,
                      prop = prop,
                      data_path = propDFpath,
                      experiment = experiment,
-                     ehull_test = ehull_test,
+                     ehull015 = ehull015,
                      small_data = small_data,
                      num_iter = 100,
                      test_ratio = 0.1,
@@ -78,7 +69,7 @@ def data_id_selector(TARGET = TARGET,
     if alignn_experiment:
         from pu_alignn.preparing_data_byFile import prepare_alignn_data
         
-        alignn_data_log = prepare_alignn_data(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
+        alignn_data_log = prepare_alignn_data(small_data=small_data, experiment=experiment, ehull015 = ehull015)
         print(alignn_data_log)
         
     # if test_strategy == 'constant':

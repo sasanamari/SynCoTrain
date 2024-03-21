@@ -19,12 +19,6 @@ parser.add_argument(
     help="name of the experiment and corresponding config files.",
 )
 parser.add_argument(
-    "--ehull",
-    type=str_to_bool,
-    default=False,
-    help="Predicting stability to evaluate PU Learning's efficacy.",
-)
-parser.add_argument(
     "--ehull015",
     type=str_to_bool,
     default=False,
@@ -36,12 +30,11 @@ parser.add_argument(
     default=False,
     help="Analysis before the final iteration.",
 )
-# parser.add_argument(
-#     "--schnettest",
-#     type=str_to_bool,
-#     default=False,
-#     help="Predicting stability and checking results.",
-# )
+parser.add_argument(
+    "--startIt", 
+    type=int, 
+    default=0, 
+    help="Starting iteration No.")
 parser.add_argument(
     "--small_data",
     type=str_to_bool,
@@ -51,19 +44,19 @@ parser.add_argument(
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment 
 ehull015 = args.ehull015
-ehull_test = args.ehull
+startIt = args.startIt
+
 small_data = args.small_data
 half_way_analysis = args.hw
 # schnettest = args.schnettest
 
-cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015=ehull015)
-# cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, schnettest=schnettest)
+cs = current_setup(small_data=small_data, experiment=experiment, ehull015=ehull015)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
 TARGET = cs["TARGET"]
 data_prefix = cs["dataPrefix"]
-print(f'experiment is {experiment}, small_data {small_data} & ehull {ehull_test}.')
+print(f'experiment is {experiment}, small_data {small_data} & ehull {ehull015}.')
 current_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(os.path.dirname(current_dir))
 data_dir = os.path.dirname(propDFpath)
@@ -79,8 +72,8 @@ def pu_report_schnet(experiment: str = None, prop=prop,
               TARGET = TARGET,
               id_LOtest = id_LOtest,
               pseudo_label_threshold = 0.75,
-              ehull_test = False, small_data = False, data_prefix = data_prefix,
-              max_iteration = 60):
+              ehull015 = False, small_data = False, data_prefix = data_prefix,
+              startIt = startIt, max_iteration = 60):
     
     def scoreFunc(x):
         trial_num = sum(x.notna())
@@ -110,7 +103,7 @@ def pu_report_schnet(experiment: str = None, prop=prop,
     print(Path().absolute()) #file path in jupyter
 
     epoch_num = config["epoch_num"]
-    start_iter = config["start_iter"] #not sure about  directory setup for starting after 0.
+    # start_iter = config["start_iter"] #not sure about  directory setup for starting after 0.
     num_iter = config["num_iter"]
     # start_iter = 20 #fix later
     # num_iter = 100 #fix later
@@ -118,12 +111,10 @@ def pu_report_schnet(experiment: str = None, prop=prop,
     if small_data:
         epoch_num = int(epoch_num*0.5)
                 
-    res_df_fileName = f'{data_prefix}{experiment}_{str(start_iter)}_{str(num_iter)}ep{str(epoch_num)}'
+    res_df_fileName = f'{data_prefix}{experiment}_{str(startIt)}_{str(num_iter)}ep{str(epoch_num)}'
     save_dir = os.path.join(schnetDirectory,f'PUOutput_{data_prefix}{experiment}')
     if ehull015:
         save_dir = os.path.join(schnetDirectory,f'PUehull015_{experiment}')
-    elif ehull_test:
-        save_dir = os.path.join(schnetDirectory,f'PUehull_{experiment}')
 
     if half_way_analysis:
         crysdf=pd.read_pickle(os.path.join(save_dir,'res_df',f'{res_df_fileName}tmp'))   #saving results at each iteration
@@ -202,7 +193,7 @@ def pu_report_schnet(experiment: str = None, prop=prop,
               'predicted_positive_rate': round(predicted_positive_rate, 4),
               'GT_true_positive_rate':'',
               'false_positive_rate':'',}
-    if ehull_test or ehull015:
+    if ehull015:
         GT_stable = propDF[propDF["stability_GT"]==1] 
         GT_stable = pd.merge(GT_stable, crysdf, on='material_id', how="inner")
         GT_unstable = propDF[propDF["stability_GT"]==0]
@@ -218,7 +209,7 @@ def pu_report_schnet(experiment: str = None, prop=prop,
 # %%
 report, propDF = pu_report_schnet(experiment = experiment,
                                 TARGET = TARGET,
-                                propDFpath=propDFpath, ehull_test = ehull_test, 
+                                propDFpath=propDFpath, ehull015 = ehull015, 
                                 small_data = small_data)
 if half_way_analysis:
     pass 

@@ -1,7 +1,0 @@
-fasteners==0.18
-numpy==1.23.5
-pandas==1.5.3
-pytorch_lightning==1.8.6
-torch==1.13.1
-torchmetrics==0.11.0
-schnetpack @ git+https://github.com/atomistic-machine-learning/schnetpack.git@6fe78ef23313ef1c7c07991cd046ca4d49da8717

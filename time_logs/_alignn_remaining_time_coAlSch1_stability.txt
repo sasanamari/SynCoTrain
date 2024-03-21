@@ -1,3 +1,0 @@
-Iterations completed: 10
-Iterations remaining: 89
-Estimated remaining time: 13 days, 2 hours

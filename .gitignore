@@ -2,6 +2,7 @@
 data/raw/
 data/clean_data/*
 !data/clean_data/synthDF
+!data/clean_data/new_*
 data/results/*.csv #might need to change with separate directories for 3 experiments.
 old_data/
 positive_data/

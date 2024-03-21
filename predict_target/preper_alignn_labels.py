@@ -3,7 +3,7 @@
 import pandas as pd  #more conveneient for ehull setup
 import os
 from data_scripts.crystal_structure_conversion import ase_to_jarvis
-# from experiment_setup import current_setup
+from experiment_setup import str_to_bool
 import sys
 import argparse
 # %%
@@ -15,8 +15,18 @@ parser.add_argument(
     default="synth",
     help="The property to predict; synth or stability.",
 )
+parser.add_argument(
+    "--balanced",
+    type=str_to_bool,
+    default=False,
+    help="Choosing balanced synth data for better training and performance.",
+)
+args = parser.parse_args(sys.argv[1:])
+
 # %%
-def prepare_alignn_labels(prop='synth'):
+def prepare_alignn_labels(prop='synth', balanced=False):
+    if balanced:
+        labelPath = "data/results/synth/synth_labels_balanced"
     if prop == 'synth':
         labelPath = "data/results/synth/synth_labels"
     if prop == 'stability':
@@ -40,6 +50,8 @@ def prepare_alignn_labels(prop='synth'):
 
     # %%
     data_files_dir = os.path.join(data_dest,f"atomistic_{prop}_poscars")
+    if balanced:
+        data_files_dir = os.path.join(data_dest,f"atomistic_{prop}_poscars_balanced")
     if not os.path.exists(data_files_dir):
         os.makedirs(data_files_dir)
     for _,row in labeldf.iterrows():
@@ -63,4 +75,4 @@ def prepare_alignn_labels(prop='synth'):
 # %%
 if __name__ == "__main__":
     args = parser.parse_args(sys.argv[1:])
-    prepare_alignn_labels()
+    prepare_alignn_labels(args.prop, args.balanced)

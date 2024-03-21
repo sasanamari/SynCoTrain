@@ -2,13 +2,13 @@
 # %%
 import pandas as pd  #more conveneient for ehull setup
 import os
-from synth.data_scripts.crystal_structure_conversion import ase_to_jarvis
+from data_scripts.crystal_structure_conversion import ase_to_jarvis
 from experiment_setup import current_setup
 # %%
 
 # %%
-def prepare_alignn_data(experiment, ehull_test, small_data, ehull015):
-    cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
+def prepare_alignn_data(experiment, small_data, ehull015):
+    cs = current_setup(small_data=small_data, experiment=experiment, ehull015 = ehull015)
     propDFpath = cs["propDFpath"]
     # result_dir = cs["result_dir"]
     prop = cs["prop"]

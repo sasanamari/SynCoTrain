@@ -20,12 +20,7 @@ parser.add_argument(
     default="alignn0",
     help="name of the experiment and corresponding config files.",
 )
-parser.add_argument(
-    "--ehull",
-    type=str_to_bool,
-    default=False,
-    help="Predicting stability to evaluate PU Learning's efficacy.",
-)
+
 parser.add_argument(
     "--ehull015",
     type=str_to_bool,
@@ -41,10 +36,9 @@ parser.add_argument(
 args = parser.parse_args(sys.argv[1:])
 experiment = args.experiment 
 ehull015 = args.ehull015
-ehull_test = args.ehull
 small_data = args.small_data
 # %%
-cs = current_setup(ehull_test=ehull_test, small_data=small_data, experiment=experiment, ehull015 = ehull015)
+cs = current_setup(small_data=small_data, experiment=experiment, ehull015 = ehull015)
 propDFpath = cs["propDFpath"]
 result_dir = cs["result_dir"]
 prop = cs["prop"]
@@ -65,15 +59,13 @@ def pu_report_alignn(experiment: str = None, prop: str = None,
               propDFpath=propDFpath,
               TARGET = TARGET,
               id_LOtest = id_LOtest,
-              pseudo_label_threshold = 0.75,ehull_test = False,
+              pseudo_label_threshold = 0.75,ehull015 = False,
               small_data = False, data_prefix = data_prefix, 
               max_iter=60):
-    print(f'experiment is {experiment}, ehull is {ehull_test} and small data is {small_data}.')
+    print(f'experiment is {experiment}, ehull015 is {ehull015} and small data is {small_data}.')
     output_dir = os.path.join(alignn_dir, f'PUOutput_{data_prefix}{experiment}')
     if ehull015:
         output_dir = os.path.join(alignn_dir, f'PUehull015_{experiment}')
-    elif ehull_test:
-        output_dir = os.path.join(alignn_dir, f'PUehull_{experiment}')
     propDF = pd.read_pickle(propDFpath)
     res_df_list = []
     res_dir_list = []
@@ -137,7 +129,7 @@ def pu_report_alignn(experiment: str = None, prop: str = None,
               'false_positive_rate':'',
               'agg_df':agg_df,
               'cotrain_df': cotrain_df} 
-    if ehull_test or ehull015:
+    if ehull015:
         GT_stable = propDF[propDF["stability_GT"]==1] 
         GT_stable = pd.merge(GT_stable, agg_df, on='material_id', how="inner")
         GT_unstable = propDF[propDF["stability_GT"]==0]
@@ -153,11 +145,11 @@ def pu_report_alignn(experiment: str = None, prop: str = None,
 report, propDF = pu_report_alignn(experiment=experiment, prop=prop,
                                 propDFpath=propDFpath,
                                 TARGET = TARGET,
-                                ehull_test = ehull_test,
+                                ehull015 = ehull015,
                                 small_data = small_data, data_prefix = data_prefix)
 print(f"The True positive rate was {report['true_positive_rate']} and the "
       f"predicted positive rate was {report['predicted_positive_rate']}.")
-if ehull_test:
+if ehull015:
     print(f"The Groud Truth true-positive-rate was {report['GT_true_positive_rate']} and the "
       f" False positive rate was {report['false_positive_rate']}.")
 

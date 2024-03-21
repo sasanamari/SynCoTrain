@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = str(0) # use before loading lightning.gpu
+
 """Directly copied from ALIGNN repo."""
 """Module to train for a folder with formatted dataset."""
 import csv
@@ -11,6 +14,7 @@ from alignn.train import train_dgl
 from alignn.config import TrainingConfig
 from jarvis.db.jsonutils import loadjson
 import argparse
+from experiment_setup import str_to_bool
 
 parser = argparse.ArgumentParser(
     description="Atomistic Line Graph Neural Network"
@@ -59,6 +63,12 @@ parser.add_argument(
     default="synth",
     help="The property to predict; synth or stability.",
 )
+parser.add_argument(
+    "--balanced",
+    type=str_to_bool,
+    default=False,
+    help="Choosing balanced synth data for better training and performance.",
+)
 
 def train_for_folder(
     root_dir="examples/sample_data",
@@ -70,6 +80,7 @@ def train_for_folder(
     file_format="poscar",
     output_dir=None,
     prop = 'synth',
+    balanced = False,
 ):
     """Train for a folder."""
     # config_dat=os.path.join(root_dir,config_name)
@@ -104,6 +115,8 @@ def train_for_folder(
         info = {}
         file_name = i[0]
         file_path = os.path.join(root_dir,f"atomistic_{prop}_poscars", file_name)
+        if balanced:
+            file_path = os.path.join(root_dir,f"atomistic_{prop}_poscars_balanced", file_name)
         if file_format == "poscar":
             atoms = Atoms.from_poscar(file_path)
         elif file_format == "cif":
@@ -209,4 +222,5 @@ if __name__ == "__main__":
         epochs=(args.epochs),
         file_format=(args.file_format),
         prop=args.prop,
+        balanced=args.balanced,
     )
