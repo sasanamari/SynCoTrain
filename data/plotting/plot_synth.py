@@ -12,7 +12,8 @@ prop = 'synth'
 df = pd.read_pickle("../clean_data/synthDF")
 df = df[df.energy_above_hull<15]
 # codf = pd.read_pickle("/home/samariam/projects/SynthCoTrain/data/results/synth/coSchAl2.pkl")
-codf = pd.read_pickle("../results/synth/coSchAl2.pkl")
+# codf = pd.read_pickle("../results/synth/coSchAl2.pkl")
+codf = pd.read_pickle("../results/synth/coSchnet2.pkl")
 codf = codf.dropna()
 # %%
 # df.columns
@@ -471,9 +472,9 @@ def midlabel_dist(codf, datadf, ehull=False,prop = prop,figtitle = None, filenam
     testSet = edf.drop(index = LO_testSet.index)
     LO_true_positive_rate = LO_testSet.prediction.mean()
     true_positive_rate = testSet.prediction.mean()
-    tpr_mean = np.mean([LO_true_positive_rate, true_positive_rate])
+    # tpr_mean = np.mean([LO_true_positive_rate, true_positive_rate])
     unlabeled_synth_frac = tdf.prediction.mean()
-    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(6,6))
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(8,8))
     if 'predScore' in edf.columns:
         prob = "predScore"
     else:
@@ -484,7 +485,9 @@ def midlabel_dist(codf, datadf, ehull=False,prop = prop,figtitle = None, filenam
     ax1.vlines(.5, 0,max_height, 'r',linewidth=3)
     ax1.arrow(.5,max_height*.7,.35,0, linewidth=3, color ='r', length_includes_head=True,
             head_width=max_height*.08, head_length=0.05)
-    ax1.text(.55,max_height*.4, '{:.1f}% true- \npositive rate'.format(tpr_mean*100), fontsize = 15);
+    ax1.text(.55,max_height*.6, '{:.1f}% Recall'.format(true_positive_rate*100), fontsize = 14);
+    ax1.text(.55,max_height*.4, '{:.1f}% Leave-out Recall'.format(LO_true_positive_rate*100), fontsize = 14);
+    # ax1.text(.55,max_height*.4, '{:.1f}% true- \npositive rate'.format(tpr_mean*100), fontsize = 15);
 
 
     plt.xlabel('Predicted Probability of Synthesizability', fontsize=14)
@@ -495,7 +498,7 @@ def midlabel_dist(codf, datadf, ehull=False,prop = prop,figtitle = None, filenam
     ax2.arrow(.5,max_height*.7,.35,0, linewidth=3, color ='r', length_includes_head=True,
             head_width=max_height*.08, head_length=0.05)
     ax2.set_title('Probability Distribution for Theoretical Data', fontsize=13.5,fontweight='bold')
-    ax2.text(.55,max_height*.4, '{:.1f}% predicted \n synthesizable'.format(unlabeled_synth_frac*100), fontsize = 15);
+    ax2.text(.55,max_height*.4, '{:.1f}% predicted \n synthesizable'.format(unlabeled_synth_frac*100), fontsize = 14);
     if figtitle:
         fig.suptitle(figtitle, fontsize = 25, y =1.02)
     if filename:
@@ -505,33 +508,7 @@ def midlabel_dist(codf, datadf, ehull=False,prop = prop,figtitle = None, filenam
 
 # %%
 # midlabel_dist(codf, df)
-# %%
-coschnet = pd.read_pickle('../results/synth/schnet0.pkl')
-# %%
-coalignn = pd.read_pickle('../results/synth/alignn0.pkl')
-# %%
-coschnet3 = pd.read_pickle('../results/synth/coSchAl3.pkl')
 
-coalignn3 = pd.read_pickle('../results/synth/coAlSch3.pkl')
-# %%
-
-midlabel_dist(coschnet, df, figtitle="Iteration '0' with SchNet", 
-              filename="schnet0_prop_dist.png")
-# %%
-midlabel_dist(coalignn, df, figtitle="Iteration '0' with ALIGNN", 
-              filename="alignn0_prop_dist.png")
-            # )
-# %%
-midlabel_dist(coalignn3, df, figtitle="Iteration '3' with ALIGNN", 
-              filename="coalignn3_prop_dist.png")
-# %%
-midlabel_dist(coschnet3, df, figtitle="Iteration '3' with SchNet", 
-              filename="coschnet3_prop_dist.png")
-
-# %%
-# finaldf = pd.read_pickle("/home/samariam/projects/SynthCoTrain/predict_target/final_df")
-# this only has about 4k data (test set)
-# write dynamic path.
 # %%
 # with open(f"leaveout_test_material_id.txt", "w") as f:
 #     for test_material_id in mdf.loc[id_LOtest].material_id:
@@ -592,8 +569,7 @@ def final_labels(plot_df, ehull=False,prop = prop,figtitle = None, filename=None
         save_plot(figure = fig, filename = filename)
     plt.show()
 
-# %%
-synthlab = pd.read_pickle("/home/samariam/projects/SynthCoTrain/data/results/synth/synth_labels")
+
 # %%
 def scatter_hm_final(proplab,datadf, prop=prop, filename=None):
     proplab = proplab.merge(datadf[["material_id", "formation_energy_per_atom", "energy_above_hull"]], on="material_id")
@@ -609,6 +585,51 @@ def scatter_hm_final(proplab,datadf, prop=prop, filename=None):
     if filename:
         save_plot(plt.gcf(), filename)
     plt.show()
+    
+# %%
+def scatter_hm_final_frac(proplab, datadf, prop=prop, filename=None):
+    proplab = proplab.merge(datadf[["material_id", "formation_energy_per_atom", "energy_above_hull"]], on="material_id")
+    proplab = proplab.dropna()
+    tdf = proplab[proplab[prop]==0]
+    colors, x, y = density_colors(tdf[f"{prop}_avg"], tdf.energy_above_hull)
+    
+    # Calculate fractions
+    total_points = len(x)
+    lower_left = sum((x_val < 0.5) and (y_val <= 1) for x_val, y_val in zip(x, y))
+    lower_right = sum((x_val >= 0.5) and (y_val <= 1) for x_val, y_val in zip(x, y))
+    upper_left = sum((x_val < 0.5) and (y_val > 1) for x_val, y_val in zip(x, y))
+    upper_right = sum((x_val >= 0.5) and (y_val > 1) for x_val, y_val in zip(x, y))
+
+    fractions = {
+        'lower_left': lower_left / total_points,
+        'lower_right': lower_right / total_points,
+        'upper_left': upper_left / total_points,
+        'upper_right': upper_right / total_points
+    }
+
+    plt.figure(figsize=(10,6))
+    # Plot first scatter plot
+    plt.scatter(x, y, c=colors, cmap='viridis', norm=LogNorm(), alpha=0.7, s=20)
+    plt.colorbar()
+    plt.xlabel('Predicted Probability of Synthesizability', fontsize = 15, labelpad=10)
+    plt.ylabel('Energy Above Hull (eV)', fontsize = 15, labelpad=10)
+    plt.title('Density Scatter Plot', fontsize = 17)
+
+    # Add dividing lines
+    plt.axvline(x=0.5, color='r', linestyle='--', linewidth=2)
+    plt.axhline(y=1, color='r', linestyle='-', linewidth=2)
+
+    # Add text annotations for fractions
+    plt.text(0.25, 0.70, f'{fractions["upper_left"]:.1%}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes, color='DodgerBlue', fontsize=25, weight = 'bold')
+    plt.text(0.75, 0.70, f'{fractions["upper_right"]:.1%}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes, color='DodgerBlue', fontsize=25, weight = 'bold')
+    plt.text(0.25, .062, f'{fractions["lower_left"]:.1%}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes, color = 'red', fontsize=25, weight = 'bold')
+    plt.text(0.75, .062, f'{fractions["lower_right"]:.1%}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes, color = 'red', fontsize=25, weight = 'bold')
+
+
+    if filename:
+        save_plot(plt.gcf(), filename)
+    plt.show()   
+# %%
 # %%
 def heatmap_final(codf, datadf,prop = prop, filename = None):
     plot_df = codf.merge(datadf[["material_id", "formation_energy_per_atom", "energy_above_hull"]], on="material_id")
@@ -639,4 +660,64 @@ def heatmap_final(codf, datadf,prop = prop, filename = None):
     if filename:
         save_plot(plt.gcf(), filename)
     plt.show()
+# %%
+# %%
+# %%
+schnet0 = pd.read_pickle('../results/synth/schnet0.pkl')
+alignn0 = pd.read_pickle('../results/synth/alignn0.pkl')
+
+coschnet1 = pd.read_pickle('../results/synth/coSchnet1.pkl')
+coalignn1 = pd.read_pickle('../results/synth/coAlignn1.pkl')
+
+coschnet2 = pd.read_pickle('../results/synth/coSchnet2.pkl')
+coalignn2 = pd.read_pickle('../results/synth/coAlignn2.pkl')
+
+coschnet3 = pd.read_pickle('../results/synth/coSchnet3.pkl')
+coalignn3 = pd.read_pickle('../results/synth/coAlignn3.pkl')
+
+synthlab = pd.read_pickle(os.path.join(
+    os.path.dirname(__file__),'../results/synth/synth_labels_2'))
+# %%
+
+midlabel_dist(schnet0, df, figtitle="Iteration '0' with SchNet", 
+              filename="schnet0_prop_dist.png")
+midlabel_dist(alignn0, df, figtitle="Iteration '0' with ALIGNN", 
+              filename="alignn0_prop_dist.png")
+            # )            
+# %%
+midlabel_dist(coalignn1, df, figtitle="Iteration '1' with ALIGNN", 
+              filename="coalignn1_prop_dist.png")
+midlabel_dist(coschnet1, df, figtitle="Iteration '1' with SchNet", 
+              filename="coschnet1_prop_dist.png")
+# %%
+midlabel_dist(coalignn2, df, figtitle="Iteration '2' with ALIGNN", 
+              filename="coalignn2_prop_dist.png")
+midlabel_dist(coschnet2, df, figtitle="Iteration '2' with SchNet", 
+              filename="coschnet2_prop_dist.png")
+# %%
+midlabel_dist(coalignn3, df, figtitle="Iteration '3' with ALIGNN", 
+              filename="coalignn3_prop_dist.png")
+midlabel_dist(coschnet3, df, figtitle="Iteration '3' with SchNet", 
+              filename="coschnet3_prop_dist.png")
+            
+# %%
+# midlabel_dist(schnet0, df, figtitle=None, 
+#               filename="schnet0_prop_dist_nt.png")
+# midlabel_dist(alignn0, df, figtitle=None, 
+#               filename="alignn0_prop_dist_nt.png")
+# midlabel_dist(coalignn3, df, figtitle=None, 
+#               filename="coalignn3_prop_dist_nt.png")
+# midlabel_dist(coschnet3, df, figtitle=None, 
+#               filename="coschnet3_prop_dist_nt.png")
+
+# %%
+# finaldf = pd.read_pickle(os.path.join(
+#     os.path.dirname(__file__),'../../predict_target/final_df'))
+# %%
+scatter_hm_final_frac(synthlab,df, prop=prop, filename='final_sctter_hm_frac_it2.png')
+# %%
+final_labels(synthlab, figtitle="Label Distribution After Averaging")
+# %%
+# label_dist4(codf, datadf, pred_col = 'prediction' ,ehull=False,prop = prop, filename=None)
+label_dist4(synthlab, df, pred_col='synth_preds', filename='final_label_dist_it2.png')
 # %%

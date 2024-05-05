@@ -72,6 +72,7 @@ def exper_oxygen_query(MPID : str,
                                     )
         
     print("Database version is ", db_version)    
+    print("The number of entries retrieved is ", len(results))
     results = [d.dict() for d in results]  #so it can be pickled/saved on disk.
     _ = [d.pop('fields_not_requested') for d in results]
     del _
@@ -127,7 +128,8 @@ def oxide_check(initStruc : Structure) -> Tuple[bool, bool, bool, Structure]:
 
 
 
-def clean_oxide(experimental : bool, pymatgenArray : np.ndarray, reportBadData : bool = False, ) -> np.ndarray:
+def clean_oxide(experimental : bool, pymatgenArray : np.ndarray, 
+                reportBadData : bool = False, read_oxide_type : bool = True) -> np.ndarray:
     '''Filters undesired data points from the pymatgen data.
     Undesired data here include: 1- structures which cannot be converted to primitive cell. 
     2- data the oxidation states of which cannot be analyzed. 
@@ -151,10 +153,12 @@ def clean_oxide(experimental : bool, pymatgenArray : np.ndarray, reportBadData :
     bad_structure_IDs = []
     ustable_experimental_IDs = []
 
-    for j, material in enumerate(pymatgenArray):        
-        if OxideType(material["structure"]).oxide_type != "oxide":
-            other_oxidation_IDs.append([j,material['material_id']])
-            continue
+    for j, material in enumerate(pymatgenArray):       
+        if read_oxide_type:
+            if OxideType(material["structure"]).oxide_type != "oxide":
+                other_oxidation_IDs.append([j,material['material_id']])
+                continue
+# read_oxide_type is not necessary, but it speeds up the filtering when available.            
         if experimental:
             if material['energy_above_hull']>1:
                 ustable_experimental_IDs.append([j,material['material_id']])

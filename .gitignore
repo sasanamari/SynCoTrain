@@ -48,3 +48,6 @@ old_code/
 _heuristics_analysis/
 _figures/
 _experiment_commands.txt
+match_crystals.ipynb
+smact.ipynb
+data/wbm_data/2022-10-19-wbm-computed-structure-entries+init-structs.json

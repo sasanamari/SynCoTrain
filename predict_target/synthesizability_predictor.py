@@ -72,6 +72,18 @@ parser.add_argument(
     default="predict_target/config.json",
     help="Name of the config file",
 )
+parser.add_argument(
+    "--iter",
+    default="2",
+    help="Iteration of co-training to use for labels.",
+)
+parser.add_argument(
+    "--output_name",
+    default="synth_preds",
+    help="name of the csv file to save the predictions",
+)
+
+args = parser.parse_args(sys.argv[1:])
 
 
 device = "cpu"
@@ -88,7 +100,9 @@ def get_config(config_name = "predict_target/config.json"):
             print("Check this expection here", exp)
     return config
 
-def load_model_from_checkpoint(checkpoint_file = "predict_target/synth_final_preds/best_model.pt",  
+def load_model_from_checkpoint(checkpoint_file = f"predict_target/synth_final_preds_{args.iter}/best_model.pt",  
+# def load_model_from_checkpoint(checkpoint_file = "predict_target/synth_final_preds/checkpoint_120.pt",  
+# def load_model_from_checkpoint(checkpoint_file = "predict_target/synth_final_preds/unbalanced_checkpoint_120.pt",  
                                output_features=1):
     config = get_config()
     model = ALIGNN(config=config.model)
@@ -235,14 +249,14 @@ def get_multiple_predictions(
 
 
 if __name__ == "__main__":
-    args = parser.parse_args(sys.argv[1:])
+    # args = parser.parse_args(sys.argv[1:])
     model_name = args.model_name
     directory_name = args.directory_name
     file_format = args.file_format
     cutoff = args.cutoff
     max_neighbors = args.max_neighbors
     config_name = args.config_name
-    
+    output_name = args.output_name
     
     directory_path = "predict_target/label_alignn_format/poscars_for_synth_prediction"    
     poscars_dir = os.path.join(directory_path, directory_name)
@@ -263,8 +277,12 @@ if __name__ == "__main__":
         
         
 
-    csv_path = os.path.join(os.path.dirname(directory_path),'synth_preds.csv')
-
+    csv_path = os.path.join(os.path.dirname(directory_path),f'{output_name}.csv')
+    
+    labels = [item[1] for item in synth_preds]
+    avg_label = sum(labels) / len(labels)
+    avg_label_percent = avg_label*100
+    print(f"{avg_label_percent:.2f}% of the structures were predicted to be synthesizable.")
 # Open the file in write mode
     with open(csv_path, 'w', newline='') as file:
         writer = csv.writer(file)
