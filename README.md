@@ -67,7 +67,7 @@ python predict_target/synthesizability_predictor.py --directory_name <your_direc
 ```
 The results will be saved in `predict_target/label_alignn_format/synth_preds.csv`.
 
-## Auxiliary exeperiments
+## Auxiliary experiments
 This package provides two auxiliary experiments to evaluate the model further. The first one includes running the regular experiments on only 5% of the available data. This is useful for checking the workflow of the code, without waiting for weeks for the computation to conclude. Please note that quality of results will suffer, as there is less data available for training.
 The second auxiliary experiment consists of classifying the stability of crystals based on their energy above hull, through the same PU Learning and Co-training code. The utility of this experiment is that, unlike a real case of Positive and Unlabeled Learning, we have access to correct labels of the unlabeled class. As stability is highly related to synthesizability, the quality of this experiment can be used as a proxy to judge the quality of the main experiment. We are mainly interested to see whether the real true-positive-rate of these experiments are close in value to the true-positive-rate produced by PU Learning.
 <!-- #### Data preparation for auxiliary exeperiments
