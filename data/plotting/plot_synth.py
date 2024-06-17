@@ -515,7 +515,8 @@ def midlabel_dist(codf, datadf, ehull=False,prop = prop,figtitle = None, filenam
 #         f.write(str(test_material_id) + "\n") 
 # #mdf is synthdf or schnet0 or coSchnet...
 # %%
-def final_labels(plot_df, ehull=False,prop = prop,figtitle = None, filename=None):
+def final_labels(plot_df, ehull=False,prop = prop,figtitle = None, filename=None,
+                 threshold = 0.5):
     edf = plot_df[plot_df[prop] == 1]
     tdf = plot_df[plot_df[prop] == 0]
     # prob = "prediction"
@@ -542,15 +543,25 @@ def final_labels(plot_df, ehull=False,prop = prop,figtitle = None, filename=None
     # unlabeled_synth_frac = tdf.prediction.mean()
 
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(8,8))
-
+    if threshold <= 0.5:
+        # Position the text to the right of the vline
+        text_halign = 'left'
+        text_offset = 0.03
+    else:
+        # Position the text to the left of the vline
+        text_halign = 'right'
+        text_offset = -0.03
     n, bins, patches = ax1.hist(edf[prob_col], bins=40)
     max_height = n.max()
     ax1.set_title('Probability Distribution for Experimental Data', fontsize=13.5, fontweight='bold')
-    ax1.vlines(.5, 0,max_height, 'r',linewidth=3)
-    ax1.arrow(.5,max_height*.7,.35,0, linewidth=3, color ='r', length_includes_head=True,
+    ax1.vlines(threshold, 0,max_height, 'r',linewidth=3)
+    ax1.arrow(threshold,max_height*.7,.35,0, linewidth=3, color ='r', length_includes_head=True,
             head_width=max_height*.08, head_length=0.05)
-    ax1.text(.53,max_height*.6, '{:.1f}% Recall'.format(true_positive_rate*100), fontsize = 14);
-    ax1.text(.53,max_height*.4, '{:.1f}% Leave-out Recall'.format(LO_true_positive_rate*100), fontsize = 14);
+    # ax1.text(threshold+.03,max_height*.6, '{:.1f}% Recall'.format(true_positive_rate*100), fontsize = 14);
+    ax1.text(threshold+text_offset,max_height * .6, '{:.1f}% Recall'.format(true_positive_rate * 100),
+         fontsize=14, ha=text_halign);
+    ax1.text(threshold+text_offset,max_height*.4, '{:.1f}% Leave-out Recall'.format(LO_true_positive_rate*100), 
+         fontsize=14, ha=text_halign);
     # ax1.text(.55,max_height*.4, '{:.1f}% true- \npositive rate'.format(true_positive_rate*100), fontsize = 15);
 
 
@@ -558,11 +569,12 @@ def final_labels(plot_df, ehull=False,prop = prop,figtitle = None, filename=None
 
     n, bins, patches = ax2.hist(tdf[prob_col],bins=40)
     max_height = n.max()
-    ax2.vlines(.5, 0,max_height, 'r',linewidth=3)
-    ax2.arrow(.5,max_height*.7,.35,0, linewidth=3, color ='r', length_includes_head=True,
+    ax2.vlines(threshold, 0,max_height, 'r',linewidth=3)
+    ax2.arrow(threshold,max_height*.7,.35,0, linewidth=3, color ='r', length_includes_head=True,
             head_width=max_height*.08, head_length=0.05)
     ax2.set_title('Probability Distribution for Theoretical Data', fontsize=13.5,fontweight='bold')
-    ax2.text(.53,max_height*.4, '{:.1f}% predicted \n synthesizable'.format(unlabeled_synth_frac*100), fontsize = 14);
+    ax2.text(threshold+text_offset,max_height*.4, '{:.1f}% predicted \n synthesizable'.format(unlabeled_synth_frac*100),
+             fontsize = 14, ha=text_halign);
     if figtitle:
         fig.suptitle(figtitle, fontsize = 25, y =1.02)
     if filename:
@@ -621,7 +633,7 @@ def scatter_hm_final_frac(proplab, datadf, prop=prop, filename=None):
 
     # Add text annotations for fractions
     plt.text(0.25, 0.70, f'{fractions["upper_left"]:.1%}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes, color='DodgerBlue', fontsize=25, weight = 'bold')
-    plt.text(0.75, 0.70, f'{fractions["upper_right"]:.1%}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes, color='DodgerBlue', fontsize=25, weight = 'bold')
+    plt.text(0.75, 0.70, f'{fractions["upper_right"]:.2%}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes, color='DodgerBlue', fontsize=25, weight = 'bold')
     plt.text(0.25, .062, f'{fractions["lower_left"]:.1%}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes, color = 'red', fontsize=25, weight = 'bold')
     plt.text(0.75, .062, f'{fractions["lower_right"]:.1%}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes, color = 'red', fontsize=25, weight = 'bold')
 
@@ -716,8 +728,28 @@ midlabel_dist(coschnet3, df, figtitle="Iteration '3' with SchNet",
 # %%
 scatter_hm_final_frac(synthlab,df, prop=prop, filename='final_sctter_hm_frac_it2.png')
 # %%
-final_labels(synthlab, figtitle="Label Distribution After Averaging")
+final_labels(synthlab, figtitle="Label Distribution After Averaging")#, filename='final_label_dist_it2.png')    
 # %%
 # label_dist4(codf, datadf, pred_col = 'prediction' ,ehull=False,prop = prop, filename=None)
 label_dist4(synthlab, df, pred_col='synth_preds', filename='final_label_dist_it2.png')
+# %%
+synthlab_t0 = pd.read_pickle(os.path.join(
+    os.path.dirname(__file__),'../results/synth/synth_labels_2_threshold_0_0'))
+synthlab_t1 = pd.read_pickle(os.path.join(
+    os.path.dirname(__file__),'../results/synth/synth_labels_2_threshold_1_0'))
+synthlab_t25 = pd.read_pickle(os.path.join(
+    os.path.dirname(__file__),'../results/synth/synth_labels_2_threshold_0_25'))
+synthlab_t75 = pd.read_pickle(os.path.join(
+    os.path.dirname(__file__),'../results/synth/synth_labels_2_threshold_0_75'))
+# %%
+final_labels(synthlab_t75, figtitle="Label Distribution with 0.75 Threshold",
+             filename='final_label_dist_it2_75.png', threshold=0.75)
+final_labels(synthlab_t25, figtitle="Label Distribution with 0.25 Threshold",
+             filename='final_label_dist_it2_25.png', threshold=0.25)
+# %%
+# try this with the condition of where the threshold is:
+#     # Place text on the plot so that it ends at `threshold`
+# ax1.text(threshold, max_height*0.7, text, ha='right', va='center', color='black')
+
+
 # %%
