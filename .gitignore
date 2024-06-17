@@ -54,3 +54,4 @@ data/wbm_data/2022-10-19-wbm-computed-structure-entries+init-structs.json
 stat.log
 crystal_cifs/*
 vo_data_parsing.ipynb
+SynCoTrain.egg-info
