@@ -1,0 +1,17 @@
+exper,true_positive_rate,predicted_positive_rate,LO_true_positive_rate
+SchNet0,,,
+ALIGNN0,,,
+coSchNet1,,,
+coALIGNN1,,,
+coSchNet2,,,
+coALIGNN2,,,
+coSchNet3,,,
+coALIGNN3,,,
+schnet0,0.8544,0.1551,0.8902
+alignn0,0.8995,0.1532,0.9314
+coAlignn1,0.9618,0.1966,0.9431
+coSchnet1,0.9144,0.1628,0.9098
+coAlignn2,0.9681,0.1998,0.9451
+coSchnet2,0.9551,0.2048,0.9314
+coAlignn3,0.9755,0.2297,0.9529
+coSchnet3,0.956,0.2091,0.9373

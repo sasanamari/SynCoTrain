@@ -1,0 +1,9 @@
+exper,true_positive_rate,predicted_positive_rate,LO_true_positive_rate
+SchNet0,0.7914,0.1841,0.8098
+ALIGNN0,0.823,0.1785,0.8275
+coSchNet1,0.8738,0.1938,0.8196
+coALIGNN1,0.9267,0.2367,0.8431
+coSchNet2,0.9393,0.2537,0.8392
+coALIGNN2,0.9363,0.2405,0.8529
+coSchNet3,0.9368,0.2548,0.8529
+coALIGNN3,0.9502,0.2845,0.8725
