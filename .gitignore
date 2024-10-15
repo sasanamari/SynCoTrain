@@ -60,9 +60,11 @@ schnet_pred/models/*
 schnet_pred/logs/*
 .coverage
 .idea/
-
+data/results/synth/synth_labels_2_threshold_25.pkl
+data/results/synth/synth_labels_2_threshold_75.pkl
 *.egg-info/
 
 !schnet_pred/results/*5_noise_10_DOE_20_DOI_aug_75_cos_sym_sc*
 !schnet_pred/models/*5_noise_10_DOE_20_DOI_aug_75_cos_sym_sc*
+!schnet_pred/results/MP_oxide_labesl.csv
 # !schnet_pred/logs/*5_noise_10_DOE_20_DOI_aug_75_cos_sym_sc*

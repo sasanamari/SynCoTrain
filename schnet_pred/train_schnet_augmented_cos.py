@@ -16,7 +16,7 @@ import pu_schnet.pu_learn.int2metric as int2metric
 from data_scripts.add_noise import format_and_add_noise
 import torch.nn as nn
 from torch import tensor
-from custom_loss_s import FocalLoss
+# from custom_loss_s import FocalLoss
 
 # from schnet_drop_mod import SchNetWithDropout
 device = "cpu"
