@@ -13,59 +13,32 @@ The final model achieves a notable true-positive rate of 96% for the experimenta
 ## Installation
 It is recommended to create a virtual environment with mamba and miniforge to install the different packages easily. Start by installing mamba according to the instructions [here](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html).
 
-Then we can create our environment and activate it. Let's call it sync:
+
+Start by cloning this repository in your preferred path as shown below:
 ```bash
-mamba create -n sync python=3.10
+cd /path/to/parent/directory
+git clone https://github.com/sasanamari/SynCoTrain.git
+```
+Next, navigate to the cloned directory. You can create the appropriate mamba environment there based on the `sync.yml` file:
+```bash
+cd SynCoTrain
+mamba env create -f condaEnvs/sync.yml
 mamba activate sync
 ```
-##### Method 1
-The easiest way of installing all the required libraries is to take advantage of the `requirements.txt` file:
-```bash
-pip install -r requirements.txt
-```
-Then, you can clone this repository in your preferred path and install it with the following commands:
-```bash
-cd /path/to/parent/directory
-git clone https://github.com/sasanamari/SynCoTrain.git
-cd SynCoTrain
-pip install .
-```
-##### Method 2
-If the first method does not conclude successfully, you can try installing the required libraries manually. Start by installing the ALIGGN model by following [these instructions](https://github.com/usnistgov/alignn?tab=readme-ov-file#optional-gpu-dependencies) or executing the commands below line by line:
-```bash
-mamba install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
-mamba install -c dglteam/label/cu118 dgl
-pip install alignn
-pip install dgl==1.0.1+cu117 -f https://data.dgl.ai/wheels/cu117/repo.html
-```
-Next, you'll need to install [SchNetPack](https://github.com/atomistic-machine-learning/schnetpack). To ensure compatibility with SynCoTrain, you could use the exact version of SchNetPack that was used during development. Follow the commands below to clone the SchNetPack repository, navigate to it, checkout the specific commit, and install:
+This might take a while, as all the required packages are being installed. Please note that you may need to change ther exact version of dgl and cudatoolkit based on your current setup. You can check your current cuda version using the `nvidia-smi` command. Then, you can search for a compatible dgl with cuda using the command `mamba search dgl --channel conda-forge`. Pick a version of dgl earlier than 2.0.0 which is compatible with your cudatoolkit.
 
+Once the packages are installed, you may activate the `sync` conda environment and install this repository with the following commands:
 ```bash
-git clone https://github.com/atomistic-machine-learning/schnetpack.git
-cd schnetpack
-git checkout 6fe78ef23313ef1c7c07991cd046ca4d49da8717
-pip install .
-```
-
-The final required package is Pymatgen which can be installed according to the instruction [here](https://pymatgen.org/installation.html#step-3-install-pymatgen) or simply using command:
-```bash
-mamba install --channel conda-forge pymatgen
-```
-After installing all the required packages, SynCoTrain can be installed as explained in method #1 by cloning the repository in an appropriate path:
-```bash
-cd /path/to/parent/directory
-git clone https://github.com/sasanamari/SynCoTrain.git
-cd SynCoTrain
-pip install .
+pip install -e .
 ```
 ## Predicting Synthesizability of Oxides
 You don't need to train the model from scratch if you are only interested in predicting synthesizability. The current version of SynCoTrain has been trained to predict the synthesizability of oxide crystals. 
 To this end, you may use the checkpoint file `predict_target/synth_final_preds/checkpoint_120.pt` and follow the instructions on [ALIGNN repository](https://github.com/usnistgov/alignn?tab=readme-ov-file#using-pre-trained-models) on how to use a pretrained model.
-Alternatively, you can deposite the POSCAR files of the crystals of your interest in a directory in `predict_target/label_alignn_format/poscars_for_synth_prediction/<your_directory_name>`. The command below predicts the synthesizability of these crystals and saves them in `synth_pred.csv` in the same directory:
+Alternatively, you can deposite the POSCAR files of the crystals of your interest in a directory in `predict_target/label_alignn_format/poscars_for_synth_prediction/<your_directory_name>`. The command below predicts the synthesizability of these crystals:
 ```bash
-python predict_target/synthesizability_predictor.py --directory_name <your_directory_name>
+python predict_target/synthesizability_predictor.py --directory_name <your_directory_name> --output_name <your_output_name>
 ```
-The results will be saved in `predict_target/label_alignn_format/synth_preds.csv`.
+The results will be saved in `predict_target/label_alignn_format/<your_output_name>.csv`.
 
 ## Auxiliary experiments
 This package provides two auxiliary experiments to evaluate the model further. The first one includes running the regular experiments on only 5% of the available data. This is useful for checking the workflow of the code, without waiting for weeks for the computation to conclude. Please note that quality of results will suffer, as there is less data available for training.
@@ -94,7 +67,7 @@ In case you have access to multiple GPUs, the `--gpu_id` parameter can be change
 ```bash
 mamba activate sync
 python pu_data_selection.py --experiment alignn0
-nohup python pu_schnet/schnet_pu_learning.py --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
+nohup python pu_alignn/alignn_pu_learning.py --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
 ```
 After each experiment is concluded, the data needs to be analyzed to produce the relevant labels for the next step of co-training. The code for the analysis of results of SchNetPack is
 

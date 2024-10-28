@@ -11,9 +11,10 @@ import warnings
 # %%
 experiment = 'final_avg'
 ehull015 = False
+# ehull015 = True
 small_data = False
 iteration = str(2)#choose which iteration to use
-clssification_cutoff = 0.25
+clssification_cutoff = 0.5
 # %%
 cs = current_setup(small_data=small_data, experiment=experiment, ehull015 = ehull015)
 propDFpath = cs["propDFpath"]
@@ -46,3 +47,5 @@ labeldf = labeldf.merge(crysdf[["material_id", "atoms"]], on="material_id", how=
 # %%
 labeldf.to_pickle(os.path.join(result_dir,f"{prop}_labels_{iteration}_threshold_{int(clssification_cutoff*100)}.pkl"))
 # %%
+# print(propDFpath)
+# print(os.path.join(result_dir,f"{prop}_labels_{iteration}_threshold_{int(clssification_cutoff*100)}.pkl"))

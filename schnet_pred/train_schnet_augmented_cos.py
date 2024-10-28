@@ -37,12 +37,12 @@ weight_loss = tensor([0.45 / 0.55]).to(device)
 ES = {'patience':70, 'monitor':'val_synth_Accuracy', 'mode':'max'}
 # ES = {'patience':60, 'monitor':'val_loss', 'mode':'min'}
 
-## Define the CosineAnnealingWarmRestarts scheduler arguments
-# scheduler_args = {
-#     "T_0": 3,  # Number of epochs before the first restart
-#     "T_mult": 2,  # Multiplier to increase the period length after each restart
-#     "eta_min": 1e-6  # Minimum learning rate
-# }
+# Define the CosineAnnealingWarmRestarts scheduler arguments
+scheduler_args = {
+    "T_0": 3,  # Number of epochs before the first restart
+    "T_mult": 2,  # Multiplier to increase the period length after each restart
+    "eta_min": 1e-6  # Minimum learning rate
+}
 
 # Define the CosineAnnealingLR scheduler arguments
 scheduler_args = {
@@ -108,34 +108,6 @@ pairwise_distance = spk.atomistic.PairwiseDistances()
 radial_basis = spk.nn.GaussianRBF(n_rbf=n_rbf, cutoff=cutoff)
 
 
-# class CustomAtomisticTask(spk.task.AtomisticTask):
-#     def __init__(self, model, outputs, optimizer_args=None, scheduler_args=None):
-#         super().__init__(model=model, outputs=outputs, optimizer_args=optimizer_args)
-#         self.optimizer_args = optimizer_args
-#         self.scheduler_args = scheduler_args
-
-#     def configure_optimizers(self):
-#         # Define the optimizer using the passed arguments
-#         optimizer = torch.optim.AdamW(self.model.parameters(), **self.optimizer_args)
-
-#         # Define the CosineAnnealingWarmRestarts scheduler
-#         scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-#             optimizer,
-#             T_0=self.scheduler_args["T_0"],
-#             T_mult=self.scheduler_args["T_mult"],
-#             eta_min=self.scheduler_args["eta_min"]
-#         )
-
-#         # Return the optimizer and scheduler
-#         return {
-#             "optimizer": optimizer,
-#             "lr_scheduler": {
-#                 "scheduler": scheduler,  # Scheduler used for learning rate adjustments
-#                 "interval": "epoch",     # Adjust learning rate after every epoch
-#                 "frequency": 1
-#             }
-#         }
-
 class CustomAtomisticTask(spk.task.AtomisticTask):
     def __init__(self, model, outputs, optimizer_args=None, scheduler_args=None):
         super().__init__(model=model, outputs=outputs, optimizer_args=optimizer_args)
@@ -146,10 +118,11 @@ class CustomAtomisticTask(spk.task.AtomisticTask):
         # Define the optimizer using the passed arguments
         optimizer = torch.optim.AdamW(self.model.parameters(), **self.optimizer_args)
 
-        # Define the CosineAnnealingLR scheduler
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        # Define the CosineAnnealingWarmRestarts scheduler
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
             optimizer,
-            T_max=self.scheduler_args["T_max"],  # Set to match the total number of epochs
+            T_0=self.scheduler_args["T_0"],
+            T_mult=self.scheduler_args["T_mult"],
             eta_min=self.scheduler_args["eta_min"]
         )
 
@@ -162,6 +135,33 @@ class CustomAtomisticTask(spk.task.AtomisticTask):
                 "frequency": 1
             }
         }
+
+# class CustomAtomisticTask(spk.task.AtomisticTask):
+#     def __init__(self, model, outputs, optimizer_args=None, scheduler_args=None):
+#         super().__init__(model=model, outputs=outputs, optimizer_args=optimizer_args)
+#         self.optimizer_args = optimizer_args
+#         self.scheduler_args = scheduler_args
+
+#     def configure_optimizers(self):
+#         # Define the optimizer using the passed arguments
+#         optimizer = torch.optim.AdamW(self.model.parameters(), **self.optimizer_args)
+
+#         # Define the CosineAnnealingLR scheduler
+#         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+#             optimizer,
+#             T_max=self.scheduler_args["T_max"],  # Set to match the total number of epochs
+#             eta_min=self.scheduler_args["eta_min"]
+#         )
+
+#         # Return the optimizer and scheduler
+#         return {
+#             "optimizer": optimizer,
+#             "lr_scheduler": {
+#                 "scheduler": scheduler,  # Scheduler used for learning rate adjustments
+#                 "interval": "epoch",     # Adjust learning rate after every epoch
+#                 "frequency": 1
+#             }
+#         }
 
 
 # Define the optimizer arguments

@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+from matplotlib.patches import FancyBboxPatch
 import pandas as pd
 import os
 from matplotlib.colors import LogNorm
@@ -439,8 +440,8 @@ def label_dist4(codf, datadf, pred_col = 'prediction' ,ehull=False,prop = 'synth
     big_ax = fig.add_subplot(111, frameon=False)
     # Hide tick and tick label of the big axis
     big_ax.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
-    big_ax.set_ylabel('Formation energy per atom', labelpad=20, fontsize=17.5)
-    xlabel = big_ax.set_xlabel('Energy above hull', labelpad=20, fontsize=17.5)
+    big_ax.set_ylabel('Formation energy per atom (eV)', labelpad=20, fontsize=17.5)
+    xlabel = big_ax.set_xlabel('Energy above hull (eV)', labelpad=20, fontsize=17.5)
     xlabel.set_position((0.45, -0.1))  # Adjust these values as needed
 
     
@@ -449,6 +450,109 @@ def label_dist4(codf, datadf, pred_col = 'prediction' ,ehull=False,prop = 'synth
         save_plot(figure = fig, filename = filename)
 
     plt.show()
+# %%
+def label_dist4_frames(codf, datadf, pred_col='prediction', ehull=False, prop='synth', filename=None):
+    plot_df = codf.merge(datadf[["material_id", "formation_energy_per_atom", "energy_above_hull"]], on="material_id")
+    if ehull:
+        prop = "stability"
+        
+    edf = plot_df[plot_df[prop] == 1]
+    tdf = plot_df[plot_df[prop] == 0]
+    edf = edf.sort_values(pred_col, ascending=False)
+    tdf = tdf.sort_values(pred_col, ascending=True)
+
+    # Create a GridSpec with 2 rows and 3 columns
+    fig = plt.figure(figsize=(12, 10))
+    gs = GridSpec(2, 3, figure=fig, width_ratios=[1, 1, 0.05], wspace=0.3)
+
+    # Create subplots in the first two columns
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax2 = fig.add_subplot(gs[0, 1], sharex=ax1, sharey=ax1)
+    ax3 = fig.add_subplot(gs[1, 0], sharex=ax1, sharey=ax1)
+    ax4 = fig.add_subplot(gs[1, 1], sharex=ax1, sharey=ax1)
+    
+    axs = [[ax1, ax2], [ax3, ax4]]
+    
+    # Define a common norm object based on the combined range of values
+    all_densities = np.concatenate([
+        density_colors(edf.energy_above_hull[edf[pred_col] == 0], edf.formation_energy_per_atom[edf[pred_col] == 0])[0],
+        density_colors(edf.energy_above_hull[edf[pred_col] == 1], edf.formation_energy_per_atom[edf[pred_col] == 1])[0],
+        density_colors(tdf.energy_above_hull[tdf[pred_col] == 0], tdf.formation_energy_per_atom[tdf[pred_col] == 0])[0],
+        density_colors(tdf.energy_above_hull[tdf[pred_col] == 1], tdf.formation_energy_per_atom[tdf[pred_col] == 1])[0]
+    ])
+    norm = LogNorm(vmin=all_densities.min(), vmax=all_densities.max())
+
+    # Experimental data scatter plots
+    colors, x, y = density_colors(edf.energy_above_hull[edf[pred_col] == 0], edf.formation_energy_per_atom[edf[pred_col] == 0])
+    scatter1 = axs[0][0].scatter(x, y, c=colors, cmap='viridis', norm=norm, alpha=0.7)
+    axs[0][0].set_title('Experimental Data', color=	"#0072BD", fontsize=14, fontweight='bold')
+
+    colors, x, y = density_colors(edf.energy_above_hull[edf[pred_col] == 1], edf.formation_energy_per_atom[edf[pred_col] == 1])
+    scatter2 = axs[1][0].scatter(x, y, c=colors, cmap='viridis', norm=norm, alpha=0.7)
+    axs[1][0].set_title('Experimental Data', color=	"#0072BD", fontsize=14, fontweight='bold')
+
+    # Theoretical data scatter plots
+    colors, x, y = density_colors(tdf.energy_above_hull[tdf[pred_col] == 0], tdf.formation_energy_per_atom[tdf[pred_col] == 0])
+    scatter3 = axs[0][1].scatter(x, y, c=colors, cmap='viridis', norm=norm, alpha=0.7)
+    axs[0][1].set_title('Theoretical Data', color='#767171', fontsize=14, fontweight='bold')
+
+    colors, x, y = density_colors(tdf.energy_above_hull[tdf[pred_col] == 1], tdf.formation_energy_per_atom[tdf[pred_col] == 1])
+    scatter4 = axs[1][1].scatter(x, y, c=colors, cmap='viridis', norm=norm, alpha=0.7)
+    axs[1][1].set_title('Theoretical Data', color='#767171', fontsize=14, fontweight='bold')
+
+    # Change the spines (plot frame) color of the Experimental Data plots to blue
+    for ax in [axs[0][0], axs[1][0]]:  # Only the left plots
+        for spine in ax.spines.values():
+            spine.set_edgecolor("#0072BD")  # Set the color of the frame
+            spine.set_linewidth(2)       # Optionally, make the frame thicker
+
+    # Adjusted frames for Negative and Positive Labels with rounded corners
+    rect_negative = FancyBboxPatch((0.14, 0.56), 0.65, 0.31, 
+                                transform=fig.transFigure, 
+                                boxstyle="round,pad=0.05",  # "round" style with padding
+                                edgecolor='red', linewidth=3, facecolor='none')
+    fig.patches.append(rect_negative)
+
+    rect_positive = FancyBboxPatch((0.14, 0.12), 0.65, 0.31,
+                                transform=fig.transFigure, 
+                                boxstyle="round,pad=0.05",  # "round" style with padding
+                                edgecolor='green', linewidth=3, facecolor='none')
+    fig.patches.append(rect_positive)
+
+    # Add twin axes for Negative and Positive Labels on the right-hand side
+    ax5 = axs[0][1].twinx()  # Top-right (Theoretical, Negative Labels)
+    ax5.set_frame_on(False)
+    ax5.set_ylabel('Negative Labels', color='red', fontsize=14, fontweight='bold', labelpad=30)
+    ax5.yaxis.set_label_position("right")
+    ax5.tick_params(axis='y', which='both', left=False, right=False, labelleft=False, labelright=False)
+
+    ax6 = axs[1][1].twinx()  # Bottom-right (Theoretical, Positive Labels)
+    ax6.set_frame_on(False)
+    ax6.set_ylabel('Positive Labels', color='green', fontsize=14, fontweight='bold', labelpad=30)
+    ax6.yaxis.set_label_position("right")
+    ax6.tick_params(axis='y', which='both', left=False, right=False, labelleft=False, labelright=False)
+
+    # Create a single colorbar for all subplots
+    cax = fig.add_subplot(gs[:, 2])
+    sm = plt.cm.ScalarMappable(norm=norm, cmap='viridis')
+    fig.colorbar(sm, cax=cax, orientation='vertical')
+
+    # Set common labels
+    big_ax = fig.add_subplot(111, frameon=False)
+    big_ax.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    big_ax.set_ylabel('Formation energy per atom (eV)', labelpad=20, fontsize=17.5)
+    xlabel = big_ax.set_xlabel('Energy above hull (eV)', labelpad=20, fontsize=17.5)
+    xlabel.set_position((0.45, -0.1))  # Adjust these values as needed
+
+    # Adjust subplot spacing with `hspace` to create more space between the rows
+    plt.subplots_adjust(hspace=0.4)
+
+    # Save the plot
+    if filename:
+        fig.savefig(filename, dpi=300, bbox_inches='tight')
+
+    plt.show()
+
 
 # %%
 # %%
@@ -755,3 +859,89 @@ final_labels(synthlab_t25, figtitle="Label Distribution with 0.25 Threshold",
 
 # %%
 """
+# %%
+
+# import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+
+def label_dist5(codf, datadf, pred_col='prediction', ehull=False, prop='synth', filename=None):
+    plot_df = codf.merge(datadf[["material_id", "formation_energy_per_atom", "energy_above_hull"]], on="material_id")
+    if ehull:
+        prop = "stability"
+        
+    edf = plot_df[plot_df[prop] == 1]
+    tdf = plot_df[plot_df[prop] == 0]
+    edf = edf.sort_values(pred_col, ascending=False)
+    tdf = tdf.sort_values(pred_col, ascending=True)
+
+    # Create a GridSpec with 2 rows and 3 columns
+    fig = plt.figure(figsize=(12, 10))
+    gs = GridSpec(2, 3, figure=fig, width_ratios=[1, 1, 0.05], wspace=0.3)
+    
+    # Create subplots in the first two columns
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax2 = fig.add_subplot(gs[0, 1], sharex=ax1, sharey=ax1)
+    ax3 = fig.add_subplot(gs[1, 0], sharex=ax1, sharey=ax1)
+    ax4 = fig.add_subplot(gs[1, 1], sharex=ax1, sharey=ax1)
+    
+    axs = [[ax1, ax2], [ax3, ax4]]
+    
+    # Default black edges for scatter plots
+    for ax_row in axs:
+        for ax in ax_row:
+            for spine in ax.spines.values():
+                spine.set_edgecolor('black')
+                spine.set_linewidth(1)
+            ax.tick_params(colors='black', labelsize=11)
+    
+    # Create density scatter plots (this part is unchanged)
+    all_densities = np.concatenate([
+        density_colors(edf.energy_above_hull[edf[pred_col] == 0], edf.formation_energy_per_atom[edf[pred_col] == 0])[0],
+        density_colors(edf.energy_above_hull[edf[pred_col] == 1], edf.formation_energy_per_atom[edf[pred_col] == 1])[0],
+        density_colors(tdf.energy_above_hull[tdf[pred_col] == 0], tdf.formation_energy_per_atom[tdf[pred_col] == 0])[0],
+        density_colors(tdf.energy_above_hull[tdf[pred_col] == 1], tdf.formation_energy_per_atom[tdf[pred_col] == 1])[0]
+    ])
+    norm = LogNorm(vmin=all_densities.min(), vmax=all_densities.max())
+
+    # Experimental data scatter plots
+    colors, x, y = density_colors(edf.energy_above_hull[edf[pred_col] == 0], edf.formation_energy_per_atom[edf[pred_col] == 0])
+    scatter1 = axs[0][0].scatter(x, y, c=colors, cmap='viridis', norm=norm, alpha=0.7)
+
+    colors, x, y = density_colors(edf.energy_above_hull[edf[pred_col] == 1], edf.formation_energy_per_atom[edf[pred_col] == 1])
+    scatter2 = axs[1][0].scatter(x, y, c=colors, cmap='viridis', norm=norm, alpha=0.7)
+
+    # Theoretical data scatter plots
+    colors, x, y = density_colors(tdf.energy_above_hull[tdf[pred_col] == 0], tdf.formation_energy_per_atom[tdf[pred_col] == 0])
+    scatter3 = axs[0][1].scatter(x, y, c=colors, cmap='viridis', norm=norm, alpha=0.7)
+
+    colors, x, y = density_colors(tdf.energy_above_hull[tdf[pred_col] == 1], tdf.formation_energy_per_atom[tdf[pred_col] == 1])
+    scatter4 = axs[1][1].scatter(x, y, c=colors, cmap='viridis', norm=norm, alpha=0.7)
+
+    # Add a big frame around the experimental data
+    rect_exp = Rectangle((0.1, 0.1), 0.4, 0.85, transform=fig.transFigure, color='blue', fill=False, linewidth=3)
+    fig.patches.append(rect_exp)
+    fig.text(0.3, 0.95, 'Experimental Data', fontsize=16, fontweight='bold', color='blue', ha='center')
+
+    # Add a big frame around the theoretical data
+    rect_theo = Rectangle((0.52, 0.1), 0.4, 0.85, transform=fig.transFigure, color='#767171', fill=False, linewidth=3)
+    fig.patches.append(rect_theo)
+    fig.text(0.72, 0.95, 'Theoretical Data', fontsize=16, fontweight='bold', color='#767171', ha='center')
+
+    # Create a single colorbar for all subplots
+    cax = fig.add_subplot(gs[:, 2])
+    sm = plt.cm.ScalarMappable(norm=norm, cmap='viridis')
+    fig.colorbar(sm, cax=cax, orientation='vertical')
+
+    # Set common labels
+    big_ax = fig.add_subplot(111, frameon=False)
+    big_ax.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    big_ax.set_ylabel('Formation energy per atom (eV)', labelpad=20, fontsize=17.5)
+    big_ax.set_xlabel('Energy above hull (eV)', labelpad=20, fontsize=17.5)
+
+    # Save the plot
+    if filename:
+        fig.savefig(filename, dpi=300, bbox_inches='tight')
+
+    plt.show()
+
+# %%

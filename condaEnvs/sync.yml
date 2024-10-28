@@ -1,0 +1,14 @@
+name: sync
+channels:
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - cudatoolkit=11.8
+  - numpy=1.26.3
+  - pandas=2.1.4
+  - pip
+  - pip:
+    - -r condaEnvs/sync_reqs.txt
+

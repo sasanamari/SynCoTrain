@@ -75,7 +75,9 @@ final_labels(synthlab, figtitle="Label Distribution After Averaging",
              filename='final_label_dist_it2.png')    
 # %%
 # label_dist4(codf, datadf, pred_col = 'prediction' ,ehull=False,prop = prop, filename=None)
-label_dist4(synthlab, df, pred_col='synth_preds', 
+# label_dist4(synthlab, df, pred_col='synth_preds', 
+#             filename='final_label_dist_it2.png')
+label_dist4_frames(synthlab, df, pred_col='synth_preds', 
             filename='final_label_dist_it2.png')
 # %%
 # synthlab_t0 = pd.read_pickle(os.path.join(

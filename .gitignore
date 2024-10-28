@@ -68,3 +68,4 @@ data/results/synth/synth_labels_2_threshold_75.pkl
 !schnet_pred/models/*5_noise_10_DOE_20_DOI_aug_75_cos_sym_sc*
 !schnet_pred/results/MP_oxide_labesl.csv
 # !schnet_pred/logs/*5_noise_10_DOE_20_DOI_aug_75_cos_sym_sc*
+data/results/stability015/stability_labels_2_threshold_50.pkl
