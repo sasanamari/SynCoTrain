@@ -1,14 +1,17 @@
 name: sync
 channels:
+  - dglteam/label/cu117  # Add this channel first to ensure compatibility
   - nvidia
   - conda-forge
   - defaults
 dependencies:
   - python=3.10
-  - cudatoolkit=11.8
+  - dgl=1.0.1.cu117  
+  - cudatoolkit=11.7
   - numpy=1.26.3
   - pandas=2.1.4
+  - jupyter
   - pip
   - pip:
-    - -r condaEnvs/sync_reqs.txt
+    - -r sync_reqs.txt
 

@@ -4,7 +4,7 @@ import argparse
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Predict using pre-trained SchNet model.")
 parser.add_argument("--input_file", type=str, default="test_df", help="Name of the .pkl file containing the test data.")
-parser.add_argument("--gpu", type=str, default="1", help="CUDA device to use, e.g., 'cuda:0'.")
+parser.add_argument("--gpu", type=str, default="0", help="CUDA device to use, e.g., 'cuda:0'.")
 parser.add_argument("--threshold", type=float, default=0.5, help="Classification threshold for predictions.")
 args = parser.parse_args()
 

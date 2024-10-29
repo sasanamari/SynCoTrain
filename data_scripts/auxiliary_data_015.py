@@ -35,12 +35,12 @@ stabilityDF = stabilityDF.drop(columns = 'synth')
 # %%
 stabilityDF.to_pickle(os.path.join(data_dir,'stabilityDF015'))
 # %%
-# small_experimental_df = experimental_df.sample(frac = small_data_frac, 
-#                        random_state = 42, ignore_index = True)
-# small_theoretical_df = theoretical_df.sample(frac = small_data_frac, 
-#                        random_state = 42, ignore_index = True)
-# small_df = pd.concat([small_experimental_df, small_theoretical_df],
-#                      ignore_index=True)
-# small_df.to_pickle(os.path.join(data_dir, 'small_synthDF'))
+small_experimental_df = experimental_df.sample(frac = small_data_frac, 
+                       random_state = 42, ignore_index = True)
+small_theoretical_df = theoretical_df.sample(frac = small_data_frac, 
+                       random_state = 42, ignore_index = True)
+small_df = pd.concat([small_experimental_df, small_theoretical_df],
+                     ignore_index=True)
+small_df.to_pickle(os.path.join(data_dir, 'small_synthDF'))
 # %%
 print(f"stabilityDF was saved in {os.path.join(data_dir,'stabilityDF015')}.")

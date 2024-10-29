@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = str(2) # use before loading lightning.gpu
+os.environ['CUDA_VISIBLE_DEVICES'] = str(0) # use before loading lightning.gpu
 from pathlib import Path
 import json
 import numpy as np

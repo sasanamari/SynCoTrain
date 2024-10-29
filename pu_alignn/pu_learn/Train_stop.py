@@ -259,31 +259,31 @@ def train_dgl(
         "alignn_layernorm": ALIGNN_LN,
     }
     
-    def initialize_model_with_dropout(config, dropout=0.0):
-        """Initialize model with a specified dropout value."""
-        model_name = config.model.name
-        model_class = _model.get(model_name)
+    # def initialize_model_with_dropout(config, dropout=0.0):
+    #     """Initialize model with a specified dropout value."""
+    #     model_name = config.model.name
+    #     model_class = _model.get(model_name)
         
-        if model_class is ALIGNN:
-            # Initialize the ALIGNN model with a custom dropout value
-            model = model_class(config.model, dropout=dropout)
-        else:
-            # Initialize other models without dropout customization
-            model = model_class(config.model)
+    #     if model_class is ALIGNN:
+    #         # Initialize the ALIGNN model with a custom dropout value
+    #         model = model_class(config.model, dropout=dropout)
+    #     else:
+    #         # Initialize other models without dropout customization
+    #         model = model_class(config.model)
 
-        return model
+    #     return model
     
-        # Determine the model to use
-    if model is None:
-        net = initialize_model_with_dropout(config, dropout)
-        print(f"Using model with dropout={dropout}")
-    else:
-        net = model
-
+    #     # Determine the model to use
     # if model is None:
-    #     net = _model.get(config.model.name)(config.model)
+    #     net = initialize_model_with_dropout(config, dropout)
+    #     print(f"Using model with dropout={dropout}")
     # else:
     #     net = model
+
+    if model is None:
+        net = _model.get(config.model.name)(config.model)
+    else:
+        net = model
 
     net.to(device)
     # group parameters to skip weight decay for bias and batchnorm

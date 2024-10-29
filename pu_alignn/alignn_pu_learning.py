@@ -40,7 +40,7 @@ parser.add_argument(
 parser.add_argument(
     "--gpu_id", 
     type=int, 
-    default=3, 
+    default=0, 
     help="GPU ID to use for training.")
 
 
