@@ -32,13 +32,14 @@ Once the packages are installed, you may activate the `sync` conda environment a
 pip install -e .
 ```
 ## Predicting Synthesizability of Oxides
-You don't need to train the model from scratch if you are only interested in predicting synthesizability. The current version of SynCoTrain has been trained to predict the synthesizability of oxide crystals. 
-To this end, you may use the checkpoint file `predict_target/synth_final_preds/checkpoint_120.pt` and follow the instructions on [ALIGNN repository](https://github.com/usnistgov/alignn?tab=readme-ov-file#using-pre-trained-models) on how to use a pretrained model.
-Alternatively, you can deposite the POSCAR files of the crystals of your interest in a directory in `predict_target/label_alignn_format/poscars_for_synth_prediction/<your_directory_name>`. The command below predicts the synthesizability of these crystals:
+You don't need to train the model from scratch if you are only interested in predicting synthesizability. The current version of SynCoTrain has been trained to predict the synthesizability of oxide crystals. We use the SchNet as our classifier.
+
+In order to predict synthesizability results for your own data, place a pickled DataFrame inside the `schnet_pred/data` directory, e.g. `schnet_pred/data/<your_crsytal_data>.pkl`. Next, you can feed this DataFrame as the input to the model:
 ```bash
-python predict_target/synthesizability_predictor.py --directory_name <your_directory_name> --output_name <your_output_name>
+python schnet_pred/predict_schnet.py --input_file <your_crsytal_data>
 ```
-The results will be saved in `predict_target/label_alignn_format/<your_output_name>.csv`.
+The result will be saved in `schnet_pred/results/<your_crsytal_data>_predictions.csv`.
+
 
 ## Auxiliary experiments
 This package provides two auxiliary experiments to evaluate the model further. The first one includes running the regular experiments on only 5% of the available data. This is useful for checking the workflow of the code, without waiting for weeks for the computation to conclude. Please note that quality of results will suffer, as there is less data available for training.
@@ -89,11 +90,21 @@ schnet0 > coAlignn1 > coSchnet2 > coAlignn3
 The auxiliary stability experiments can be run with almost the same commands, except for an extra `--ehull015 True` flag. The relavant commands are stored in `stability_commands.txt`.
 
 ## Training the predictor
-After the final round of predictions, the predictions are averaged to produce the final labels. Then, the final ALIGNN-based model is trained as follows:
+After the final round of predictions, the predictions are averaged and the classification threshold is applied to produce training labels. Next, the data is augmented to improve model generalization.
 ```bash
-python predict_target/label_by_average.py
-python predict_target/preper_alignn_labels.py
-nohup python predict_target/train_folder.py > nohups/synth_predictor.log &
+python schnet_pred/label_by_average.py
+python schnet_pred/data_augment.py
 ```
+Now our training data is ready. We can train a SchNet classifier on these augmented data.
+```bash
+python schnet_pred/train_schnet.py
+```
+After the training is complete, we can predict the results for the test-set:
+```bash
+python schnet_pred/predict_schnet.py
+```
+
+
+
 
 

@@ -14,26 +14,33 @@ np.random.seed(394)
 noise_frac = 0.05 #0.10
 balanced = False
 symmetrical_test = True
-source_test_dest = ['data/results/synth/synth_labels_2_75', 'test_df_aug_75.pkl', 'augmented_data_75.pkl']
-source_test_dest_symmetrical = ['data/results/synth/synth_labels_2_75', 'test_df_aug_75_symmetrical.pkl', 'augmented_data_75_symmetrical.pkl']
-source_test_dest_10 = ['data/results/synth/synth_labels_2_75', 'test_df_aug_75_10_noise.pkl', 'augmented_data_75_10_noise.pkl']
-source_test_dest_balanced = ['data/results/synth/synth_labels_2_75_balanced', 'test_df_aug_75_balanced.pkl', 'augmented_data_75_balanced.pkl']
-def get_name(noise, balanced, symmetrical_test):
-    lists = {
-        (.05, False, False): source_test_dest,
-        (.05, False, True): source_test_dest_symmetrical,
-        (.10, False,False): source_test_dest_10,
-        (.05, True, False): source_test_dest_balanced
-    }
-    if (noise, balanced, symmetrical_test) in lists:
-        return lists[(noise, balanced, symmetrical_test)]
-    else:
-        raise ValueError(f"No list found for noise={noise}, balanced={balanced} and symmetrical_test={symmetrical_test}")
+# source_test_dest = ['data/results/synth/synth_labels_2_75', 'test_df_aug_75.pkl', 'augmented_data_75.pkl']
+# source_test_dest_symmetrical = ['data/results/synth/synth_labels_2_75', 'test_df_aug_75_symmetrical.pkl', 'augmented_data_75_symmetrical.pkl']
+# source_test_dest_10 = ['data/results/synth/synth_labels_2_75', 'test_df_aug_75_10_noise.pkl', 'augmented_data_75_10_noise.pkl']
+# source_test_dest_balanced = ['data/results/synth/synth_labels_2_75_balanced', 'test_df_aug_75_balanced.pkl', 'augmented_data_75_balanced.pkl']
+# def get_name(noise, balanced, symmetrical_test):
+#     lists = {
+#         (.05, False, False): source_test_dest,
+#         (.05, False, True): source_test_dest_symmetrical,
+#         (.10, False,False): source_test_dest_10,
+#         (.05, True, False): source_test_dest_balanced
+#     }
+#     if (noise, balanced, symmetrical_test) in lists:
+#         return lists[(noise, balanced, symmetrical_test)]
+#     else:
+#         raise ValueError(f"No list found for noise={noise}, balanced={balanced} and symmetrical_test={symmetrical_test}")
 
-source = get_name(noise_frac, balanced,symmetrical_test)[0]
-test_filename = get_name(noise_frac, balanced,symmetrical_test)[1]
-dest_filename = get_name(noise_frac, balanced, symmetrical_test)[2]
+# source = get_name(noise_frac, balanced,symmetrical_test)[0]
+# test_filename = get_name(noise_frac, balanced,symmetrical_test)[1]
+# dest_filename = get_name(noise_frac, balanced, symmetrical_test)[2]
+# print(f"Source: {source}, Test filename: {test_filename}, Destination filename: {dest_filename}")
+source = 'synth_labels_2_threshold_75.pkl'
+test_filename = 'test_df_aug_75_symmetrical.pkl'
+dest_filename = 'augmented_data_75_symmetrical.pkl'
+
 print(f"Source: {source}, Test filename: {test_filename}, Destination filename: {dest_filename}")
+
+
 # source = 'data/results/synth/synth_labels_2_75_balanced'
 # source = 'data/results/synth/synth_labels_2_75'
 # source = 'data/results/synth/synth_labels_2_balanced'

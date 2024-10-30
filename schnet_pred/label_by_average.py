@@ -14,7 +14,7 @@ ehull015 = False
 # ehull015 = True
 small_data = False
 iteration = str(2)#choose which iteration to use
-clssification_cutoff = 0.5
+clssification_cutoff = 0.75
 # %%
 cs = current_setup(small_data=small_data, experiment=experiment, ehull015 = ehull015)
 propDFpath = cs["propDFpath"]
