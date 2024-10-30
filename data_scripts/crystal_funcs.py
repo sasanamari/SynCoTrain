@@ -9,7 +9,7 @@ import logging
 import os
 import pandas as pd
 # from pymatgen.ext.matproj import MPRester  #legacy version
-# from mp_api.client import MPRester
+from mp_api.client import MPRester
 import requests
 import json
 import pickle
@@ -29,61 +29,61 @@ from pymatgen.analysis.chemenv.connectivity.structure_connectivity import Struct
 from typing import Generator, Iterable, Sequence, Any, Union, List, Optional, Tuple
 
 
-# def exper_oxygen_query(MPID : str, 
-#                      theoretical_data = False, 
-#                      num_sites = (1,150),
-#                      fields : Union[str, List[str]] = "default",) -> str:
-#     '''Retrieves experimental (ICSD) crystallographic data through the Materials Project API.
-#     Currently queries for crystals which contain Oxide anions, are not theoretical, and have at least 2 elements.
-#     It stores their (pretty) formula, structure object and material_id.
-#     Parameters:
-#     ----------------
-#     MPID : string
-#         The user ID from Materials Project which allows data query.
-#     Location : string
-# 	The directory in which the downloaded data will be stored.
-# '''
+def exper_oxygen_query(MPID : str, 
+                     theoretical_data = False, 
+                     num_sites = (1,150),
+                     fields : Union[str, List[str]] = "default",) -> str:
+    '''Retrieves experimental (ICSD) crystallographic data through the Materials Project API.
+    Currently queries for crystals which contain Oxide anions, are not theoretical, and have at least 2 elements.
+    It stores their (pretty) formula, structure object and material_id.
+    Parameters:
+    ----------------
+    MPID : string
+        The user ID from Materials Project which allows data query.
+    Location : string
+	The directory in which the downloaded data will be stored.
+'''
 
-#     if fields == "default":
-#         fields = ["material_id", 
-#                 "formula_pretty", 
-#                 'composition',
-#                 "structure",
-#                 "e_total",
-#                 'elements',
-#                 'energy_above_hull',
-#                 'energy_per_atom',
-#                 'formation_energy_per_atom',
-#                 'is_stable',
-#                 'theoretical',
-#                 'deprecated',
-#                 ]
+    if fields == "default":
+        fields = ["material_id", 
+                "formula_pretty", 
+                'composition',
+                "structure",
+                "e_total",
+                'elements',
+                'energy_above_hull',
+                'energy_per_atom',
+                'formation_energy_per_atom',
+                'is_stable',
+                'theoretical',
+                'deprecated',
+                ]
     
-#     with MPRester(MPID) as mpr:
-#         db_version = mpr.get_database_version()
-#     # If you get error 404, try upgrading mp-api from the terminal.
-#         results = mpr.summary.search(
-#             elements=["O"],
-#             num_elements = (2,100),
-#             theoretical=theoretical_data,
-#             num_sites = num_sites,  #change this to (1,150) when pipeline is ready.
-#         #  all_fields=True,
-#             fields=fields
-#                                     )
+    with MPRester(MPID) as mpr:
+        db_version = mpr.get_database_version()
+    # If you get error 404, try upgrading mp-api from the terminal.
+        results = mpr.summary.search(
+            elements=["O"],
+            num_elements = (2,100),
+            theoretical=theoretical_data,
+            num_sites = num_sites,  #change this to (1,150) when pipeline is ready.
+        #  all_fields=True,
+            fields=fields
+                                    )
         
-#     print("Database version is ", db_version)    
-#     print("The number of entries retrieved is ", len(results))
-#     results = [d.dict() for d in results]  #so it can be pickled/saved on disk.
-#     _ = [d.pop('fields_not_requested') for d in results]
-#     del _
+    print("Database version is ", db_version)    
+    print("The number of entries retrieved is ", len(results))
+    results = [d.dict() for d in results]  #so it can be pickled/saved on disk.
+    _ = [d.pop('fields_not_requested') for d in results]
+    del _
     
         
-#     arrdata = np.array(results) #converts list to array, much faster to work with
-#     del results #free up memory
+    arrdata = np.array(results) #converts list to array, much faster to work with
+    del results #free up memory
     
-#     # if return_data:
-#         # return arrdata
-#     return arrdata, db_version
+    # if return_data:
+        # return arrdata
+    return arrdata, db_version
 
 
 
