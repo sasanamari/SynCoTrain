@@ -209,11 +209,11 @@ task = CustomAtomisticTask(
 
 
 
-# Define the converter
-converter = spk.interfaces.AtomsConverter(
-    neighbor_list=trn.ASENeighborList(cutoff=5.), 
-    dtype=torch.float32
-)
+# #Define the converter
+# converter = spk.interfaces.AtomsConverter(
+#     neighbor_list=trn.ASENeighborList(cutoff=5.), 
+#     dtype=torch.float32
+# )
 
 # Check if the dataset file already exists and delete it if necessary
 db_path = data_dir / f"train_dataset_{exp_id}.db"

@@ -192,7 +192,7 @@ for it in range(start_iter, num_iter):
         scheduler_args=scheduler['scheduler_args'],
     )
 
-    converter = spk.interfaces.AtomsConverter(neighbor_list=trn.ASENeighborList(cutoff=5.), dtype=torch.float32)
+    # converter = spk.interfaces.AtomsConverter(neighbor_list=trn.ASENeighborList(cutoff=5.), dtype=torch.float32)
     
     splitFilestring = directory_setup(res_dir = res_dir, 
                                       dataPath = trainDataPath, save_dir = save_it_dir,
