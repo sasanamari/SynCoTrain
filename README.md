@@ -61,14 +61,14 @@ It is recommended not to run simultanous experiments on the same gpu, since you 
 Before co-training, we need to train our models separately on our PU data; we call this step iteration "0". The code for running the SchNetPack part of this step could be:
 ```bash
 mamba activate sync
-python pu_data_selection.py --experiment schnet0
-nohup python pu_schnet/schnet_pu_learning.py --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
+syncotrainmp_data_selection --experiment schnet0
+nohup syncotrainmp_pu_schnet --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
 ```
 In case you have access to multiple GPUs, the `--gpu_id` parameter can be changed accordingly. Similarly for the ALIGNN experiment we have:
 ```bash
 mamba activate sync
-python pu_data_selection.py --experiment alignn0
-nohup python pu_alignn/alignn_pu_learning.py --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
+syncotrainmp_data_selection --experiment alignn0
+nohup syncotrainmp_pu_alignn --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
 ```
 After each experiment is concluded, the data needs to be analyzed to produce the relevant labels for the next step of co-training. The code for the analysis of results of SchNetPack is
 

@@ -1,18 +1,18 @@
 -PU experiments:
-nohup python pu_alignn/alignn_pu_learning.py --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
-nohup python pu_schnet/schnet_pu_learning.py --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
+nohup syncotrainmp_pu_alignn --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
+nohup syncotrainmp_pu_schnet --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
 
-nohup python pu_alignn/alignn_pu_learning.py --experiment coAlignn1 --gpu_id 1 > nohups/coAlignn1_synth_gpu1.log &
-nohup python pu_schnet/schnet_pu_learning.py --experiment coSchnet1 --gpu_id 1 > nohups/coSchnet1_synth_gpu1.log &
+nohup syncotrainmp_pu_alignn --experiment coAlignn1 --gpu_id 1 > nohups/coAlignn1_synth_gpu1.log &
+nohup syncotrainmp_pu_schnet --experiment coSchnet1 --gpu_id 1 > nohups/coSchnet1_synth_gpu1.log &
 
-nohup python pu_alignn/alignn_pu_learning.py --experiment coAlignn2 --gpu_id 0 > nohups/coAlignn2_synth_gpu0.log &
-nohup python pu_schnet/schnet_pu_learning.py --experiment coSchnet2 --gpu_id 0 > nohups/coSchnet2_synth_gpu0.log &
+nohup syncotrainmp_pu_alignn --experiment coAlignn2 --gpu_id 0 > nohups/coAlignn2_synth_gpu0.log &
+nohup syncotrainmp_pu_schnet --experiment coSchnet2 --gpu_id 0 > nohups/coSchnet2_synth_gpu0.log &
 
-nohup python pu_alignn/alignn_pu_learning.py --experiment coAlignn3 --gpu_id 3 > nohups/coAlignn3_synth_gpu3.log &
-nohup python pu_schnet/schnet_pu_learning.py --experiment coSchnet3 --gpu_id 3 > nohups/coSchnet3_synth_gpu3.log &
+nohup syncotrainmp_pu_alignn --experiment coAlignn3 --gpu_id 3 > nohups/coAlignn3_synth_gpu3.log &
+nohup syncotrainmp_pu_schnet --experiment coSchnet3 --gpu_id 3 > nohups/coSchnet3_synth_gpu3.log &
 
-nohup python pu_alignn/alignn_pu_learning.py --experiment coAlignn3 --gpu_id 1 --startIt 40 > nohups/coAlignn3_synth_it40_gpu1.log &
-nohup python pu_schnet/schnet_pu_learning.py --experiment coSchnet3 --gpu_id 1 --startIt 51 > nohups/coSchnet3_synth_it51_gpu1.log &
+nohup syncotrainmp_pu_alignn --experiment coAlignn3 --gpu_id 1 --startIt 40 > nohups/coAlignn3_synth_it40_gpu1.log &
+nohup syncotrainmp_pu_schnet --experiment coSchnet3 --gpu_id 1 --startIt 51 > nohups/coSchnet3_synth_it51_gpu1.log &
 
 -alignn configs:
 python pu_alignn/alignn_configs/alignn_pu_config.py --experiment alignn0 
@@ -22,17 +22,17 @@ python pu_alignn/alignn_configs/alignn_pu_config.py --experiment coAlignn3
 
 
 -pu_data_selection:
-python pu_data_selection.py --experiment alignn0
-python pu_data_selection.py --experiment schnet0
+syncotrainmp_data_selection --experiment alignn0
+syncotrainmp_data_selection --experiment schnet0
 
-python pu_data_selection.py --experiment coAlignn1
-python pu_data_selection.py --experiment coSchnet1
+syncotrainmp_data_selection --experiment coAlignn1
+syncotrainmp_data_selection --experiment coSchnet1
 
-python pu_data_selection.py --experiment coAlignn2
-python pu_data_selection.py --experiment coSchnet2
+syncotrainmp_data_selection --experiment coAlignn2
+syncotrainmp_data_selection --experiment coSchnet2
 
-python pu_data_selection.py --experiment coAlignn3
-python pu_data_selection.py --experiment coSchnet3
+syncotrainmp_data_selection --experiment coAlignn3
+syncotrainmp_data_selection --experiment coSchnet3
 
 
 -Analysis commands:

@@ -1,7 +1,7 @@
 {
-  "default_class_config": "pu_alignn/alignn_configs/default_class_config.json",
-  "pu_config_name": "pu_alignn/alignn_configs/pu_config_alignn0_synth.json",
-  "class_config_name": "pu_alignn/alignn_configs/class_config_alignn0_synth.json",
+  "default_class_config": "syncotrainmp/pu_alignn/alignn_configs/default_class_config.json",
+  "pu_config_name": "syncotrainmp/pu_alignn/alignn_configs/pu_config_alignn0_synth.json",
+  "class_config_name": "syncotrainmp/pu_alignn/alignn_configs/class_config_alignn0_synth.json",
   "data_dir": "data/clean_data",
   "root_dir": "data/clean_data/alignn_format",
   "file_format": "poscar",

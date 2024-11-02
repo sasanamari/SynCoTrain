@@ -30,9 +30,7 @@ from experiment_setup import current_setup, str_to_bool
 # experiment = args.experiment 
 # ehull015 = args.ehull015
 # small_data = args.small_data
-current_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(os.path.join(current_dir,'../../'))
-# os.chdir("alignn/alignn_configs")
+
 def alignn_pu_config_generator(experiment, small_data, ehull015):
     cs = current_setup(small_data=small_data, experiment=experiment, ehull015=ehull015)
     # propDFpath = cs["propDFpath"]
@@ -45,7 +43,7 @@ def alignn_pu_config_generator(experiment, small_data, ehull015):
     data_dir = "data/clean_data"
     root_dir = os.path.join(data_dir,"alignn_format")
     pu_setup = dict()
-    alignn_dir = "pu_alignn"
+    alignn_dir = "syncotrainmp/pu_alignn"
     alignn_config_dir = os.path.join(alignn_dir,"alignn_configs")
     default_class_config = os.path.join(alignn_config_dir, 'default_class_config.json')
     class_config_name = os.path.join(alignn_config_dir, f'class_config_{data_prefix}{experiment}_{prop}.json')
