@@ -59,7 +59,6 @@ def load_and_prepare_data(data_path, prop, TARGET):
     Returns:
         pd.DataFrame: Cleaned DataFrame ready for train/test splitting.
     """
-    print(f"Reading data from {data_path}.")
     df = pd.read_pickle(data_path)
     df = df[['material_id', prop, TARGET]]
     df = df.loc[:, ~df.columns.duplicated()] # Drops duplicated props at round zero
@@ -82,7 +81,6 @@ def setup_output_directory(data_path, data_prefix, TARGET, prop):
     """
     split_id_dir = f"{data_prefix}{TARGET}_{prop}"
     split_id_dir_path = os.path.join(os.path.dirname(data_path), split_id_dir)
-    print(f"Creating directory for storing training data: `{split_id_dir_path}`.")
     os.makedirs(split_id_dir_path, exist_ok=True)
     return split_id_dir_path
 
@@ -97,8 +95,7 @@ def prepare_experiment_data(experiment, cs):
     """
     if experiment in {"alignn0", "coAl"}:
         from syncotrainmp.pu_alignn.alignn_data import prepare_alignn_data
-        alignn_data_log = prepare_alignn_data(experiment, cs)
-        print(alignn_data_log)
+        return prepare_alignn_data(experiment, cs)
 
 
 def leaveout_test_split(df, prop, TARGET):
@@ -118,11 +115,6 @@ def leaveout_test_split(df, prop, TARGET):
     leaveout_df = experimental_df.sample(frac=LEAVEOUT_TEST_PORTION, random_state=4242)
     positive_df = positive_df.drop(index=leaveout_df.index)
 
-    print(f"Data Information:")
-    print(f"-> Number of experimental samples: {experimental_df.shape[0]}")
-    print(f"-> Number of positive samples    : {positive_df.shape[0]} (leaveout samples removed)")
-    print(f"-> Number of leaveout samples    : {leaveout_df.shape[0]}")
-
     return experimental_df, positive_df, leaveout_df
 
 
@@ -137,7 +129,7 @@ def save_ids(data, filename):
     data.index.to_series().to_csv(filename, index=False, header=False)
 
 
-def train_test_split(df, positive_df, leaveout_df, prop, TARGET, num_iter, test_ratio):
+def train_test_split(df, positive_df, leaveout_df, TARGET, num_iter, test_ratio):
     """
     Generates train/test splits for a specified number of iterations with balanced classes.
 
@@ -155,13 +147,15 @@ def train_test_split(df, positive_df, leaveout_df, prop, TARGET, num_iter, test_
     """
     splits = []
     for it in range(num_iter):
+        # traindf1/testdf1 are training and test sets with positive data
         testdf1 = positive_df.sample(frac=test_ratio, random_state=it)
         testdf1 = pd.concat([leaveout_df, testdf1])
         df_wo_test = df.drop(index=testdf1.index)
         traindf1 = df_wo_test[df_wo_test[TARGET] == 1].sample(frac=1, random_state=it+1)
         class_train_num = len(traindf1)
-        unlabeled_df = df_wo_test[df_wo_test[TARGET] == 0]
 
+        # traindf0/testdf0 are training and test sets with unlabeled data
+        unlabeled_df = df_wo_test[df_wo_test[TARGET] == 0]
         unlabeled_shortage = class_train_num - len(unlabeled_df)
         if unlabeled_shortage > 0:
             testdf0 = unlabeled_df.sample(n=int(test_ratio * max(len(unlabeled_df), len(positive_df))), random_state=it+4)
@@ -170,11 +164,15 @@ def train_test_split(df, positive_df, leaveout_df, prop, TARGET, num_iter, test_
                                   unlabeled_df.sample(n=unlabeled_shortage, replace=True, random_state=it+3)])
         else:
             traindf0 = unlabeled_df.sample(n=class_train_num, random_state=it+2)
-            testdf0 = unlabeled_df.drop(index=traindf0.index)
+            testdf0  = unlabeled_df.drop(index=traindf0.index)
 
-        splits.append((pd.concat([traindf0, traindf1]).sample(frac=1, random_state=it+3),
-                       pd.concat([testdf0, testdf1]).sample(frac=1, random_state=it+4)))
-    return splits
+        traindf = pd.concat([traindf0, traindf1])
+        testdf  = pd.concat([ testdf0,  testdf1])
+
+        splits.append((traindf.sample(frac=1, random_state=it+3),
+                        testdf.sample(frac=1, random_state=it+4)))
+
+    return splits, traindf.shape[0], testdf.shape[0]
 
 
 def save_splits(splits, output_dir):
@@ -190,7 +188,7 @@ def save_splits(splits, output_dir):
         save_ids(test_df, os.path.join(output_dir, f"test_id_{it}.txt"))
 
 
-def main():
+def main(num_iter=100):
     """
     Main execution function to set up, process, and save experiment data splits.
     """
@@ -203,20 +201,39 @@ def main():
     print(f"The property is the quantity we would like to predict, i.e. either synthesizability or stability. The")
     print(f"target on the other hand is what we use as labels for training our ML models. After each PU-step the")
     print(f"targets will be updated using the predictions from the trained ML model. Initially, the target is")
-    print(f"identical to the property.\n")
+    print(f"identical to the property.")
+    print(f"")
 
+    print(f"Reading data from {cs['propDFpath']}.")
     df = load_and_prepare_data(cs["propDFpath"], cs["prop"], cs["TARGET"])
     output_dir = setup_output_directory(cs["propDFpath"], cs["dataPrefix"], cs["TARGET"], cs["prop"])
-    prepare_experiment_data(args.experiment, cs)
+    print(f"Creating directory for storing training data: `{output_dir}`.")
+    tmp_path = prepare_experiment_data(args.experiment, cs)
+    print(f"Temporary data path: `{tmp_path}`.")
+    print(f"")
 
     experimental_df, positive_df, leaveout_df = leaveout_test_split(df, cs["prop"], cs["TARGET"])
+
+    print(f"Data Information:")
+    print(f"-> Number of data points         : {df.shape[0]}")
+    print(f"-> Number of experimental samples: {experimental_df.shape[0]}")
+    print(f"-> Number of positive samples    : {positive_df.shape[0]} (leaveout samples removed)")
+    print(f"-> Number of leaveout samples    : {leaveout_df.shape[0]}")
+    print(f"")
+
     save_ids(leaveout_df, os.path.join(output_dir, "leaveout_test_id.txt"))
     # Save the experimental data size as a scalar value
     with open(os.path.join(output_dir, "experimentalDataSize.txt"), "w") as f:
         f.write(str(experimental_df[cs["prop"]].sum()))
 
-    splits = train_test_split(df, positive_df, leaveout_df, cs["prop"], cs["TARGET"], num_iter=100, test_ratio=TEST_PORTION)
+    splits, n_train, n_test = train_test_split(df, positive_df, leaveout_df, cs["TARGET"], num_iter=num_iter, test_ratio=TEST_PORTION)
     save_splits(splits, output_dir)
+
+    print(f"Train/Test Data Information:")
+    print(f"-> Number of PU steps                    : {num_iter}")
+    print(f"-> Number of training points in each step: {n_train}")
+    print(f"-> Number of test points in each step    : {n_test}")
+    print(f"")
 
     print(f"Train/Test splits for {args.experiment} experiment saved in {output_dir}.")
 

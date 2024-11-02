@@ -16,14 +16,13 @@ def prepare_alignn_data(experiment, cs):
     - cs (dict): Current setup.
 
     Returns:
-    - str: A message indicating where the data was saved.
+    - str: The path to the converted data.
     """
     # Load configuration and dataset paths
     propDFpath = cs["propDFpath"]
     prop = cs["prop"]
     TARGET = cs["TARGET"]
     data_prefix = cs["dataPrefix"]
-    print(f'Selected training target: {TARGET}')
 
     # Read dataset
     crysdf = pd.read_pickle(propDFpath)
@@ -52,4 +51,4 @@ def prepare_alignn_data(experiment, cs):
             # Write the mapping of POSCAR files to target values
             id_file.write(f"{poscar_name},{formatted_target}\n")
 
-    return f'Data was prepared in {data_files_dir} directory.'
+    return data_files_dir
