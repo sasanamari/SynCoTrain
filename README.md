@@ -33,12 +33,26 @@ Once the packages are installed, you may activate the `sync` conda environment a
 ```bash
 pip install -e .
 ```
-## Predicting Synthesizability of Oxides
-You don't need to train the model from scratch if you are only interested in predicting synthesizability. The current version of SynCoTrain has been trained to predict the synthesizability of oxide crystals. We use the SchNet as our classifier.
 
-In order to predict synthesizability results for your own data, place a pickled DataFrame inside the `schnet_pred/data` directory, e.g. `schnet_pred/data/<your_crsytal_data>.pkl`. Next, you can feed this DataFrame as the input to the model:
+
+## Predicting Synthesizability of Oxides
+
+If you are only interested in predicting the synthesizability of oxides, there’s no need to train the model from scratch. The current version of SynCoTrain comes pre-trained for synthesizability prediction of oxide crystals, using SchNet as the classifier.
+
+### How to Predict Synthesizability for Your Data
+
+1. **Prepare Your Data**: Save your crystal data as a pickled DataFrame and place it in the `schnet_pred/data` directory. For example:
+```
+schnet_pred/data/<your_crystal_data>.pkl
+```
+2. **Run Prediction**: Use the following command to feed your data into the model:
+
 ```bash
-python schnet_pred/predict_schnet.py --input_file <your_crsytal_data>
+python schnet_pred/predict_schnet.py --input_file <your_crystal_data>
+```
+3. **View Results**: The prediction results will be saved in the following location:
+```bash
+schnet_pred/results/<your_crystal_data>_predictions.csv
 ```
 The result will be saved in `schnet_pred/results/<your_crsytal_data>_predictions.csv`.
 
