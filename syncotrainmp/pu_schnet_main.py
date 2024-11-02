@@ -330,7 +330,7 @@ def get_test_train_data(it, config, cs, crysdf, trainDataPath, testDatapath, spl
     return crysData, crysTest
 
 
-def run_iteration(it, args, config, cs, crysdf, start_time, cutoff = 5):
+def run_iteration(it, iteration_results, args, config, cs, crysdf, start_time, cutoff = 5):
     """
     Runs a single iteration of the PU-SchNet training and prediction, including data loading, 
     training, and prediction on the test set.
@@ -508,9 +508,17 @@ def main():
 
     initialize_environment(args)
 
+    # Initialize result df
+    if config["start_iter"] != 0:
+        res_dir, _        = get_res_dir(args, config, cs)
+        iteration_results = pd.read_pickle(os.path.join(res_dir, f"{cs['dataPrefix']}{args.experiment}_0_{str(config['num_iter'])}ep{str(config['epoch_num'])}"+"tmp"))
+    else:
+        iteration_results = crysdf[["material_id", cs["prop"], cs["TARGET"]]]
+        iteration_results = iteration_results.loc[:, ~iteration_results.columns.duplicated()]
+
     start_time = time.time()
     for it in range(config["start_iter"], config["num_iter"]):
-        iteration_results = run_iteration(it, args, config, cs, crysdf, start_time)
+        iteration_results = run_iteration(it, iteration_results, args, config, cs, crysdf, start_time)
         print(f"Iteration {it} completed.")
 
     save_result  (args, config, cs, iteration_results)
