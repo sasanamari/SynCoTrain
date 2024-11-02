@@ -32,6 +32,7 @@ DATA_DIR = 'data/clean_data/'
 TEST_PORTION = 0.1
 LEAVEOUT_TEST_PORTION = TEST_PORTION * 0.5
 
+
 def parse_arguments():
     """
     Parses command-line arguments for configuring experiment parameters.
@@ -45,18 +46,6 @@ def parse_arguments():
     parser.add_argument("--small_data", type=str_to_bool, default=False, help="Use a small dataset for quick workflow checks.")
     return parser.parse_args(sys.argv[1:])
 
-def setup_experiment(args):
-    """
-    Sets up experiment configurations by loading paths and properties based on the specified arguments.
-
-    Args:
-        args (argparse.Namespace): Parsed command-line arguments.
-
-    Returns:
-        tuple: Contains property DataFrame path, result directory, property name, target column, and data prefix.
-    """
-    cs = current_setup(small_data=args.small_data, experiment=args.experiment, ehull015=args.ehull015)
-    return cs["propDFpath"], cs["result_dir"], cs["prop"], cs["TARGET"], cs["dataPrefix"]
 
 def load_and_prepare_data(data_path, prop, TARGET):
     """
@@ -77,6 +66,7 @@ def load_and_prepare_data(data_path, prop, TARGET):
     df = df[~df[TARGET].isna()]              # Remving NaN values. for small_data
     return df
 
+
 def setup_output_directory(data_path, data_prefix, TARGET, prop):
     """
     Creates an output directory for storing train/test split files based on experiment configuration.
@@ -95,19 +85,20 @@ def setup_output_directory(data_path, data_prefix, TARGET, prop):
     os.makedirs(split_id_dir_path, exist_ok=True)
     return split_id_dir_path
 
-def prepare_experiment_data(experiment, small_data, ehull015):
+
+def prepare_experiment_data(experiment, cs):
     """
     Prepares data specifically for "alignn" or "coAl" experiments.
 
     Args:
         experiment (str): Name of the experiment.
-        small_data (bool): Whether to use a small subset of the data.
-        ehull015 (bool): Whether to use the 0.015 eV cutoff for hull calculations.
+        cs (dict): Current setup.
     """
     if experiment in {"alignn0", "coAl"}:
-        from syncotrainmp.pu_alignn.preparing_data_byFile import prepare_alignn_data
-        alignn_data_log = prepare_alignn_data(small_data=small_data, experiment=experiment, ehull015=ehull015)
+        from syncotrainmp.pu_alignn.alignn_data import prepare_alignn_data
+        alignn_data_log = prepare_alignn_data(experiment, cs)
         print(alignn_data_log)
+
 
 def leaveout_test_split(df, prop, TARGET):
     """
@@ -127,6 +118,7 @@ def leaveout_test_split(df, prop, TARGET):
     positive_df = positive_df.drop(index=leaveout_df.index)
     return experimental_df, positive_df, leaveout_df
 
+
 def save_ids(data, filename):
     """
     Saves DataFrame indices to a specified file, typically for storing split IDs.
@@ -136,6 +128,7 @@ def save_ids(data, filename):
         filename (str): Output file path for saved IDs.
     """
     data.index.to_series().to_csv(filename, index=False, header=False)
+
 
 def train_test_split(df, positive_df, leaveout_df, prop, TARGET, num_iter, test_ratio):
     """
@@ -176,6 +169,7 @@ def train_test_split(df, positive_df, leaveout_df, prop, TARGET, num_iter, test_
                        pd.concat([testdf0, testdf1]).sample(frac=1, random_state=it+4)))
     return splits
 
+
 def save_splits(splits, output_dir):
     """
     Saves generated train/test splits for each iteration to the output directory.
@@ -188,24 +182,25 @@ def save_splits(splits, output_dir):
         save_ids(train_df, os.path.join(output_dir, f"train_id_{it}.txt"))
         save_ids(test_df, os.path.join(output_dir, f"test_id_{it}.txt"))
 
+
 def main():
     """
     Main execution function to set up, process, and save experiment data splits.
     """
     args = parse_arguments()
-    propDFpath, result_dir, prop, TARGET, data_prefix = setup_experiment(args)
-    df = load_and_prepare_data(propDFpath, prop, TARGET)
-    output_dir = setup_output_directory(propDFpath, data_prefix, TARGET, prop)
+    cs = current_setup(small_data=args.small_data, experiment=args.experiment, ehull015=args.ehull015)
 
-    prepare_experiment_data(args.experiment, args.small_data, args.ehull015)
+    df = load_and_prepare_data(cs["propDFpath"], cs["prop"], cs["TARGET"])
+    output_dir = setup_output_directory(cs["propDFpath"], cs["dataPrefix"], cs["TARGET"], cs["prop"])
+    prepare_experiment_data(args.experiment, cs)
 
-    experimental_df, positive_df, leaveout_df = leaveout_test_split(df, prop, TARGET)
+    experimental_df, positive_df, leaveout_df = leaveout_test_split(df, cs["prop"], cs["TARGET"])
     save_ids(leaveout_df, os.path.join(output_dir, "leaveout_test_id.txt"))
     # Save the experimental data size as a scalar value
     with open(os.path.join(output_dir, "experimentalDataSize.txt"), "w") as f:
-        f.write(str(experimental_df[prop].sum()))
+        f.write(str(experimental_df[cs["prop"]].sum()))
 
-    splits = train_test_split(df, positive_df, leaveout_df, prop, TARGET, num_iter=100, test_ratio=TEST_PORTION)
+    splits = train_test_split(df, positive_df, leaveout_df, cs["prop"], cs["TARGET"], num_iter=100, test_ratio=TEST_PORTION)
     save_splits(splits, output_dir)
 
     print(f"Train/Test splits for {args.experiment} experiment saved in {output_dir}.")

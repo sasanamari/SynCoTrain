@@ -5,7 +5,7 @@ import time
 import argparse
 from jarvis.db.jsonutils import loadjson, dumpjson
 
-from syncotrainmp.experiment_setup import current_setup, str_to_bool, str_to_int
+from syncotrainmp.experiment_setup import current_setup, str_to_bool
 from syncotrainmp.pu_alignn.alignn_setup import *
 from syncotrainmp.pu_alignn.alignn_configs.alignn_pu_config import alignn_pu_config_generator
 
