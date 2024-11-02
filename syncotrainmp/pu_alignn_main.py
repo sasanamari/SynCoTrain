@@ -109,7 +109,6 @@ def main():
     # Set up the current experiment configuration
     cs = current_setup(small_data=args.small_data, experiment=args.experiment, ehull015=args.ehull015)
     propDFpath = cs["propDFpath"]
-    result_dir = cs["result_dir"]
     prop = cs["prop"]
     TARGET = cs["TARGET"]
     data_prefix = cs["dataPrefix"]
@@ -120,12 +119,11 @@ def main():
     split_id_path = os.path.join(data_dir, split_id_dir)
 
     # Load PU configuration
-    alignn_dir = "pu_alignn"
-    pu_config_name = alignn_pu_config_generator(args.experiment, args.small_data, args.ehull015)
+    pu_config_name = alignn_pu_config_generator(args.experiment, cs, args.small_data)
     pu_setup = loadjson(pu_config_name)
     pu_setup['start_of_iterations'] = args.startIt
 
-    print("Now we run calculations for iterations", pu_setup['start_of_iterations'], "till", pu_setup['max_num_of_iterations'])
+    print(f"Now we run calculations for iterations {pu_setup['start_of_iterations']} till {pu_setup['max_num_of_iterations']}")
     start_time = time.time()
 
     # Run the training iterations

@@ -1,42 +1,11 @@
 # Build a json file to configure SchNetPack.
 import os
-import sys
 import json
-import argparse
-from experiment_setup import current_setup, str_to_bool
-# %%
-# Do not uncomment (this is for running this script as a standalone, not for importing).
-# parser = argparse.ArgumentParser(
-#     description="Semi-Supervised ML for Synthesizability Prediction"
-# )
-# parser.add_argument(
-#     "--experiment",
-#     default="alignn0",
-#     help="name of the experiment and corresponding config files.",
-# )
-# parser.add_argument(
-#     "--ehull015",
-#     type=str_to_bool,
-#     default=False,
-#     help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
-# )
-# parser.add_argument(
-#     "--small_data",
-#     type=str_to_bool,
-#     default=False,
-#     help="This option selects a small subset of data for checking the workflow faster.",
-# )
-# args = parser.parse_args(sys.argv[1:])
-# experiment = args.experiment 
-# ehull015 = args.ehull015
-# small_data = args.small_data
 
-def alignn_pu_config_generator(experiment, small_data, ehull015):
-    cs = current_setup(small_data=small_data, experiment=experiment, ehull015=ehull015)
-    # propDFpath = cs["propDFpath"]
-    # result_dir = cs["result_dir"]
+from experiment_setup import current_setup
+
+def alignn_pu_config_generator(experiment, cs, small_data):
     prop = cs["prop"]
-    # TARGET = cs["TARGET"]
     data_prefix = cs["dataPrefix"]
     max_num_of_iterations = 60#100
     start_of_iterations = 0  

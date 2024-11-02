@@ -17,7 +17,7 @@ It is recommended to create a virtual environment with mamba and miniforge to in
 Start by cloning this repository in your preferred path as shown below:
 ```bash
 cd /path/to/parent/directory
-git clone https://github.com/sasanamari/SynCoTrain.git
+git clone git@github.com:BAMeScience/SynCoTrainMP.git
 ```
 Next, navigate to the cloned directory. You can create the appropriate mamba environment there based on the `sync.yml` file:
 ```bash
