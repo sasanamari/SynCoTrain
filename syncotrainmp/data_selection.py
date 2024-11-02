@@ -82,6 +82,7 @@ def setup_output_directory(data_path, data_prefix, TARGET, prop):
     """
     split_id_dir = f"{data_prefix}{TARGET}_{prop}"
     split_id_dir_path = os.path.join(os.path.dirname(data_path), split_id_dir)
+    print(f"Creating directory for storing training data: `{split_id_dir_path}`.")
     os.makedirs(split_id_dir_path, exist_ok=True)
     return split_id_dir_path
 
@@ -116,6 +117,12 @@ def leaveout_test_split(df, prop, TARGET):
     positive_df = df[df[TARGET] == 1]
     leaveout_df = experimental_df.sample(frac=LEAVEOUT_TEST_PORTION, random_state=4242)
     positive_df = positive_df.drop(index=leaveout_df.index)
+
+    print(f"Data Information:")
+    print(f"-> Number of experimental samples: {experimental_df.shape[0]}")
+    print(f"-> Number of positive samples    : {positive_df.shape[0]} (leaveout samples removed)")
+    print(f"-> Number of leaveout samples    : {leaveout_df.shape[0]}")
+
     return experimental_df, positive_df, leaveout_df
 
 
@@ -189,6 +196,14 @@ def main():
     """
     args = parse_arguments()
     cs = current_setup(small_data=args.small_data, experiment=args.experiment, ehull015=args.ehull015)
+
+    print(f"Information:")
+    print(f"-> Using property = {cs['prop']}")
+    print(f"-> Using target   = {cs['TARGET']}")
+    print(f"The property is the quantity we would like to predict, i.e. either synthesizability or stability. The")
+    print(f"target on the other hand is what we use as labels for training our ML models. After each PU-step the")
+    print(f"targets will be updated using the predictions from the trained ML model. Initially, the target is")
+    print(f"identical to the property.\n")
 
     df = load_and_prepare_data(cs["propDFpath"], cs["prop"], cs["TARGET"])
     output_dir = setup_output_directory(cs["propDFpath"], cs["dataPrefix"], cs["TARGET"], cs["prop"])
