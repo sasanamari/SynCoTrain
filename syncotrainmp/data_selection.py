@@ -196,21 +196,18 @@ def main(num_iter=100):
     cs = current_setup(small_data=args.small_data, experiment=args.experiment, ehull015=args.ehull015)
 
     print(f"Information:")
-    print(f"-> Using property = {cs['prop']}")
-    print(f"-> Using target   = {cs['TARGET']}")
+    print(f"-> Using property  : {cs['prop']}")
+    print(f"-> Using target    : {cs['TARGET']}")
+    print(f"-> Using experiment: {args.experiment}")
     print(f"The property is the quantity we would like to predict, i.e. either synthesizability or stability. The")
     print(f"target on the other hand is what we use as labels for training our ML models. After each PU-step the")
     print(f"targets will be updated using the predictions from the trained ML model. Initially, the target is")
     print(f"identical to the property.")
     print(f"")
 
-    print(f"Reading data from {cs['propDFpath']}.")
     df = load_and_prepare_data(cs["propDFpath"], cs["prop"], cs["TARGET"])
     output_dir = setup_output_directory(cs["propDFpath"], cs["dataPrefix"], cs["TARGET"], cs["prop"])
-    print(f"Creating directory for storing training data: `{output_dir}`.")
     tmp_path = prepare_experiment_data(args.experiment, cs)
-    print(f"Temporary data path: `{tmp_path}`.")
-    print(f"")
 
     experimental_df, positive_df, leaveout_df = leaveout_test_split(df, cs["prop"], cs["TARGET"])
 
@@ -235,7 +232,13 @@ def main(num_iter=100):
     print(f"-> Number of test points in each step    : {n_test}")
     print(f"")
 
-    print(f"Train/Test splits for {args.experiment} experiment saved in {output_dir}.")
+    print(f"Path Information:")
+    print(f"-> Input data                  :", cs['propDFpath'])
+    print(f"-> Train/test data for PU-steps:", output_dir)
+    if tmp_path is not None:
+        print(f"-> Temporary data directory    : {tmp_path}")
+    print(f"")
+
 
 if __name__ == "__main__":
     main()
