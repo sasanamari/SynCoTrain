@@ -327,7 +327,7 @@ def get_test_train_data(it, config, cs, crysdf, trainDataPath, testDatapath, spl
     crysTest.prepare_data()
     crysTest.setup("test")
 
-    return crysData, crysTest
+    return crysData, crysTest, it_traindf, it_testdf
 
 
 def run_iteration(it, iteration_results, args, config, cs, crysdf, start_time, cutoff = 5):
@@ -373,7 +373,7 @@ def run_iteration(it, iteration_results, args, config, cs, crysdf, start_time, c
         bestModelPath= bestModelPath,
     )# iteration_num=it)
 
-    crysData, crysTest = get_test_train_data(
+    crysData, crysTest, _, it_testdf = get_test_train_data(
         it, config, cs, crysdf, trainDataPath, testDatapath,
         splitFilestring, split_id_dir_path, res_dir, save_it_dir, bestModelPath, cutoff)
 
