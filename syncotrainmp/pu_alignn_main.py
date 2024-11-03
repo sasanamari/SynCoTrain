@@ -33,7 +33,7 @@ def config_generator(newConfigName, iterNum=3, epochNum=10, class_config='syncot
     dumpjson(_config, filename=newConfigName)
     print(f'Config file for iteration {iterNum} was generated.')
 
-def run_training_iterations(pu_setup, args, split_id_path, start_time):
+def run_training_iterations(pu_setup, args, cs, split_id_path, start_time):
     """
     Runs the training iterations for the specified configuration.
 
@@ -43,6 +43,9 @@ def run_training_iterations(pu_setup, args, split_id_path, start_time):
         split_id_path (str): Path to the split ID files for training and testing.
         start_time (float): The start time of the training process for logging.
     """
+    prop = cs["prop"]
+    data_prefix = cs["dataPrefix"]
+
     for iterNum in range(pu_setup['start_of_iterations'], pu_setup['max_num_of_iterations']):
 
         config_generator(newConfigName=pu_setup["class_config_name"], iterNum=iterNum, epochNum=pu_setup['epochs'], alignn_dir='pu_alignn', experiment=args.experiment)
@@ -127,7 +130,7 @@ def main():
     start_time = time.time()
 
     # Run the training iterations
-    run_training_iterations(pu_setup, args, split_id_path, start_time)
+    run_training_iterations(pu_setup, args, cs, split_id_path, start_time)
 
 if __name__ == "__main__":
     main()
