@@ -14,12 +14,6 @@ nohup syncotrainmp_pu_schnet --experiment coSchnet3 --gpu_id 3 > nohups/coSchnet
 nohup syncotrainmp_pu_alignn --experiment coAlignn3 --gpu_id 1 --startIt 40 > nohups/coAlignn3_synth_it40_gpu1.log &
 nohup syncotrainmp_pu_schnet --experiment coSchnet3 --gpu_id 1 --startIt 51 > nohups/coSchnet3_synth_it51_gpu1.log &
 
--alignn configs:
-python pu_alignn/alignn_configs/alignn_pu_config.py --experiment alignn0 
-python pu_alignn/alignn_configs/alignn_pu_config.py --experiment coAlignn1
-python pu_alignn/alignn_configs/alignn_pu_config.py --experiment coAlignn2
-python pu_alignn/alignn_configs/alignn_pu_config.py --experiment coAlignn3
-
 
 -pu_data_selection:
 syncotrainmp_data_selection --experiment alignn0
