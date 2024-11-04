@@ -1,109 +1,157 @@
-# %%con
-import warnings
 import sys
-import os
-print(os.getcwd())
+import warnings
 warnings.filterwarnings('ignore')
 import numpy as np
-print(sys.path)
-from data_scripts.crystal_funcs import exper_oxygen_query
-# %%
-from mp_api.client import MPRester
-import argparse
-from pymatgen.analysis.structure_analyzer import OxideType
-from pymatgen.analysis.bond_valence import BVAnalyzer
-from pymatgen.core import Structure
-from crystal_funcs import clean_oxide
 import pandas as pd
-from crystal_structure_conversion import pymatgen_to_ase
+import argparse
 
-# %%
-parser = argparse.ArgumentParser(
-    description="Downloading experimental data."
-)
-parser.add_argument(
-    "--MPID",
-    default="",
-    help="This is your Materials Project ID.",
-)
-args = parser.parse_args(sys.argv[1:])
-MPID = args.MPID 
-# %%
-location = "data/raw"
-clean_location = "data/clean_data/"
-if not os.path.exists(location):
-    os.mkdir(location)
-destination_file = os.path.join(location, "experimental_raw_oxygen")
-database_text = os.path.join(location, "MP_db_version.txt")
+from pymatgen.core import Structure
+from syncotrainmp.utility.crystal_funcs import clean_oxide
+from syncotrainmp.utility.crystal_funcs import exper_oxygen_query
+from syncotrainmp.utility.crystal_structure_conversion import pymatgen_to_ase
 
-num_sites = (2,3)
-dataFrame_name = 'miniTestSynthdf.pkl'
-# #Uncomment the lines below if you wish you to query the data from scratch.
-# num_sites = (1,150)
-# dataFrame_name = 'synthDF'
-# %%
-pymatgenExpArray , db_version = exper_oxygen_query(MPID=MPID,
-                # location = location,
-                theoretical_data = False,
-                num_sites = num_sites,
-                fields = "default",
-                )
-pymatgenTheoArray , db_version = exper_oxygen_query(MPID=MPID,
-                # location = location,
-                theoretical_data = True,
-                num_sites = num_sites,
-                fields = "default",
-                )
-# %%
-# np.save(destination_file, pymatgenExpArray)
-# np.save(destination_file, pymatgenTheoArray)
-# %%
-print(db_version)
-# with open(database_text, "w") as text_file:
-#     text_file.write(db_version)
-# %%
-print(f"We retrieved {len(pymatgenExpArray)} experimental crystals from the Materials Project database.")
-print(f"We retrieved {len(pymatgenTheoArray)} theoretical crystals from the Materials Project database.")
-# %%
-for material in pymatgenExpArray:
-    material["structure"] = Structure.from_dict(material["structure"]) 
-for material in pymatgenTheoArray:
-    material["structure"] = Structure.from_dict(material["structure"])     
-# %%
-good_experimental_data = clean_oxide(experimental=True, pymatgenArray = pymatgenExpArray, 
-                                    reportBadData=False) #also removes "experimental" crystals with e_above_hull > 1 eV
-print(f"We have {len(good_experimental_data)} experimental oxides after cleaning.")
-good_theoretical_data = clean_oxide(experimental=False, pymatgenArray = pymatgenTheoArray, 
-                                    reportBadData=False)
-print(f"We have {len(good_theoretical_data)} theoretical oxides after cleaning.")
-# %%
-keys_to_keep = ["material_id", "atoms", 
-                "energy_above_hull", "formation_energy_per_atom", ]
-current_keys = set(good_experimental_data[0].keys())
-key_exclusion_exp = current_keys.difference(set(keys_to_keep))
-# %%
-for material in good_experimental_data:
-    material["atoms"] = pymatgen_to_ase(material["structure"])
-    for key in key_exclusion_exp:
-        material.pop(key, None)
-    material["synth"] = 1
-    
-for material in good_theoretical_data:
-    material["atoms"] = pymatgen_to_ase(material["structure"])
-    for key in key_exclusion_exp:
-        material.pop(key, None)
-    material["synth"] = 0    
-# %%
-experimental_df = pd.DataFrame.from_records(good_experimental_data)
-theoretical_df = pd.DataFrame.from_records(good_theoretical_data)
-# %%
-synthDF = pd.concat([experimental_df,theoretical_df])
-synthDF = synthDF.sample(frac=1, ignore_index=True) #shuffling experimental and theoretical data
-synthDF["material_id"] = synthDF.material_id.map(str)  #string format for all material_id
-experiments = ['schnet0', 'alignn0', 'coSchnet1', 'coAlignn1', 'coSchnet2',
-               'coAlignn2', 'coSchnet3', 'coAlignn3']
-synthDF[experiments] = np.nan
-# %%
-synthDF.to_pickle(os.path.join(clean_location, dataFrame_name))
-print(f'The dataframe was saved in {os.path.join(clean_location, dataFrame_name)}.')
-# %%
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Downloading experimental data."
+    )
+    parser.add_argument(
+        "--MPID",
+        default="",
+        help="This is your Materials Project ID.",
+    )
+    parser.add_argument(
+        "--small",
+        action="store_true",
+        help="If specified, creates a smaller sample for testing purposes."
+    )
+    args = parser.parse_args(sys.argv[1:])
+
+    return args
+
+
+def query_data(MPID, num_sites):
+    """Query the Materials Project database for experimental and theoretical data."""
+    pymatgen_exp_array, db_version = exper_oxygen_query(
+        MPID = MPID,
+        theoretical_data = False,
+        num_sites = num_sites,
+        fields = "default",
+    )
+    pymatgen_theo_array, db_version = exper_oxygen_query(
+        MPID=MPID,
+        theoretical_data = True,
+        num_sites = num_sites,
+        fields = "default",
+    )
+
+    print(db_version)
+    print(f"We retrieved {len(pymatgen_exp_array)} experimental crystals from the Materials Project database.")
+    print(f"Retrieved {len(pymatgen_theo_array)} theoretical crystals from the Materials Project database.")
+
+    return pymatgen_exp_array, pymatgen_theo_array
+
+
+def convert_structures(pymatgen_array):
+    """Convert structure dictionaries to Structure objects."""
+    for material in pymatgen_array:
+        material["structure"] = Structure.from_dict(material["structure"])
+    return pymatgen_array
+
+
+def clean_data(pymatgen_exp_array, pymatgen_theo_array):
+    """Clean the experimental and theoretical data arrays."""
+
+    # Also removes "experimental" crystals with e_above_hull > 1 eV
+    good_experimental_data = clean_oxide(
+        experimental = True,
+        pymatgenArray = pymatgen_exp_array,
+        reportBadData = False
+    )
+    good_theoretical_data = clean_oxide(
+        experimental = False,
+        pymatgenArray = pymatgen_theo_array,
+        reportBadData = False
+    )
+    print(f"We have {len(good_experimental_data)} experimental oxides after cleaning.")
+    print(f"We have {len(good_theoretical_data)} theoretical oxides after cleaning.")
+
+    return good_experimental_data, good_theoretical_data
+
+
+def filter_keys(data_array, keys_to_keep):
+    """Keep only the specified keys in each entry of the data array."""
+    current_keys = set(data_array[0].keys())
+    keys_to_remove = current_keys.difference(set(keys_to_keep))
+
+    for material in data_array:
+        material["atoms"] = pymatgen_to_ase(material["structure"])
+        for key in keys_to_remove:
+            material.pop(key, None)
+    return data_array
+
+
+def label_data(data_array, label):
+    """Label the data as experimental or theoretical."""
+    for material in data_array:
+        material["synth"] = label
+    return data_array
+
+
+def create_dataframe(exp_data, theo_data):
+    """Create a combined DataFrame from experimental and theoretical data arrays."""
+    exp_df = pd.DataFrame.from_records(exp_data)
+    theo_df = pd.DataFrame.from_records(theo_data)
+
+    synth_df = pd.concat([exp_df, theo_df])
+    synth_df = synth_df.sample(frac=1, ignore_index=True)  # Shuffle data
+    synth_df["material_id"] = synth_df["material_id"].astype(str)  # Ensure all IDs are strings
+
+    # Add columns for experiments with NaN values
+    experiment_columns = ['schnet0', 'alignn0', 'coSchnet1', 'coAlignn1', 'coSchnet2', 'coAlignn2', 'coSchnet3', 'coAlignn3']
+    synth_df[experiment_columns] = np.nan
+
+    return synth_df
+
+
+def save_dataframe(synth_df, filename):
+    """Save the DataFrame to a pickle file."""
+    synth_df.to_pickle(filename)
+    print(f"Dataframe saved to {filename}.")
+
+
+def main():
+    # Parse arguments and set up directories
+    args = parse_arguments()
+
+    # Query data
+    if args.small:
+        pymatgen_exp_array, pymatgen_theo_array = query_data(args.MPID, (1, 150))
+    else:
+        pymatgen_exp_array, pymatgen_theo_array = query_data(args.MPID, (2, 3))
+
+    # Convert structures from dictionaries to Structure objects
+    pymatgen_exp_array = convert_structures(pymatgen_exp_array)
+    pymatgen_theo_array = convert_structures(pymatgen_theo_array)
+
+    # Clean the data to remove unstable entries
+    good_exp_data, good_theo_data = clean_data(pymatgen_exp_array, pymatgen_theo_array)
+
+    # Filter keys and label data
+    keys_to_keep = ["material_id", "atoms", "energy_above_hull", "formation_energy_per_atom"]
+    good_exp_data = filter_keys(good_exp_data, keys_to_keep)
+    good_theo_data = filter_keys(good_theo_data, keys_to_keep)
+    good_exp_data = label_data(good_exp_data, label=1)  # Label as experimental
+    good_theo_data = label_data(good_theo_data, label=0)  # Label as theoretical
+
+    # Create and save the DataFrame
+    synth_df = create_dataframe(good_exp_data, good_theo_data)
+
+    if args.small:
+        save_dataframe(synth_df, 'miniTestSynthdf.pkl')
+    else:
+        save_dataframe(synth_df, 'synthDF')
+
+
+if __name__ == "__main__":
+    main()
