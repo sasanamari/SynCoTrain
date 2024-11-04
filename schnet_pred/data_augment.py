@@ -165,5 +165,3 @@ if __name__ == "__main__":
 
     # Save the combined DataFrame if needed
     final_df.to_pickle(Path(data_dir) / dest_filename)
-    # final_df.to_pickle(Path(data_dir) / "augmented_data_75_10_noise.pkl")
-    # final_df.to_pickle(Path(data_dir) / "augmented_data_75_balanced.pkl")

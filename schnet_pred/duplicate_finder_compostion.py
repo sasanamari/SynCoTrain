@@ -11,8 +11,8 @@ def format_time(seconds):
     seconds = seconds % 60
     return f"{int(days)}d {int(hours)}h {int(minutes)}m {int(seconds)}s"
 
-synthDF = pd.read_pickle('/home/samariam/projects/final_syncotrain/MP_SynCoTrain/data/clean_data/synthDF')
-oqmd = pd.read_pickle('/home/samariam/projects/final_syncotrain/MP_SynCoTrain/data/clean_data/oqmd_df.pkl')
+synthDF = pd.read_pickle('data/clean_data/synthDF')
+oqmd = pd.read_pickle('data/clean_data/oqmd_df.pkl')
 # Convert ASE Atoms to Pymatgen Structures and calculate composition
 oqmd['structure'] = oqmd['atoms'].apply(lambda x: AseAtomsAdaptor.get_structure(x))
 oqmd['composition'] = oqmd['structure'].apply(lambda x: x.composition.reduced_formula)
