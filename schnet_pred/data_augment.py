@@ -10,7 +10,6 @@ import tqdm
 
 # Set random seed for reproducibility
 np.random.seed(394)
-# noise_frac = 0.05 #0.05
 noise_frac = 0.05 #0.10
 balanced = False
 symmetrical_test = True
@@ -40,13 +39,6 @@ dest_filename = 'augmented_data_75_symmetrical.pkl'
 
 print(f"Source: {source}, Test filename: {test_filename}, Destination filename: {dest_filename}")
 
-
-# source = 'data/results/synth/synth_labels_2_75_balanced'
-# source = 'data/results/synth/synth_labels_2_75'
-# source = 'data/results/synth/synth_labels_2_balanced'
-# test_filename = 'test_df_aug_75_balanced.pkl'
-# test_filename = 'test_df_aug_75_10_noise.pkl'
-# test_filename = 'test_df_aug_75.pkl'
 # Function to convert ASE Atoms to Pymatgen Structure
 def ase_to_pymatgen(ase_atoms):
     return AseAtomsAdaptor.get_structure(ase_atoms)
@@ -128,9 +120,6 @@ if __name__ == "__main__":
     # Convert ASE Atoms to Pymatgen Structures
     print('Converting ASE Atoms to Pymatgen Structures...')
     train_val_df['pmg_structure'] = train_val_df['atoms'].apply(ase_to_pymatgen)
-    # tqdm.pandas(desc="Converting ASE Atoms to Pymatgen Structures")
-    # train_val_df['pmg_structure'] = train_val_df['atoms'].progress_apply(ase_to_pymatgen)
-    
     
     # Add balanced noise to the DataFrame
     print('Adding balanced noise to the data...')
