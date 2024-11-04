@@ -1,11 +1,9 @@
 # predict_schnet.py
 import argparse
-# need to import the correct schnet with dropout 
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Predict using pre-trained SchNet model.")
 parser.add_argument("--input_file", type=str, default="test_df", help="Name of the .pkl file containing the test data.")
 parser.add_argument("--gpu", type=str, default="0", help="CUDA device to use, e.g., 'cuda:0'.")
-# parser.add_argument("--threshold", type=float, default=0.5, help="Classification threshold for predictions.")
 args = parser.parse_args()
 
 # Use the provided arguments
@@ -41,31 +39,15 @@ model_dir = base_dir / "models"
 result_dir = base_dir / "results"
 os.makedirs(result_dir, exist_ok=True)
 
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_bl"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_focal"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_f_w"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w_wd"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w_long"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w_cos_loss"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w_cos_sym"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w_cos_loss_sym"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_cos_sym_LR"
+
 exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_cos_sym_sc"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_cos_sym"
+
 
 # Define paths
 model_name = f"schnet_model_{exp_id}"
-# model_name = "best_schnet_model_5.0_noise"
-# model_name = f"best_schnet_model_{str(noise_level * 100)}_noise"
-# model_name = "best_schnet_model"
 
 output_file_base = Path(f'{test_filename}_{exp_id}')
 
-# test_filename = 'test_df.pkl'
 prop = "synth"  # The property to predict
 
 # Adjust paths and filenames for quick debug
@@ -85,9 +67,6 @@ split_file_path = data_dir / f"split_{test_filename}_{exp_id}.npz"
 if split_file_path.exists():
     split_file_path.unlink()  # Remove the existing split file
 
-# split_file_path = base_dir.parent / "split.npz"
-# if split_file_path.exists():
-#     split_file_path.unlink()  # Remove the existing split file
 
 # Load the saved model (no need to set up architecture manually)
 model_path = model_dir / model_name
@@ -140,9 +119,8 @@ test_dataset = spk.data.ASEAtomsData.create(str(test_db_path),
                                             property_unit_dict={"dummy": int(1)})
 
 # Add systems to the dataset with a minimal dummy property
-# for atoms in test_df.atoms:
-#     test_dataset.add_system(atoms, dummy=np.array([0.0]))  # Minimal property to satisfy requirement
-dummy_properties = [{"dummy": np.array([0.0])} for _ in range(len(test_df))]
+
+dummy_properties = [{"dummy": np.array([0.0])} for _ in range(len(test_df))] # Minimal property to satisfy requirement
 test_dataset.add_systems(np.array(dummy_properties), np.array(test_df.atoms))
 
 
@@ -196,9 +174,7 @@ resdf = resdf.set_index('testIndex').sort_index()
 test_df = test_df.merge(resdf[['pred_synth', 'synth_score']], left_index=True, right_index=True, how='outer')
 
 
-## Save results to CSV
-# test_df["pred_synth"] = results
-# output_file_base = Path(f'{test_filename}_{str(int(noise_level*100))}_noise_{str(int(dropout_rate * 100))}_DO')#.stem
+# Save results to CSV
 output_path = result_dir / f"{output_file_base}_predictions.csv"
 if quick_debug:
     output_path = result_dir / "debug_predictions.csv"
