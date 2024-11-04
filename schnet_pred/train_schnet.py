@@ -23,15 +23,13 @@ device = "cpu"
 if torch.cuda.is_available():
     device = torch.device("cuda")
 
-# model1 = {'noise_level':0, 'dropout_embedding':.1, 'dropout_interaction':.25}
-# model2 = {'noise_level':0.05, 'dropout_embedding':.1, 'dropout_interaction':.2}
+
 quick_debug = False
 noise_level = 0.05 #already applied to the data before augmentation.
 dropout_embedding=0.1#0.1
 dropout_interaction=0.2#0.2 
 epoch_num = 200
-# weight_loss = tensor([0.35 / 0.65]).to(device)
-# weight_loss = None
+
 weight_loss = tensor([0.45 / 0.55]).to(device)
 # ES_patience = 100 #best model is saved anyway
 ES = {'patience':70, 'monitor':'val_synth_Accuracy', 'mode':'max'}
@@ -50,30 +48,13 @@ scheduler_args = {
     "eta_min": 1e-6  # Minimum learning rate
 }
 my_loss = torch.nn.BCEWithLogitsLoss(pos_weight=weight_loss)
-# my_loss = FocalLoss(gamma=2).to(device)
-# my_loss = FocalLoss(gamma=1, pos_weight=weight_loss).to(device)
-# my_loss = FocalLoss(gamma=0.5, pos_weight=weight_loss).to(device)
+
 n_interactions = 3
 batch_size = 32
 
-# train_val_filename = 'augmented_data.pkl'
-# train_val_filename = f'augmented_data_75_{str(int(noise_level * 100))}_noise.pkl'
 train_val_filename = 'augmented_data_75_symmetrical.pkl'
-# train_val_filename = 'augmented_data_75_balanced.pkl'
-# train_val_filename = 'augmented_data_75_10_noise.pkl'
 
-
-
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w_cos_sym"
-exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_cos_sym_LR"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_cos_sym_sc"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_cos_sym"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w_cos_loss_sym"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w_cyclic"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w_cos_loss"
-# exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_w_cos"
-
-
+exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_cos_sym_sc"
 
 model_name = f"schnet_model_{exp_id}"
 print(f"Model name: {model_name}")
@@ -136,34 +117,6 @@ class CustomAtomisticTask(spk.task.AtomisticTask):
             }
         }
 
-# class CustomAtomisticTask(spk.task.AtomisticTask):
-#     def __init__(self, model, outputs, optimizer_args=None, scheduler_args=None):
-#         super().__init__(model=model, outputs=outputs, optimizer_args=optimizer_args)
-#         self.optimizer_args = optimizer_args
-#         self.scheduler_args = scheduler_args
-
-#     def configure_optimizers(self):
-#         # Define the optimizer using the passed arguments
-#         optimizer = torch.optim.AdamW(self.model.parameters(), **self.optimizer_args)
-
-#         # Define the CosineAnnealingLR scheduler
-#         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-#             optimizer,
-#             T_max=self.scheduler_args["T_max"],  # Set to match the total number of epochs
-#             eta_min=self.scheduler_args["eta_min"]
-#         )
-
-#         # Return the optimizer and scheduler
-#         return {
-#             "optimizer": optimizer,
-#             "lr_scheduler": {
-#                 "scheduler": scheduler,  # Scheduler used for learning rate adjustments
-#                 "interval": "epoch",     # Adjust learning rate after every epoch
-#                 "frequency": 1
-#             }
-#         }
-
-
 # Define the optimizer arguments
 optimizer_args = {
     "lr": 1e-3
@@ -207,13 +160,6 @@ task = CustomAtomisticTask(
     scheduler_args=scheduler_args
 )
 
-
-
-# #Define the converter
-# converter = spk.interfaces.AtomsConverter(
-#     neighbor_list=trn.ASENeighborList(cutoff=5.), 
-#     dtype=torch.float32
-# )
 
 # Check if the dataset file already exists and delete it if necessary
 db_path = data_dir / f"train_dataset_{exp_id}.db"
@@ -301,8 +247,9 @@ trainer = pl.Trainer(
 # Train the Model
 trainer.fit(task, datamodule=crysData)
 
+# No need to save the model manually as done below. The ModelCheckpoint callback will save the best model automatically.
 # Save the model
-model_path = model_dir / model_name
+# model_path = model_dir / model_name
 # torch.save(nnpot.state_dict(), f"{model_path}.pt")
 # torch.save(nnpot, f"{model_path}.pt")
 
