@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 
 def format_and_add_noise(df, noise_frac=0.05):
@@ -28,5 +27,3 @@ def format_and_add_noise(df, noise_frac=0.05):
     df["targets"] = df["targets"].map(lambda target: {"synth": np.array(target)})
     
     return df
-
-
