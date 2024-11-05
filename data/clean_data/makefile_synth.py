@@ -126,9 +126,9 @@ def main():
 
     # Query data
     if args.small:
-        pymatgen_exp_array, pymatgen_theo_array = query_data(args.MPID, (1, 150))
-    else:
         pymatgen_exp_array, pymatgen_theo_array = query_data(args.MPID, (2, 3))
+    else:
+        pymatgen_exp_array, pymatgen_theo_array = query_data(args.MPID, (1, 150))
 
     # Convert structures from dictionaries to Structure objects
     pymatgen_exp_array = convert_structures(pymatgen_exp_array)
