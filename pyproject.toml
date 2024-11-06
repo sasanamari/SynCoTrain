@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "syncotrainmp"
+version = "0.1.0"
+description = "PU-Learning with Co-Training of SchNet and ALIGNN for Crystal Synthesizability Prediction"
+authors = [
+    {name = "Sasan AmariAmir"},
+    {name = "Philipp Benner"}
+]
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = ["crystal", "synthesizability", "machine learning", "co-training"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+[project.scripts]
+syncotrainmp_data_selection = "syncotrainmp.data_selection:main"
+syncotrainmp_pu_alignn = "syncotrainmp.pu_alignn_main:main"
+syncotrainmp_pu_schnet = "syncotrainmp.pu_schnet_main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["syncotrainmp"]

@@ -14,9 +14,28 @@ def str_to_int(value):
 
 
 def current_setup(small_data, experiment, ehull015):
+    """
+    Set up the current experiment configuration based on input parameters.
+
+    Args:
+        small_data (bool): Indicates whether to use a small subset of data.
+        experiment (str): The name of the experiment.
+        ehull015 (bool): Indicates whether to use a specific stability cutoff.
+
+    Returns:
+        dict: A dictionary containing the configuration setup, including:
+            - propDFpath: Path to the property DataFrame.
+            - result_dir: Directory for saving results.
+            - prop: The property name being analyzed.
+            - TARGET: The training label column based on the experiment.
+            - dataPrefix: A prefix for the dataset based on input parameters.
+
+    Raises:
+        Exception: If both small_data and ehull015 are set to True.
+        KeyError: If the experiment is not recognized in the mapping.
+    """
     if str_to_bool(ehull015) and str_to_bool(small_data):
-        error_message = "small_data and ehull015 are not allowed at the same time."
-        raise Exception(error_message)
+        raise Exception("small_data and ehull015 cannot be set to True at the same time.")
 
     elif small_data:
         propDFpath = 'data/clean_data/small_synthDF'
@@ -30,7 +49,7 @@ def current_setup(small_data, experiment, ehull015):
         propDFpath = 'data/clean_data/synthDF'
         result_dir = 'data/results/synth'
         prop = 'synth'
-        
+
     experiment_target_match = { #output_dir: training_label_column
             'alignn0':prop, 
             'coAlignn1':'schnet0',
@@ -50,6 +69,9 @@ def current_setup(small_data, experiment, ehull015):
     if ehull015:
         data_prefix = "15_"
     
-    
+    # Ensure the experiment is valid and retrieve the target
+    if experiment not in experiment_target_match:
+        raise KeyError(f"Unrecognized experiment: {experiment}")
+
     return {"propDFpath":propDFpath, "result_dir":result_dir, "prop":prop, 
             "TARGET":experiment_target_match[experiment], "dataPrefix":data_prefix}

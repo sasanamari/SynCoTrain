@@ -1,10 +1,8 @@
-# %%
-# import ase
 from pymatgen.core import Structure, Element
 from ase import Atoms as AseAtoms
 from pymatgen.io.ase import AseAtomsAdaptor as pase
 from jarvis.core.atoms import Atoms as JarvisAtoms
-# %%
+
 def pymatgen_to_ase(pmg_structure):
     """Convert a PymatgenStructure object to an AseAtoms object.
 
@@ -83,5 +81,3 @@ def jarvis_to_pymatgen(jarvis_atoms):
     pmg_structure = Structure(lattice, species, 
                               coords, coords_are_cartesian = False)
     return pmg_structure
-
-# %%

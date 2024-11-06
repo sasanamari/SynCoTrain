@@ -1,6 +1,8 @@
 # SynCoTrain 
-Co-Training for Crystal Synthesizability Prediction
-## Intoroduction
+Co-training enhanced PU-learning for crystal synthesizability prediction.
+
+
+## Introduction
 SynthCoTrain is a materials-informatics package which predicts the synthesizability of crystals. The nature of the problem is a semi-supervised classification, in which we access only to positively labeled and unlabeled data points. SynCoTrain does this classification task by combining two semi-supervised classification methods: **Positive and Unlabeled (PU) Learning** and **Co-training**. The classifiers used in this package are [ALIGNN](https://github.com/usnistgov/alignn) and [SchNetPack](https://github.com/atomistic-machine-learning/schnetpack).
 
 <!-- ![cotraining scheme](figures/cotraining_scheme.jpg) -->
@@ -10,14 +12,14 @@ SynthCoTrain is a materials-informatics package which predicts the synthesizabil
 
 The final model achieves a notable true-positive rate of 96% for the experimentally synthesized test-set and predicts that 29% of the theoretical crystals are synthesizable. These results go beyond the scope of thermodynamic stability analysis alone. This work carries significant implications, including the filtration of structural predictions from high-throughput simulations to identify synthesizable candidates.
 
+
 ## Installation
 It is recommended to create a virtual environment with mamba and miniforge to install the different packages easily. Start by installing mamba according to the instructions [here](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html).
-
 
 Start by cloning this repository in your preferred path as shown below:
 ```bash
 cd /path/to/parent/directory
-git clone https://github.com/sasanamari/SynCoTrain.git
+git clone git@github.com:BAMeScience/SynCoTrainMP.git
 ```
 Next, navigate to the cloned directory. You can create the appropriate mamba environment there based on the `sync.yml` file:
 ```bash
@@ -31,60 +33,86 @@ Once the packages are installed, you may activate the `sync` conda environment a
 ```bash
 pip install -e .
 ```
-## Predicting Synthesizability of Oxides
-You don't need to train the model from scratch if you are only interested in predicting synthesizability. The current version of SynCoTrain has been trained to predict the synthesizability of oxide crystals. We use the SchNet as our classifier.
 
-In order to predict synthesizability results for your own data, place a pickled DataFrame inside the `schnet_pred/data` directory, e.g. `schnet_pred/data/<your_crsytal_data>.pkl`. Next, you can feed this DataFrame as the input to the model:
+
+## Predicting Synthesizability of Oxides
+
+If you are only interested in predicting the synthesizability of oxides, there’s no need to train the model from scratch. The current version of SynCoTrain comes pre-trained for synthesizability prediction of oxide crystals, using SchNet as the classifier.
+
+### How to Predict Synthesizability for Your Data
+
+1. **Prepare Your Data**: Save your crystal data as a pickled DataFrame and place it in the `schnet_pred/data` directory. For example:
+```
+schnet_pred/data/<your_crystal_data>.pkl
+```
+2. **Run Prediction**: Use the following command to feed your data into the model:
+
 ```bash
-python schnet_pred/predict_schnet.py --input_file <your_crsytal_data>
+python schnet_pred/predict_schnet.py --input_file <your_crystal_data>
+```
+3. **View Results**: The prediction results will be saved in the following location:
+```bash
+schnet_pred/results/<your_crystal_data>_predictions.csv
 ```
 The result will be saved in `schnet_pred/results/<your_crsytal_data>_predictions.csv`.
 
 
-## Auxiliary experiments
-This package provides two auxiliary experiments to evaluate the model further. The first one includes running the regular experiments on only 5% of the available data. This is useful for checking the workflow of the code, without waiting for weeks for the computation to conclude. Please note that quality of results will suffer, as there is less data available for training.
-The second auxiliary experiment consists of classifying the stability of crystals based on their energy above hull, through the same PU Learning and Co-training code. The utility of this experiment is that, unlike a real case of Positive and Unlabeled Learning, we have access to correct labels of the unlabeled class. As stability is highly related to synthesizability, the quality of this experiment can be used as a proxy to judge the quality of the main experiment. We are mainly interested to see whether the real true-positive-rate of these experiments are close in value to the true-positive-rate produced by PU Learning.
-<!-- #### Data preparation for auxiliary exeperiments
-The data-set needed for both auxilary experiemnts can be produced from the main data. Simple, run the data_scripts/auxiliary_data_015.py file to produce both data-sets:
-```
-python data_scripts/auxiliary_data.py -->
-<!-- ``` -->
-## Training the models
-To replicate the results of this library, you need to run the scripts made for running each PU experiment. There are three experiments for each of the base classifiers, with pre-defined data handling. Each experimment consists of 60 iterations of PU learning.
+## Auxiliary Experiments
 
-First, the base experiment is run with each model. Next, each model can be trained on the additional psuedo-labels provided by the other model. 
+This package includes two auxiliary experiments to further evaluate model performance:
 
-Please note that these experiments are rather long. Using a NVIDIA A100 80GB PCIe GPU, each experiment took an average of one week or more to conclude. So, for the full-data experiment, you may want to use the `nohup` command, as shown later.
+1. **Reduced Data Experiment**: Runs the regular experiment on only 5% of the available data. This is useful for testing the code workflow without long computation times. Note that the model’s performance may decrease due to the reduced data.
 
-It is recommended not to run simultanous experiments on the same gpu, since you run the risk of overflowing the gpu memory and crashing the experiment mid-way.
+2. **Stability Classification Experiment**: Classifies the stability of crystals based on their energy above hull using the same PU Learning and Co-training approach. This experiment differs from typical Positive and Unlabeled (PU) Learning because we have correct labels for the “unlabeled” class. Since stability correlates with synthesizability, this experiment provides a proxy for assessing the quality of the main experiment by comparing true-positive rates from PU Learning.
 
-Before co-training, we need to train our models separately on our PU data; we call this step iteration "0". The code for running the SchNetPack part of this step could be:
+## Training the Models
+
+To replicate the results from this library, follow the steps for running each PU experiment. Three predefined experiments are available for each base classifier, with each experiment comprising 60 iterations of PU learning.
+
+1. **Run Base Experiment**: Begin by running the base experiment for each model. Afterward, each model is trained on pseudo-labels provided by the other model to improve co-training.
+
+> **Note**: These experiments are computationally intensive. For example, on an NVIDIA A100 80GB PCIe GPU, each experiment takes approximately one week. If running on full data, consider using the `nohup` command to allow the process to run in the background.
+
+> **Recommendation**: Avoid running multiple experiments simultaneously on the same GPU to prevent memory overflow, which could crash the experiment.
+
+### Step 1: Initial Model Training (Iteration "0")
+
+Before co-training, train each model separately on the PU data. For example, to train the SchNet model:
 ```bash
 mamba activate sync
-python pu_data_selection.py --experiment schnet0
-nohup python pu_schnet/schnet_pu_learning.py --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
+syncotrainmp_data_selection --experiment schnet0
+nohup syncotrainmp_pu_schnet --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
 ```
 In case you have access to multiple GPUs, the `--gpu_id` parameter can be changed accordingly. Similarly for the ALIGNN experiment we have:
 ```bash
 mamba activate sync
-python pu_data_selection.py --experiment alignn0
-nohup python pu_alignn/alignn_pu_learning.py --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
+syncotrainmp_data_selection --experiment alignn0
+nohup syncotrainmp_pu_alignn --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
 ```
-After each experiment is concluded, the data needs to be analyzed to produce the relevant labels for the next step of co-training. The code for the analysis of results of SchNetPack is
 
-```
+### Step 2: Analyze Results and Generate Labels
+
+After each experiment is concluded, the data needs to be analyzed to produce the relevant labels for the next step of co-training. The code for the analysis of results of SchNetPack is
+```bash
 python pu_schnet/schnet_pu_analysis.py --experiment schnet0 
 ```
 and for ALIGNN:
-```
+```bash
 python pu_alignn/alignn_pu_analysis.py --experiment alignn0 
 ```
+
+### Subsequent Steps
+
 From this point, it matters that the experiments are executed in their proper order. Before each PU experiment, the relevant data selection needs to be performed. After each PU experiment, the analysis of the results are needed to produce the labels for the next iteration. The commands to run these experiments can be found on `synth_commands.txt`.
 
 The correct order of running the experiments starting from alignn0 is:
+```
 alignn0 > coSchnet1 > coAlignn2 > coSchnet3
+```
 and for the other view, starting from schnet0:
+```
 schnet0 > coAlignn1 > coSchnet2 > coAlignn3
+```
 
 ## Stability experiments
 The auxiliary stability experiments can be run with almost the same commands, except for an extra `--ehull015 True` flag. The relavant commands are stored in `stability_commands.txt`.
@@ -105,6 +133,25 @@ python schnet_pred/predict_schnet.py
 ```
 
 
+## Querying the Data
+The data for this project was obtained from the Materials Project API. A pickled DataFrame containing this data is available in `data/clean_data/synthDF`.
 
+To reproduce the data query, you can use the `icsd_data_query.py` script. Follow these steps to set up the necessary environment and API access:
 
+1. **Install the Materials Project API**:
 
+    - Due to conflicting dependencies—specifically, different `pydantic` versions required by `ALIGNN` and the API—it’s recommended to create a separate Conda (or Mamba) environment.
+    - Sign up at the [Materials Project website](https://next-gen.materialsproject.org/api)  and obtain an API key for access.
+2. **Set Up the Environment**:
+
+```bash
+cd SynCoTrain
+mamba create -n query python=3.10 numpy pandas requests typing pymatgen ase jarvis-tools mp-api
+mamba activate query
+pip install -e . #to enable relative paths
+```
+3. **Run the Query Script**: By default, `icsd_data_query.py` will query and save a small sample DataFrame to demonstrate the data pipeline. To download the full dataset, uncomment the lines `# num_sites = (1,150)` and `# dataFrame_name = 'synthDF'` in the script.
+
+```bash
+python data_scripts/icsd_data_query.py --MPID <your_api_key>
+```
