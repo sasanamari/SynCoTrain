@@ -78,7 +78,7 @@ final_labels(synthlab, figtitle="Label Distribution After Averaging",
 # label_dist4(synthlab, df, pred_col='synth_preds', 
 #             filename='final_label_dist_it2.png')
 label_dist4_frames(synthlab, df, pred_col='synth_preds', 
-            filename='final_label_dist_it2.png')
+            filename='final_label_class_dist_it2.png')
 # %%
 # synthlab_t0 = pd.read_pickle(os.path.join(
 #     os.path.dirname(__file__),'../results/synth/synth_labels_2_threshold_0_0'))
