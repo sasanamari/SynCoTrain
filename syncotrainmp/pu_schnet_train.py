@@ -23,7 +23,7 @@ from syncotrainmp.pu_schnet.pu_learn import int2metric
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="SynCoTrainMP SchNet Step"
+        description="Semi-Supervised ML for Synthesizability Prediction -- SchNet PU Step"
     )
     parser.add_argument("--experiment", default="schnet0", help="Name of the experiment and config files.")
     parser.add_argument("--ehull015", type=str_to_bool, default=False, help="Use 0.015 eV cutoff for stability.")

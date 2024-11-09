@@ -10,6 +10,20 @@ from syncotrainmp.pu_alignn.alignn_setup import *
 from syncotrainmp.pu_alignn.alignn_configs.alignn_pu_config import alignn_pu_config_generator
 
 
+def parse_arguments():
+    """Parses command-line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Semi-Supervised ML for Synthesizability Prediction -- ALIGNN PU Step"
+    )
+    parser.add_argument("--experiment", default="alignn0", help="Name of the experiment and corresponding config files.")
+    parser.add_argument("--small_data", type=str_to_bool, default=False, help="Select a small subset of data for quicker workflow checks.")
+    parser.add_argument("--ehull015", type=str_to_bool, default=False, help="Predict stability to evaluate PU Learning's efficacy with 0.015 eV cutoff.")
+    parser.add_argument("--startIt", type=int, default=0, help="Starting iteration number.")
+    parser.add_argument("--gpu_id", type=int, default=3, help="GPU ID to use for training.")
+
+    # Parse the arguments
+    return parser.parse_args(sys.argv[1:])
+
 def config_generator(newConfigName, iterNum=3, epochNum=10, class_config='syncotrainmp/pu_alignn/alignn_configs/default_class_config.json', alignn_dir='pu_alignn', ehull015=False, experiment=None):
     """
     Generates a configuration file for the training process based on specified parameters.
@@ -101,16 +115,8 @@ def main():
     Main function to execute the semi-supervised machine learning process for
     synthesizability prediction.
     """
-    # Set up command-line argument parsing
-    parser = argparse.ArgumentParser(description="SynCoTrainMP ALIGNN Step")
-    parser.add_argument("--experiment", default="alignn0", help="Name of the experiment and corresponding config files.")
-    parser.add_argument("--small_data", type=str_to_bool, default=False, help="Select a small subset of data for quicker workflow checks.")
-    parser.add_argument("--ehull015", type=str_to_bool, default=False, help="Predict stability to evaluate PU Learning's efficacy with 0.015 eV cutoff.")
-    parser.add_argument("--startIt", type=int, default=0, help="Starting iteration number.")
-    parser.add_argument("--gpu_id", type=int, default=3, help="GPU ID to use for training.")
-
     # Parse the arguments
-    args = parser.parse_args(sys.argv[1:])
+    args = parse_arguments()
 
     # Set up the current experiment configuration
     cs = current_setup(small_data=args.small_data, experiment=args.experiment, ehull015=args.ehull015)

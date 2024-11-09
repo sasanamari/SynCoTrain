@@ -11,10 +11,12 @@ from syncotrainmp.experiment_setup import current_setup, str_to_bool
 # For each round, we need a separate prediction column and a cotrain label.
 # The final round only gets a prediction label.
 
+# TODO: Lots of duplicated code between alignn and schnet
+
 def parse_arguments():
     """Parses command-line arguments."""
     parser = argparse.ArgumentParser(
-        description="Semi-Supervised ML for Synthesizability Prediction -- Analyze PU results"
+        description="Semi-Supervised ML for Synthesizability Prediction -- Analyze ALIGNN PU results"
     )
     parser.add_argument(
         "--experiment",
@@ -26,6 +28,12 @@ def parse_arguments():
         type=str_to_bool,
         default=False,
         help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
+    )
+    parser.add_argument(
+        "--hw",
+        type=str_to_bool,
+        default=False,
+        help="Analysis before the final iteration.",
     )
     parser.add_argument(
         "--small_data",
@@ -61,11 +69,11 @@ def load_experiment_results(output_dir, max_iter):
             break
         resdir = os.path.join(output_dir, PUiter)
         try:
-            # Account for incomplete experiments, when the last prediction is not ready.
             res_dir_list.append(resdir)
             res = pd.read_csv(resdir+'/prediction_results_test_set.csv')
             res_df_list.append(res)
         except:
+            # Account for incomplete experiments, when the last prediction is not ready.
             pass
 
     resdf = pd.concat(res_df_list)
@@ -89,8 +97,8 @@ def compute_aggregate_df(resdf, propDF, prop, pseudo_label_threshold):
 def split_data(agg_df, propDF, prop, id_LOtest):
     """Splits data into experimental, unlabeled, and leave-out test sets."""
 
-    experimental_data = agg_df[agg_df[prop]==1] #needs to change for cotrain?
-    unlabeled_data = agg_df[agg_df[prop]==0]   
+    experimental_data = agg_df[agg_df[prop] == 1]
+    unlabeled_data    = agg_df[agg_df[prop] == 0]   
     
     LO_test = propDF.loc[id_LOtest] 
     LO_test = pd.merge(LO_test, agg_df, on='material_id', how="inner")
@@ -124,8 +132,8 @@ def pu_report_alignn(
         prop: str,
         propDFpath,
         TARGET,
-        id_LOtest,
         data_prefix,
+        id_LOtest,
         ehull015               = False,
         small_data             = False,
         max_iter               = 60,
@@ -144,44 +152,46 @@ def pu_report_alignn(
     propDF = pd.read_pickle(propDFpath)
     resdf, res_dir_list = load_experiment_results(output_dir, max_iter)
 
-    agg_df = compute_aggregate_df(resdf, propDF, prop, pseudo_label_threshold)
+    aggdf = compute_aggregate_df(resdf, propDF, prop, pseudo_label_threshold)
 
-    experimental_data = agg_df[agg_df[prop] == 1]
-    unlabeled_data    = agg_df[agg_df[prop] == 0]
-
-    experimental_data, unlabeled_data, LO_test = split_data(agg_df, propDF, prop, id_LOtest)
+    experimental_data, unlabeled_data, LO_test = split_data(aggdf, propDF, prop, id_LOtest)
 
     # Compute statistics
     LO_true_positive_rate = LO_test['prediction'].sum()/len(LO_test)
     true_positive_rate = experimental_data['prediction'].sum()/len(experimental_data)
     predicted_positive_rate = unlabeled_data['prediction'].sum()/len(unlabeled_data)
 
-    cotrain_df = compute_cotrain_labels(propDF, agg_df, TARGET, prop)
+    cotraindf = compute_cotrain_labels(propDF, aggdf, TARGET, prop)
        
     report = {'res_dir_list'           : res_dir_list,
               'resdf'                  : resdf,
+              'agg_df'                 : aggdf,
+              'cotrain_df'             : cotraindf,
               'true_positive_rate'     : round(true_positive_rate, 4),
               'LO_true_positive_rate'  : round(LO_true_positive_rate, 4),
               'predicted_positive_rate': round(predicted_positive_rate, 4),
               'GT_true_positive_rate'  : '',
-              'false_positive_rate'    : '',
-              'agg_df'                 : agg_df,
-              'cotrain_df'             : cotrain_df }
+              'false_positive_rate'    : '' }
 
     if ehull015:
-        GT_stable   = propDF[propDF["stability_GT"]==1]
-        GT_stable   = pd.merge(GT_stable, agg_df, on='material_id', how="inner")
-        GT_unstable = propDF[propDF["stability_GT"]==0]
-        GT_unstable = pd.merge(GT_unstable, agg_df, on='material_id', how="inner")
-        GT_tpr      = GT_stable['prediction'].sum()/len(GT_stable)
-        false_positive_rate = GT_unstable['prediction'].sum()/len(GT_unstable)
+
+        GT_stable           = propDF[propDF["stability_GT"]==1]
+        GT_stable           = pd.merge(GT_stable, aggdf, on='material_id', how="inner")
+        GT_unstable         = propDF[propDF["stability_GT"]==0]
+        GT_unstable         = pd.merge(GT_unstable, aggdf, on='material_id', how="inner")
+        GT_tpr              = GT_stable['prediction'].mean()
+        false_positive_rate = GT_unstable['prediction'].mean()
+
         report['GT_true_positive_rate'] = round(GT_tpr, 4)
-        report['false_positive_rate'] = round(false_positive_rate, 4)
-    
+        report['false_positive_rate']   = round(false_positive_rate, 4)
+
+        print(f"The Groud Truth true-positive-rate was {report['GT_true_positive_rate']*100}% and the")
+        print(f"False positive rate was {100*report['false_positive_rate']}%.")
+
     return report, propDF
 
 
-def save_results(report, propDF, result_dir, experiment, propDFpath):
+def save_report(report, result_dir, experiment):
     """Saves aggregated and prediction results, updates co-train labels in propDF."""
     filename_agg = os.path.join(result_dir,f'{experiment}.pkl')
     filename_res = os.path.join(result_dir,f'{experiment}_resdf.pkl')
@@ -191,17 +201,20 @@ def save_results(report, propDF, result_dir, experiment, propDFpath):
     print(f"Saving results df to {filename_res}")
     report['resdf' ].to_pickle(filename_res)
 
+
+def save_predictions(report, propDF, experiment, propDFpath):
+    """Export predictions to propDF"""
     print(f"Exporting new labels to `{propDFpath}`")
     propDF[experiment] = report['cotrain_df'].new_labels
     propDF.to_pickle(propDFpath)
 
 
-def save_report(result_dir, experiment, report):
-    """Saves final report with performance metrics to a CSV file."""
+def update_results_csv(report, result_dir, experiment):
+    """Updates the results.csv file with the latest experiment report metrics."""
 
-    filename_report = os.path.join(result_dir, 'results.csv')
+    filename_results = os.path.join(result_dir, 'results.csv')
 
-    resultcsv = pd.read_csv(filename_report, index_col=0)
+    resultcsv = pd.read_csv(filename_results, index_col=0)
 
     new_rates = {
         'true_positive_rate'     : report['true_positive_rate'],
@@ -210,9 +223,9 @@ def save_report(result_dir, experiment, report):
         'GT_true_positive_rate'  : report['GT_true_positive_rate'],
         'false_positive_rate'    : report['false_positive_rate'] }
 
-    print(f"Saving report to {filename_report}")
-    resultcsv.loc[experiment.split('PUOutput_')[-1]] = new_rates
-    resultcsv.to_csv(filename_report)
+    print(f"Saving report to {filename_results}")
+    resultcsv.loc[experiment] = new_rates
+    resultcsv.to_csv(filename_results)
 
 
 def main():
@@ -220,15 +233,14 @@ def main():
     cs, id_LOtest = setup_experiment(args)
 
     report, propDF = pu_report_alignn(
-        experiment  = args.experiment,
-        prop        = cs['prop'],
-        propDFpath  = cs['propDFpath'],
-        TARGET      = cs['TARGET'],
-        id_LOtest   = id_LOtest,
-        data_prefix = cs['dataPrefix'],
+        args.experiment,
+        cs['prop'],
+        cs['propDFpath'],
+        cs['TARGET'],
+        cs['dataPrefix'],
+        id_LOtest,
         ehull015    = args.ehull015,
         small_data  = args.small_data)
-
 
     print(f"The True positive rate was {report['true_positive_rate']} and the "
         f"predicted positive rate was {report['predicted_positive_rate']}.")
@@ -237,9 +249,14 @@ def main():
         print(f"The Groud Truth true-positive-rate was {report['GT_true_positive_rate']} and the "
         f" False positive rate was {report['false_positive_rate']}.")
 
-    save_results(report, propDF, cs['result_dir'], args.experiment, cs['propDFpath'])
+    if args.hw:
+        return
 
-    save_report(cs['result_dir'], args.experiment, report)
+    save_report(report, cs['result_dir'], args.experiment)
+
+    save_predictions(report, propDF, args.experiment, cs['propDFpath'])
+
+    update_results_csv(report, cs['result_dir'], args.experiment)
 
 
 if __name__ == "__main__":
