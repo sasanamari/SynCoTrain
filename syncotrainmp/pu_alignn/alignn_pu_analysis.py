@@ -75,7 +75,7 @@ def load_experiment_results(output_dir, max_iter):
     return resdf, res_dir_list
 
 
-def compute_aggregate_df(resdf, prop, pseudo_label_threshold):
+def compute_aggregate_df(resdf, propDF, prop, pseudo_label_threshold):
     """Computes an aggregated DataFrame with predictions and labels."""
     agg_df = pd.DataFrame()
     agg_df['avg_prediction'] = resdf.groupby('material_id').prediction.mean()
@@ -144,7 +144,7 @@ def pu_report_alignn(
     propDF = pd.read_pickle(propDFpath)
     resdf, res_dir_list = load_experiment_results(output_dir, max_iter)
 
-    agg_df = compute_aggregate_df(resdf, prop, pseudo_label_threshold)
+    agg_df = compute_aggregate_df(resdf, propDF, prop, pseudo_label_threshold)
 
     experimental_data = agg_df[agg_df[prop] == 1]
     unlabeled_data    = agg_df[agg_df[prop] == 0]
