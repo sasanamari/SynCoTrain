@@ -216,6 +216,11 @@ def main(num_iter=100):
     print(f"-> Number of experimental samples: {experimental_df.shape[0]}")
     print(f"-> Number of positive samples    : {positive_df.shape[0]} (leaveout samples removed)")
     print(f"-> Number of leaveout samples    : {leaveout_df.shape[0]}")
+    print(f"During PU-learning, we sample data from the experimental samples and use it as negative")
+    print(f"set for training. Classifiers are always trained with a balanced set, which means that")
+    print(f"the number of positive samples matches with the number of negative samples. In addition,")
+    print(f"we split a leaveout test set, which is only used for testing. This data is never used")
+    print(f"for training and will be appended to the test data at every PU iteration.")
     print(f"")
 
     save_ids(leaveout_df, os.path.join(output_dir, "leaveout_test_id.txt"))
