@@ -1,18 +1,18 @@
 -PU experiments:
-nohup syncotrainmp_pu_alignn --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
-nohup syncotrainmp_pu_schnet --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
+nohup syncotrainmp_alignn_train --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
+nohup syncotrainmp_schnet_train --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
 
-nohup syncotrainmp_pu_alignn --experiment coAlignn1 --gpu_id 1 > nohups/coAlignn1_synth_gpu1.log &
-nohup syncotrainmp_pu_schnet --experiment coSchnet1 --gpu_id 1 > nohups/coSchnet1_synth_gpu1.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn1 --gpu_id 1 > nohups/coAlignn1_synth_gpu1.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet1 --gpu_id 1 > nohups/coSchnet1_synth_gpu1.log &
 
-nohup syncotrainmp_pu_alignn --experiment coAlignn2 --gpu_id 0 > nohups/coAlignn2_synth_gpu0.log &
-nohup syncotrainmp_pu_schnet --experiment coSchnet2 --gpu_id 0 > nohups/coSchnet2_synth_gpu0.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn2 --gpu_id 0 > nohups/coAlignn2_synth_gpu0.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet2 --gpu_id 0 > nohups/coSchnet2_synth_gpu0.log &
 
-nohup syncotrainmp_pu_alignn --experiment coAlignn3 --gpu_id 3 > nohups/coAlignn3_synth_gpu3.log &
-nohup syncotrainmp_pu_schnet --experiment coSchnet3 --gpu_id 3 > nohups/coSchnet3_synth_gpu3.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn3 --gpu_id 3 > nohups/coAlignn3_synth_gpu3.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet3 --gpu_id 3 > nohups/coSchnet3_synth_gpu3.log &
 
-nohup syncotrainmp_pu_alignn --experiment coAlignn3 --gpu_id 1 --startIt 40 > nohups/coAlignn3_synth_it40_gpu1.log &
-nohup syncotrainmp_pu_schnet --experiment coSchnet3 --gpu_id 1 --startIt 51 > nohups/coSchnet3_synth_it51_gpu1.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn3 --gpu_id 1 --startIt 40 > nohups/coAlignn3_synth_it40_gpu1.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet3 --gpu_id 1 --startIt 51 > nohups/coSchnet3_synth_it51_gpu1.log &
 
 
 -pu_data_selection:
@@ -30,17 +30,17 @@ syncotrainmp_data_selection --experiment coSchnet3
 
 
 -Analysis commands:
-python pu_alignn/alignn_pu_analysis.py --experiment alignn0 
-python pu_schnet/schnet_pu_analysis.py --experiment schnet0 
+syncotrainmp_alignn_analyze --experiment alignn0 
+syncotrainmp_schnet_analyze --experiment schnet0 
 
-python pu_alignn/alignn_pu_analysis.py --experiment coAlignn1 
-python pu_schnet/schnet_pu_analysis.py --experiment coSchnet1 
+syncotrainmp_alignn_analyze --experiment coAlignn1 
+syncotrainmp_schnet_analyze --experiment coSchnet1 
 
-python pu_alignn/alignn_pu_analysis.py --experiment coAlignn2 
-python pu_schnet/schnet_pu_analysis.py --experiment coSchnet2 
+syncotrainmp_alignn_analyze --experiment coAlignn2 
+syncotrainmp_schnet_analyze --experiment coSchnet2 
 
-python pu_alignn/alignn_pu_analysis.py --experiment coAlignn3 
-python pu_schnet/schnet_pu_analysis.py --experiment coSchnet3 
+syncotrainmp_alignn_analyze --experiment coAlignn3 
+syncotrainmp_schnet_analyze --experiment coSchnet3 
 
 
 -Train synthesizability predictor:
@@ -51,4 +51,4 @@ nohup python predict_target/train_folder_with_stop.py > nohups/synth_predictor_w
 
 
 -Predict synthesizability for new data in predict_target/label_alignn_format/id_for_synth_pred.csv
-python predict_target/synthesizability_predictor.py 
+python predict_target/synthesizability_predictor.py

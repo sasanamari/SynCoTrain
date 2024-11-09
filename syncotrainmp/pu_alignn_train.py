@@ -9,6 +9,7 @@ from syncotrainmp.experiment_setup import current_setup, str_to_bool
 from syncotrainmp.pu_alignn.alignn_setup import *
 from syncotrainmp.pu_alignn.alignn_configs.alignn_pu_config import alignn_pu_config_generator
 
+
 def config_generator(newConfigName, iterNum=3, epochNum=10, class_config='syncotrainmp/pu_alignn/alignn_configs/default_class_config.json', alignn_dir='pu_alignn', ehull015=False, experiment=None):
     """
     Generates a configuration file for the training process based on specified parameters.
@@ -32,6 +33,7 @@ def config_generator(newConfigName, iterNum=3, epochNum=10, class_config='syncot
 
     dumpjson(_config, filename=newConfigName)
     print(f'Config file for iteration {iterNum} was generated.')
+
 
 def run_training_iterations(pu_setup, args, cs, split_id_path, start_time):
     """
@@ -93,6 +95,7 @@ def run_training_iterations(pu_setup, args, cs, split_id_path, start_time):
 
     print(f"PU Learning completed. Total time taken: {elapsed_days} days, {elapsed_hours} hours")
 
+
 def main():
     """
     Main function to execute the semi-supervised machine learning process for
@@ -131,6 +134,7 @@ def main():
 
     # Run the training iterations
     run_training_iterations(pu_setup, args, cs, split_id_path, start_time)
+
 
 if __name__ == "__main__":
     main()

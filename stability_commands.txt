@@ -1,20 +1,20 @@
 -PU experiments:
-nohup syncotrainmp_pu_alignn --experiment alignn0 --gpu_id 2 --ehull015 True > nohups/alignn0_stability_gpu2.log &
-nohup syncotrainmp_pu_schnet --experiment schnet0 --gpu_id 2 --ehull015 True > nohups/schnet0_stability_gpu2.log &
+nohup syncotrainmp_alignn_train --experiment alignn0 --gpu_id 2 --ehull015 True > nohups/alignn0_stability_gpu2.log &
+nohup syncotrainmp_schnet_train --experiment schnet0 --gpu_id 2 --ehull015 True > nohups/schnet0_stability_gpu2.log &
 
-nohup syncotrainmp_pu_alignn --experiment coAlignn1 --gpu_id 2 --ehull015 True > nohups/coAlignn1_stability_gpu2.log &
-nohup syncotrainmp_pu_alignn --experiment coAlignn1 --gpu_id 0 --ehull015 True --startIt 56 > nohups/coAlignn1_stability_gpu0_it56.log &
-nohup syncotrainmp_pu_schnet --experiment coSchnet1 --gpu_id 2 --ehull015 True > nohups/coSchnet1_stability_gpu2.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn1 --gpu_id 2 --ehull015 True > nohups/coAlignn1_stability_gpu2.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn1 --gpu_id 0 --ehull015 True --startIt 56 > nohups/coAlignn1_stability_gpu0_it56.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet1 --gpu_id 2 --ehull015 True > nohups/coSchnet1_stability_gpu2.log &
 
-nohup syncotrainmp_pu_alignn --experiment coAlignn2 --gpu_id 2 --ehull015 True > nohups/coAlignn2_stability_gpu2.log &
-nohup syncotrainmp_pu_alignn --experiment coAlignn2 --gpu_id 2 --ehull015 True --startIt 22 > nohups/coAlignn2_stability_it22_gpu2.log &
-nohup syncotrainmp_pu_schnet --experiment coSchnet2 --gpu_id 3 --ehull015 True > nohups/coSchnet2_stability_gpu3.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn2 --gpu_id 2 --ehull015 True > nohups/coAlignn2_stability_gpu2.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn2 --gpu_id 2 --ehull015 True --startIt 22 > nohups/coAlignn2_stability_it22_gpu2.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet2 --gpu_id 3 --ehull015 True > nohups/coSchnet2_stability_gpu3.log &
 
-nohup syncotrainmp_pu_alignn --experiment coAlignn3 --gpu_id 2 --ehull015 True > nohups/coAlignn3_stability_gpu2.log &
-nohup syncotrainmp_pu_schnet --experiment coSchnet3 --gpu_id 2 --ehull015 True > nohups/coSchnet3_stability_gpu2.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn3 --gpu_id 2 --ehull015 True > nohups/coAlignn3_stability_gpu2.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet3 --gpu_id 2 --ehull015 True > nohups/coSchnet3_stability_gpu2.log &
 
-nohup syncotrainmp_pu_alignn --experiment coAlignn3 --gpu_id 2 --ehull015 True --startIt 37 > nohups/coAlignn3_stability_it37_gpu2.log &
-nohup syncotrainmp_pu_schnet --experiment coSchnet3 --gpu_id 2 --ehull015 True --startIt 45 > nohups/coSchnet3_stability_it45_gpu2.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn3 --gpu_id 2 --ehull015 True --startIt 37 > nohups/coAlignn3_stability_it37_gpu2.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet3 --gpu_id 2 --ehull015 True --startIt 45 > nohups/coSchnet3_stability_it45_gpu2.log &
 
 
 -pu_data_selection:
@@ -32,15 +32,15 @@ syncotrainmp_data_selection --experiment coSchnet3 --ehull015 True
 
 
 -Analysis commands:
-python pu_alignn/alignn_pu_analysis.py --experiment alignn0 --ehull015 True
-python pu_schnet/schnet_pu_analysis.py --experiment schnet0 --ehull015 True
+syncotrainmp_alignn_analyze --experiment alignn0 --ehull015 True
+syncotrainmp_schnet_analyze --experiment schnet0 --ehull015 True
 
-python pu_alignn/alignn_pu_analysis.py --experiment coAlignn1 --ehull015 True
-python pu_schnet/schnet_pu_analysis.py --experiment coSchnet1 --ehull015 True
+syncotrainmp_alignn_analyze --experiment coAlignn1 --ehull015 True
+syncotrainmp_schnet_analyze --experiment coSchnet1 --ehull015 True
 
-python pu_alignn/alignn_pu_analysis.py --experiment coAlignn2 --ehull015 True
-python pu_schnet/schnet_pu_analysis.py --experiment coSchnet2 --ehull015 True 
+syncotrainmp_alignn_analyze --experiment coAlignn2 --ehull015 True
+syncotrainmp_schnet_analyze --experiment coSchnet2 --ehull015 True 
 
-python pu_alignn/alignn_pu_analysis.py --experiment coAlignn3 --ehull015 True
-python pu_schnet/schnet_pu_analysis.py --experiment coSchnet3 --ehull015 True
+syncotrainmp_alignn_analyze --experiment coAlignn3 --ehull015 True
+syncotrainmp_schnet_analyze --experiment coSchnet3 --ehull015 True
 
