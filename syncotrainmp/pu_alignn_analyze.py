@@ -6,7 +6,7 @@ import sys
 import argparse
 import warnings
 
-from syncotrainmp.experiment_setup import current_setup, str_to_bool
+from syncotrainmp.experiment_setup import current_setup
 
 # For each round, we need a separate prediction column and a cotrain label.
 # The final round only gets a prediction label.
@@ -25,22 +25,28 @@ def parse_arguments():
     )
     parser.add_argument(
         "--ehull015",
-        type=str_to_bool,
+        action='store_true',
         default=False,
         help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
     )
     parser.add_argument(
         "--hw",
-        type=str_to_bool,
+        action='store_true',
         default=False,
         help="Analysis before the final iteration.",
     )
     parser.add_argument(
         "--small_data",
-        type=str_to_bool,
+        action='store_true',
         default=False,
         help="This option selects a small subset of data for checking the workflow faster.",
     )
+    parser.add_argument(
+        "--output-dir",
+        default="results",
+        help="Name of the experiment and corresponding config files."
+    )
+
     return parser.parse_args(sys.argv[1:])
 
 

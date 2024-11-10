@@ -25,7 +25,7 @@ import argparse
 import numpy as np
 import pandas as pd
 
-from syncotrainmp.experiment_setup import current_setup, str_to_bool
+from syncotrainmp.experiment_setup import current_setup
 
 # Constants [TODO: convert to options]
 DATA_DIR = 'data/clean_data/'
@@ -42,8 +42,8 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(description="Semi-Supervised ML for Synthesizability Prediction")
     parser.add_argument("--experiment", default="alignn0", help="Experiment name and corresponding config files.")
-    parser.add_argument("--ehull015", type=str_to_bool, default=False, help="Evaluate PU Learning efficacy with 0.015 eV cutoff.")
-    parser.add_argument("--small_data", type=str_to_bool, default=False, help="Use a small dataset for quick workflow checks.")
+    parser.add_argument("--ehull015", action='store_true', default=False, help="Evaluate PU Learning efficacy with 0.015 eV cutoff.")
+    parser.add_argument("--small_data", action='store_true', default=False, help="Use a small dataset for quick workflow checks.")
     return parser.parse_args(sys.argv[1:])
 
 

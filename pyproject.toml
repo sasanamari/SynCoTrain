@@ -29,3 +29,6 @@ syncotrainmp_schnet_analyze = "syncotrainmp.pu_schnet_analyze:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["syncotrainmp"]
+
+[tool.setuptools.package-data]
+syncotrainmp = ["pu_alignn/alignn_configs/default_class_config.json"]

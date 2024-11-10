@@ -3,9 +3,10 @@ import os
 import sys
 import time
 import argparse
+from importlib.resources import files
 from jarvis.db.jsonutils import loadjson, dumpjson
 
-from syncotrainmp.experiment_setup import current_setup, str_to_bool
+from syncotrainmp.experiment_setup import current_setup
 from syncotrainmp.pu_alignn.alignn_setup import *
 from syncotrainmp.pu_alignn.alignn_configs.alignn_pu_config import alignn_pu_config_generator
 
@@ -16,15 +17,17 @@ def parse_arguments():
         description="Semi-Supervised ML for Synthesizability Prediction -- ALIGNN PU Step"
     )
     parser.add_argument("--experiment", default="alignn0", help="Name of the experiment and corresponding config files.")
-    parser.add_argument("--small_data", type=str_to_bool, default=False, help="Select a small subset of data for quicker workflow checks.")
-    parser.add_argument("--ehull015", type=str_to_bool, default=False, help="Predict stability to evaluate PU Learning's efficacy with 0.015 eV cutoff.")
+    parser.add_argument("--small_data", action='store_true', default=False, help="Select a small subset of data for quicker workflow checks.")
+    parser.add_argument("--ehull015", action='store_true', default=False, help="Predict stability to evaluate PU Learning's efficacy with 0.015 eV cutoff.")
     parser.add_argument("--startIt", type=int, default=0, help="Starting iteration number.")
-    parser.add_argument("--gpu_id", type=int, default=3, help="GPU ID to use for training.")
+    parser.add_argument("--gpu_id", type=int, default=0, help="GPU ID to use for training.")
+    parser.add_argument("--output-dir", default="results", help="Name of the experiment and corresponding config files.")
 
     # Parse the arguments
     return parser.parse_args(sys.argv[1:])
 
-def config_generator(newConfigName, data_prefix, iterNum=3, epochNum=10, class_config='syncotrainmp/pu_alignn/alignn_configs/default_class_config.json', alignn_dir='pu_alignn', ehull015=False, experiment=None):
+
+def config_generator(newConfigName, data_prefix, iterNum, epochNum, output_dir, ehull015=False, experiment=None):
     """
     Generates a configuration file for the training process based on specified parameters.
     
@@ -32,25 +35,26 @@ def config_generator(newConfigName, data_prefix, iterNum=3, epochNum=10, class_c
         newConfigName (str): The name of the new configuration file to be created.
         iterNum (int): The current iteration number.
         epochNum (int): The number of training epochs.
-        class_config (str): Path to the class configuration file.
         alignn_dir (str): Directory for ALIGNN-related files.
         ehull015 (bool): Flag indicating if the 0.015 eV cutoff is used.
         experiment (str): Name of the current experiment.
     """
-    _config = loadjson(class_config)
+    config_path = files("syncotrainmp.pu_alignn.alignn_configs").joinpath("default_class_config.json")
+
+    _config = loadjson(config_path)
     _config['random_seed'] = iterNum
     _config['epochs'] = epochNum
 
     # Set output directory based on the cutoff flag
     output_prefix = 'PUehull015' if ehull015 else 'PUOutput'
-    output_dir = os.path.join(alignn_dir, f"{output_prefix}_{data_prefix}{experiment}")
+    output_dir = os.path.join(output_dir, 'pu_alignn', f"{output_prefix}_{data_prefix}{experiment}")
     _config['output_dir'] = os.path.join(output_dir, f'{iterNum}iter/')
 
     dumpjson(_config, filename=newConfigName)
     print(f'Config file for iteration {iterNum} was generated.')
 
 
-def run_training_iterations(pu_setup, args, cs, split_id_path, start_time):
+def run_training_iterations(pu_setup, args, cs, split_id_path, start_time, output_dir):
     """
     Runs the training iterations for the specified configuration.
 
@@ -65,7 +69,7 @@ def run_training_iterations(pu_setup, args, cs, split_id_path, start_time):
 
     for iterNum in range(pu_setup['start_of_iterations'], pu_setup['max_num_of_iterations']):
 
-        config_generator(pu_setup["class_config_name"], cs['dataPrefix'], iterNum=iterNum, epochNum=pu_setup['epochs'], alignn_dir='pu_alignn', experiment=args.experiment)
+        config_generator(pu_setup["class_config_name"], cs['dataPrefix'], iterNum, pu_setup['epochs'], output_dir, experiment=args.experiment)
 
         train_for_folder(
             gpu_id=args.gpu_id,
@@ -92,7 +96,10 @@ def run_training_iterations(pu_setup, args, cs, split_id_path, start_time):
         remaining_days = int(estimated_remaining_time // (24 * 3600))
         remaining_hours = int((estimated_remaining_time % (24 * 3600)) // 3600)
 
-        time_log_path = os.path.join('time_logs', f'alignn_remaining_time_{data_prefix}{args.experiment}_{prop}.txt')
+        if not os.path.exists(os.path.join(output_dir, 'time_logs')):
+            os.makedirs(os.path.join(output_dir, 'time_logs'))
+
+        time_log_path = os.path.join(output_dir, 'time_logs', f'alignn_remaining_time_{data_prefix}{args.experiment}_{prop}.txt')
         with open(time_log_path, 'w') as file:
             file.write(f"Iterations completed: {iterNum - pu_setup['start_of_iterations']}\n")
             file.write(f"Iterations remaining: {remaining_iterations}\n")
@@ -132,7 +139,7 @@ def main():
     split_id_path = os.path.join(data_dir, split_id_dir)
 
     # Load PU configuration
-    pu_config_name = alignn_pu_config_generator(args.experiment, cs, args.small_data)
+    pu_config_name = alignn_pu_config_generator(args.experiment, cs, args.small_data, args.output_dir)
     pu_setup = loadjson(pu_config_name)
     pu_setup['start_of_iterations'] = args.startIt
 
@@ -140,7 +147,7 @@ def main():
     start_time = time.time()
 
     # Run the training iterations
-    run_training_iterations(pu_setup, args, cs, split_id_path, start_time)
+    run_training_iterations(pu_setup, args, cs, split_id_path, start_time, args.output_dir)
 
 
 if __name__ == "__main__":

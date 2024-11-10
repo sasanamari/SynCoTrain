@@ -6,7 +6,7 @@ import numpy as np
 import sys
 import argparse
 
-from syncotrainmp.experiment_setup import current_setup, str_to_bool
+from syncotrainmp.experiment_setup import current_setup
 
 # TODO: Lots of duplicated code between alignn and schnet
 
@@ -22,13 +22,13 @@ def parse_arguments():
     )
     parser.add_argument(
         "--ehull015",
-        type=str_to_bool,
+        action='store_true',
         default=False,
         help="Predicting stability to evaluate PU Learning's efficacy with 0.015eV cutoff.",
     )
     parser.add_argument(
         "--hw",
-        type=str_to_bool,
+        action='store_true',
         default=False,
         help="Analysis before the final iteration.",
     )
@@ -39,10 +39,16 @@ def parse_arguments():
         help="Starting iteration No.")
     parser.add_argument(
         "--small_data",
-        type=str_to_bool,
+        action='store_true',
         default=False,
         help="This option selects a small subset of data for checking the workflow faster.",
     )
+    parser.add_argument(
+        "--output-dir",
+        default="results",
+        help="Name of the experiment and corresponding config files."
+    )
+
     return parser.parse_args(sys.argv[1:])
 
 

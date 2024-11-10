@@ -15,7 +15,7 @@ import schnetpack as spk
 from schnetpack import transform as trn
 from schnetpack.data import ASEAtomsData, AtomsDataModule
 
-from syncotrainmp.experiment_setup import current_setup, str_to_bool
+from syncotrainmp.experiment_setup import current_setup
 from syncotrainmp.pu_schnet.pu_learn.schnet_funcs import directory_setup, predProb
 from syncotrainmp.pu_schnet.pu_learn.Datamodule4PU import DataModuleWithPred
 from syncotrainmp.pu_schnet.pu_learn import int2metric
@@ -26,10 +26,11 @@ def parse_arguments():
         description="Semi-Supervised ML for Synthesizability Prediction -- SchNet PU Step"
     )
     parser.add_argument("--experiment", default="schnet0", help="Name of the experiment and config files.")
-    parser.add_argument("--ehull015", type=str_to_bool, default=False, help="Use 0.015 eV cutoff for stability.")
-    parser.add_argument("--small_data", type=str_to_bool, default=False, help="Use a small dataset for testing.")
+    parser.add_argument("--ehull015", action='store_true', default=False, help="Use 0.015 eV cutoff for stability.")
+    parser.add_argument("--small_data", action='store_true', default=False, help="Use a small dataset for testing.")
     parser.add_argument("--startIt", type=int, default=0, help="Starting iteration number.")
-    parser.add_argument("--gpu_id", type=int, default=3, help="GPU ID to use for training.")
+    parser.add_argument("--gpu_id", type=int, default=0, help="GPU ID to use for training.")
+    parser.add_argument("--output-dir", default="results", help="Name of the experiment and corresponding config files.")
     return parser.parse_args()
 
 

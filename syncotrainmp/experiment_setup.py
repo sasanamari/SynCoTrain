@@ -1,17 +1,3 @@
-def str_to_bool(value):
-    if isinstance(value, bool):
-        return value
-    if value.lower() in ('true', 'false'):
-        return value.lower() == 'true'
-    raise ValueError(f'Boolean value expected for --small_data and --ehull015. Insead we got {value} with type{type(value)}.')
-
-def str_to_int(value):
-    try:
-        return int(value)
-    except ValueError:
-        raise ValueError(f'Integer value expected, but received {value} with type {type(value)}.')
-
-
 
 def current_setup(small_data, experiment, ehull015):
     """
@@ -34,7 +20,7 @@ def current_setup(small_data, experiment, ehull015):
         Exception: If both small_data and ehull015 are set to True.
         KeyError: If the experiment is not recognized in the mapping.
     """
-    if str_to_bool(ehull015) and str_to_bool(small_data):
+    if ehull015 and small_data:
         raise Exception("small_data and ehull015 cannot be set to True at the same time.")
 
     elif small_data:
@@ -50,20 +36,20 @@ def current_setup(small_data, experiment, ehull015):
         result_dir = 'data/results/synth'
         prop = 'synth'
 
-    experiment_target_match = { #output_dir: training_label_column
-            'alignn0':prop, 
-            'coAlignn1':'schnet0',
-            'coAlignn2':'coSchnet1',
-            'coAlignn3':'coSchnet2',
-            'coAlignn4':'coSchnet3',
-            'coAlignn5':'coSchnet4',
-            'schnet0':prop, 
-            'coSchnet1':'alignn0',
-            'coSchnet2':'coAlignn1',
-            'coSchnet3':'coAlignn2',
-            'coSchnet4':'coAlignn3',
-            'coSchnet5':'coAlignn4',
-            'final_avg':'final_label',
+    experiment_target_match = {
+            'alignn0'  : prop,
+            'coAlignn1': 'schnet0',
+            'coAlignn2': 'coSchnet1',
+            'coAlignn3': 'coSchnet2',
+            'coAlignn4': 'coSchnet3',
+            'coAlignn5': 'coSchnet4',
+            'schnet0'  : prop,
+            'coSchnet1': 'alignn0',
+            'coSchnet2': 'coAlignn1',
+            'coSchnet3': 'coAlignn2',
+            'coSchnet4': 'coAlignn3',
+            'coSchnet5': 'coAlignn4',
+            'final_avg': 'final_label',
     }
     data_prefix = "small_" if small_data else ""
     if ehull015:
@@ -73,5 +59,11 @@ def current_setup(small_data, experiment, ehull015):
     if experiment not in experiment_target_match:
         raise KeyError(f"Unrecognized experiment: {experiment}")
 
-    return {"propDFpath":propDFpath, "result_dir":result_dir, "prop":prop, 
-            "TARGET":experiment_target_match[experiment], "dataPrefix":data_prefix}
+    result = {
+        "propDFpath" : propDFpath,
+        "result_dir" : result_dir,
+        "prop"       : prop,
+        "TARGET"     : experiment_target_match[experiment],
+        "dataPrefix" : data_prefix }
+
+    return result
