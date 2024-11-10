@@ -24,7 +24,7 @@ def parse_arguments():
     # Parse the arguments
     return parser.parse_args(sys.argv[1:])
 
-def config_generator(newConfigName, iterNum=3, epochNum=10, class_config='syncotrainmp/pu_alignn/alignn_configs/default_class_config.json', alignn_dir='pu_alignn', ehull015=False, experiment=None):
+def config_generator(newConfigName, data_prefix, iterNum=3, epochNum=10, class_config='syncotrainmp/pu_alignn/alignn_configs/default_class_config.json', alignn_dir='pu_alignn', ehull015=False, experiment=None):
     """
     Generates a configuration file for the training process based on specified parameters.
     
@@ -42,8 +42,9 @@ def config_generator(newConfigName, iterNum=3, epochNum=10, class_config='syncot
     _config['epochs'] = epochNum
 
     # Set output directory based on the cutoff flag
-    output_prefix = 'PUehull015_' if ehull015 else 'PUOutput_'
-    _config['output_dir'] = os.path.join(alignn_dir, f'{output_prefix}{experiment}', f'{iterNum}iter/')
+    output_prefix = 'PUehull015' if ehull015 else 'PUOutput'
+    output_dir = os.path.join(alignn_dir, f"{output_prefix}_{data_prefix}{experiment}")
+    _config['output_dir'] = os.path.join(output_dir, f'{iterNum}iter/')
 
     dumpjson(_config, filename=newConfigName)
     print(f'Config file for iteration {iterNum} was generated.')
@@ -64,7 +65,7 @@ def run_training_iterations(pu_setup, args, cs, split_id_path, start_time):
 
     for iterNum in range(pu_setup['start_of_iterations'], pu_setup['max_num_of_iterations']):
 
-        config_generator(newConfigName=pu_setup["class_config_name"], iterNum=iterNum, epochNum=pu_setup['epochs'], alignn_dir='pu_alignn', experiment=args.experiment)
+        config_generator(pu_setup["class_config_name"], cs['dataPrefix'], iterNum=iterNum, epochNum=pu_setup['epochs'], alignn_dir='pu_alignn', experiment=args.experiment)
 
         train_for_folder(
             gpu_id=args.gpu_id,
