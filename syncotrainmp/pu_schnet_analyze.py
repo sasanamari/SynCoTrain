@@ -85,6 +85,39 @@ def load_config(small_data=False):
     return config
 
 
+def load_experiment_results(config, data_prefix, experiment, max_iter, ehull015, half_way_analysis, startIt):
+
+    resdf_filename = f'{data_prefix}{experiment}_{str(startIt)}_{str(config["num_iter"])}ep{str(config["epoch_num"])}'
+
+    schnet_dir = config["schnetDirectory"]
+
+    if ehull015:
+        output_dir = os.path.join(schnet_dir, f'PUehull015_{data_prefix}{experiment}')
+    else:
+        output_dir = os.path.join(schnet_dir, f'PUOutput_{data_prefix}{experiment}')
+
+    if half_way_analysis:
+        resdf=pd.read_pickle(os.path.join(output_dir, 'res_df', f'{resdf_filename}tmp'))
+    else:
+        resdf=pd.read_pickle(os.path.join(output_dir, 'res_df', resdf_filename))
+   
+    pred_columns = []
+    excess_iters = []
+
+    # Always start at 0 because we want to average prediction over all the iterations.
+    for it in range(0, config["num_iter"]):
+        pred_col_name = 'pred_'+str(it)
+        if half_way_analysis:
+            if pred_col_name not in resdf.columns:
+                continue
+        if it > max_iter:
+            excess_iters.append(pred_col_name)
+        else:            
+            pred_columns.append(pred_col_name)
+
+    return resdf, pred_columns, excess_iters
+
+
 def pu_report_schnet(
         experiment: str,
         prop: str,
@@ -99,38 +132,12 @@ def pu_report_schnet(
         max_iter               = 60,
         pseudo_label_threshold = 0.75,
     ):
-    
+
+    print(f'experiment is {experiment}, ehull015 is {ehull015} and small data is {small_data}.')
+
     config = load_config(small_data=small_data)
 
-    schnetDirectory = config["schnetDirectory"]
-
-    res_df_fileName = f'{data_prefix}{experiment}_{str(startIt)}_{str(config["num_iter"])}ep{str(config["epoch_num"])}'
-    save_dir = os.path.join(schnetDirectory,f'PUOutput_{data_prefix}{experiment}')
-    if ehull015:
-        save_dir = os.path.join(schnetDirectory,f'PUehull015_{experiment}')
-
-    if half_way_analysis:
-        resdf=pd.read_pickle(os.path.join(save_dir,'res_df',f'{res_df_fileName}tmp'))
-    else:
-        resdf=pd.read_pickle(os.path.join(save_dir,'res_df',res_df_fileName))
-   
-    pred_columns  = []
-    score_columns = []
-    excess_iters  = []
-
-    # Always start at 0 because we want to average prediction over all the iterations.
-    for it in range(0, config["num_iter"]):
-        pred_col_name = 'pred_'+str(it)
-        if half_way_analysis:
-            if pred_col_name not in resdf.columns:
-                continue
-        if it > max_iter:
-            excess_iters.append(pred_col_name)
-        else:            
-            pred_columns.append(pred_col_name)
-            
-            score_col_name = 'pred_score'+str(it)
-            score_columns.append(score_col_name)
+    resdf, pred_columns, excess_iters = load_experiment_results(config, data_prefix, experiment, max_iter, ehull015, half_way_analysis, startIt)
 
     Preds = resdf[pred_columns]
     resdf['predScore'] = Preds.apply(score_function, axis=1)

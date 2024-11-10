@@ -85,31 +85,31 @@ def load_experiment_results(output_dir, max_iter):
 
 def compute_aggregate_df(resdf, propDF, prop, pseudo_label_threshold):
     """Computes an aggregated DataFrame with predictions and labels."""
-    agg_df = pd.DataFrame()
-    agg_df['avg_prediction'] = resdf.groupby('material_id').prediction.mean()
-    agg_df['prediction'] = agg_df['avg_prediction'].map(round)
-    agg_df['new_labels'] = agg_df['avg_prediction'].map(lambda x: 1 if x >= pseudo_label_threshold else 0)
-    agg_df['target'] = resdf.groupby('material_id').target.first()
+    aggdf = pd.DataFrame()
+    aggdf['avg_prediction'] = resdf.groupby('material_id').prediction.mean()
+    aggdf['prediction'] = aggdf['avg_prediction'].map(round)
+    aggdf['new_labels'] = aggdf['avg_prediction'].map(lambda x: 1 if x >= pseudo_label_threshold else 0)
+    aggdf['target'] = resdf.groupby('material_id').target.first()
 
-    return agg_df.merge(propDF[['material_id', prop]], on='material_id', how='left')
+    return aggdf.merge(propDF[['material_id', prop]], on='material_id', how='left')
 
 
-def split_data(agg_df, propDF, prop, id_LOtest):
+def split_data(aggdf, propDF, prop, id_LOtest):
     """Splits data into experimental, unlabeled, and leave-out test sets."""
 
-    experimental_data = agg_df[agg_df[prop] == 1]
-    unlabeled_data    = agg_df[agg_df[prop] == 0]   
+    experimental_data = aggdf[aggdf[prop] == 1]
+    unlabeled_data    = aggdf[aggdf[prop] == 0]
     
     LO_test = propDF.loc[id_LOtest] 
-    LO_test = pd.merge(LO_test, agg_df, on='material_id', how="inner")
+    LO_test = pd.merge(LO_test, aggdf, on='material_id', how="inner")
 
     return experimental_data, unlabeled_data, LO_test
 
 
-def compute_cotrain_labels(propDF, agg_df, TARGET, prop):
+def compute_cotrain_labels(propDF, aggdf, TARGET, prop):
     """Computes cotraining labels, filling NaNs with pseudo-labels."""
     cotrain_df = propDF[['material_id', prop]].merge(
-    agg_df[['material_id','new_labels']], on='material_id', how='left')
+    aggdf[['material_id','new_labels']], on='material_id', how='left')
 
     cotrain_index = propDF[propDF[prop]!=propDF[TARGET]].index
     # Used in cotraining, not predicted. does nothing at step 0
