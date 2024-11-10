@@ -97,9 +97,9 @@ def load_experiment_results(config, data_prefix, experiment, max_iter, ehull015,
         output_dir = os.path.join(schnet_dir, f'PUOutput_{data_prefix}{experiment}')
 
     if half_way_analysis:
-        resdf=pd.read_pickle(os.path.join(output_dir, 'res_df', f'{resdf_filename}tmp'))
+        resdf = pd.read_pickle(os.path.join(output_dir, 'res_df', f'{resdf_filename}tmp'))
     else:
-        resdf=pd.read_pickle(os.path.join(output_dir, 'res_df', resdf_filename))
+        resdf = pd.read_pickle(os.path.join(output_dir, 'res_df', resdf_filename))
    
     pred_columns = []
     excess_iters = []
@@ -116,6 +116,18 @@ def load_experiment_results(config, data_prefix, experiment, max_iter, ehull015,
             pred_columns.append(pred_col_name)
 
     return resdf, pred_columns, excess_iters
+
+
+def split_data(resdf, propDF, prop, id_LOtest):
+    """Splits data into experimental, unlabeled, and leave-out test sets."""
+
+    experimental_data = resdf[resdf[prop] == 1]
+    unlabeled_data    = resdf[resdf[prop] == 0]
+
+    LO_test = propDF.loc[id_LOtest] 
+    LO_test = pd.merge(LO_test, resdf, on='material_id', how="inner")
+
+    return experimental_data, unlabeled_data, LO_test
 
 
 def pu_report_schnet(
@@ -137,6 +149,7 @@ def pu_report_schnet(
 
     config = load_config(small_data=small_data)
 
+    propDF = pd.read_pickle(propDFpath)
     resdf, pred_columns, excess_iters = load_experiment_results(config, data_prefix, experiment, max_iter, ehull015, half_way_analysis, startIt)
 
     Preds = resdf[pred_columns]
@@ -145,27 +158,20 @@ def pu_report_schnet(
     resdf["prediction"] = resdf.predScore.map(lambda x: x if np.isnan(x) else round(x))
     resdf["new_labels"] = resdf.predScore.map(lambda x: x if np.isnan(x) else 1 if x >= pseudo_label_threshold else 0)
 
-    res_df = resdf[resdf.predScore.notna()][[
-        'material_id',prop, TARGET,'prediction', 'predScore', 'trial_num']]  #selecting data with prediction values
-    res_df = res_df.loc[:, ~res_df.columns.duplicated()] # drops duplicated props at round zero.
+    resdf = resdf[resdf.predScore.notna()][[
+        'material_id', prop, TARGET,'prediction', 'predScore', 'trial_num']]  #selecting data with prediction values
+    resdf = resdf.loc[:, ~resdf.columns.duplicated()] # drops duplicated props at round zero.
 
     resdf = resdf.drop(columns=Preds)
-    resdf = resdf.drop(columns=excess_iters) #might require a df like Preds
+    resdf = resdf.drop(columns=excess_iters) #might require a df like Preds    
     
-    
+    experimental_data, unlabeled_data, LO_test = split_data(resdf, propDF, prop, id_LOtest)
 
-    experimental_data = res_df[res_df[prop]==1]
-    unlabeled_data = res_df[res_df[prop]==0]
-    
+    # Compute statistics
+    LO_true_positive_rate = LO_test.prediction.mean()
     true_positive_rate = experimental_data.prediction.mean()
     predicted_positive_rate = unlabeled_data.prediction.mean()
-    
-    propDF = pd.read_pickle(propDFpath)
-    
-    LO_test = propDF.loc[id_LOtest] 
-    LO_test = pd.merge(LO_test, resdf, on='material_id', how="inner")
-    LO_true_positive_rate = LO_test.prediction.mean()
-    
+
     print('Our true positive rate is {:.1f}% after {} iterations of {} epochs.'.format(true_positive_rate*100, config["num_iter"], config["epoch_num"]))
     print('Our LO true positive rate is {:.1f}% after {} iterations of {} epochs.'.format(LO_true_positive_rate*100, config["num_iter"], config["epoch_num"]))
     print('and {:.1f}% of currenly unlabeled data have been predicted to belong to the positive class.'.format(predicted_positive_rate*100))    
@@ -202,7 +208,7 @@ def pu_report_schnet(
         false_positive_rate = GT_unstable['prediction'].mean()
 
         report['GT_true_positive_rate'] = round(GT_tpr, 4)
-        report['false_positive_rate'] = round(false_positive_rate, 4)
+        report['false_positive_rate']   = round(false_positive_rate, 4)
 
         print(f"The Groud Truth true-positive-rate was {report['GT_true_positive_rate']*100}% and the")
         print(f"False positive rate was {100*report['false_positive_rate']}%.")

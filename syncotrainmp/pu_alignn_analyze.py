@@ -109,7 +109,7 @@ def split_data(aggdf, propDF, prop, id_LOtest):
 def compute_cotrain_labels(propDF, aggdf, TARGET, prop):
     """Computes cotraining labels, filling NaNs with pseudo-labels."""
     cotrain_df = propDF[['material_id', prop]].merge(
-    aggdf[['material_id','new_labels']], on='material_id', how='left')
+        aggdf[['material_id','new_labels']], on='material_id', how='left')
 
     cotrain_index = propDF[propDF[prop]!=propDF[TARGET]].index
     # Used in cotraining, not predicted. does nothing at step 0
@@ -157,9 +157,9 @@ def pu_report_alignn(
     experimental_data, unlabeled_data, LO_test = split_data(aggdf, propDF, prop, id_LOtest)
 
     # Compute statistics
-    LO_true_positive_rate = LO_test['prediction'].sum()/len(LO_test)
-    true_positive_rate = experimental_data['prediction'].sum()/len(experimental_data)
-    predicted_positive_rate = unlabeled_data['prediction'].sum()/len(unlabeled_data)
+    LO_true_positive_rate = LO_test['prediction'].mean()
+    true_positive_rate = experimental_data['prediction'].mean()
+    predicted_positive_rate = unlabeled_data['prediction'].mean()
 
     cotraindf = compute_cotrain_labels(propDF, aggdf, TARGET, prop)
        
