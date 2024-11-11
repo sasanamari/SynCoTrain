@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import sys
 import argparse
+from importlib.resources import files
 
 from syncotrainmp.experiment_setup import current_setup
 
@@ -78,8 +79,8 @@ def score_function(x):
 
 
 def load_config(small_data=False):
-    schnet_config_dir = "pu_schnet/schnet_configs"
-    config_path = os.path.join(schnet_config_dir, 'pu_config_schnetpack.json')
+
+    config_path = files("syncotrainmp.pu_schnet.schnet_configs").joinpath("pu_config_schnetpack.json")
         
     with open(config_path, "r") as read_file:
         print("Read Experiment configuration")
@@ -91,16 +92,16 @@ def load_config(small_data=False):
     return config
 
 
-def load_experiment_results(config, data_prefix, experiment, max_iter, ehull015, half_way_analysis, startIt):
+def load_experiment_results(config, data_prefix, output_dir, experiment, max_iter, ehull015, half_way_analysis, startIt):
 
     resdf_filename = f'{data_prefix}{experiment}_{str(startIt)}_{str(config["num_iter"])}ep{str(config["epoch_num"])}'
 
     schnet_dir = config["schnetDirectory"]
 
     if ehull015:
-        output_dir = os.path.join(schnet_dir, f'PUehull015_{data_prefix}{experiment}')
+        output_dir = os.path.join(output_dir, schnet_dir, f'PUehull015_{data_prefix}{experiment}')
     else:
-        output_dir = os.path.join(schnet_dir, f'PUOutput_{data_prefix}{experiment}')
+        output_dir = os.path.join(output_dir, schnet_dir, f'PUOutput_{data_prefix}{experiment}')
 
     if half_way_analysis:
         resdf = pd.read_pickle(os.path.join(output_dir, 'res_df', f'{resdf_filename}tmp'))
@@ -142,6 +143,7 @@ def pu_report_schnet(
         propDFpath,
         TARGET,
         data_prefix,
+        output_dir,
         id_LOtest,
         ehull015               = False,
         small_data             = False,
@@ -156,7 +158,7 @@ def pu_report_schnet(
     config = load_config(small_data=small_data)
 
     propDF = pd.read_pickle(propDFpath)
-    resdf, pred_columns, excess_iters = load_experiment_results(config, data_prefix, experiment, max_iter, ehull015, half_way_analysis, startIt)
+    resdf, pred_columns, excess_iters = load_experiment_results(config, data_prefix, output_dir, experiment, max_iter, ehull015, half_way_analysis, startIt)
 
     Preds = resdf[pred_columns]
     resdf['predScore'] = Preds.apply(score_function, axis=1)
@@ -269,6 +271,7 @@ def main():
         cs['propDFpath'],
         cs['TARGET'],
         cs['dataPrefix'],
+        args.output_dir,
         id_LOtest,
         startIt           = args.startIt,
         ehull015          = args.ehull015, 

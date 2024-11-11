@@ -139,6 +139,7 @@ def pu_report_alignn(
         propDFpath,
         TARGET,
         data_prefix,
+        output_dir,
         id_LOtest,
         ehull015               = False,
         small_data             = False,
@@ -150,7 +151,7 @@ def pu_report_alignn(
     print(f'experiment is {experiment}, ehull015 is {ehull015} and small data is {small_data}.')
 
     alignn_dir = "pu_alignn"
-    output_dir = os.path.join(alignn_dir, f'PUOutput_{data_prefix}{experiment}')
+    output_dir = os.path.join(output_dir, alignn_dir, f'PUOutput_{data_prefix}{experiment}')
 
     if ehull015:
         output_dir = os.path.join(alignn_dir, f'PUehull015_{experiment}')
@@ -244,6 +245,7 @@ def main():
         cs['propDFpath'],
         cs['TARGET'],
         cs['dataPrefix'],
+        args.output_dir,
         id_LOtest,
         ehull015    = args.ehull015,
         small_data  = args.small_data)
