@@ -1,0 +1,115 @@
+# We have two cotraining series:
+
+# | Iteration    | series A               | series B               |
+# |--------------|------------------------|------------------------|
+# | Iteration 0  | schnet0                | alignn0                |
+# | Iteration 1  | coAlignn1              | coSchnet1              |
+# | Iteration 2  | coSchnet2              | coAlignn2              |
+# | Iteration 3  | coAlignn3              | coSchnet3              |
+
+
+# Iteration 0, series A: schnet0
+# PU Data Selection
+syncotrainmp_data_selection --experiment schnet0
+
+# PU Learning
+nohup syncotrainmp_pu_schnet --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
+
+# PU Analysis
+syncotrainmp_schnet_analyze --experiment schnet0
+
+
+# Iteration 0, series B: alignn0
+# PU Data Selection
+syncotrainmp_data_selection --experiment alignn0
+
+# PU Learning
+nohup syncotrainmp_pu_alignn --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
+
+# PU Analysis
+syncotrainmp_alignn_analyze --experiment alignn0
+
+
+# Iteration 1, series A: coAlignn1
+# PU Data Selection
+syncotrainmp_data_selection --experiment coAlignn1
+
+# PU Learning
+nohup syncotrainmp_pu_alignn --experiment coAlignn1 --gpu_id 0 > nohups/coAlignn1_synth_gpu0.log &
+
+# PU Analysis
+syncotrainmp_alignn_analyze --experiment coAlignn1
+
+
+# Iteration 1, series B: coSchnet1
+# PU Data Selection
+syncotrainmp_data_selection --experiment coSchnet1
+
+# PU Learning
+nohup syncotrainmp_pu_schnet --experiment coSchnet1 --gpu_id 0 > nohups/coSchnet1_synth_gpu0.log &
+
+# PU Analysis
+syncotrainmp_schnet_analyze --experiment coSchnet1
+
+
+# Iteration 2, series A: coSchnet2
+# PU Data Selection
+syncotrainmp_data_selection --experiment coSchnet2
+
+# PU Learning
+nohup syncotrainmp_pu_schnet --experiment coSchnet2 --gpu_id 0 > nohups/coSchnet2_synth_gpu0.log &
+
+# PU Analysis
+syncotrainmp_schnet_analyze --experiment coSchnet2
+
+
+# Iteration 2, series B: coAlignn2
+# PU Data Selection
+syncotrainmp_data_selection --experiment coAlignn2
+
+# PU Learning
+nohup syncotrainmp_pu_alignn --experiment coAlignn2  --gpu_id 0 > nohups/coAlignn2_synth_gpu0.log &
+
+# PU Analysis
+syncotrainmp_alignn_analyze --experiment coAlignn2
+
+
+# Iteration 3, series A: coAlignn3
+# PU Data Selection
+syncotrainmp_data_selection --experiment coAlignn3
+
+# PU Learning
+nohup syncotrainmp_pu_alignn --experiment coAlignn3  --gpu_id 0 > nohups/coAlignn3_synth_gpu0.log &
+
+# PU Analysis
+syncotrainmp_alignn_analyze --experiment coAlignn3
+
+
+# Iteration 3, series B: coSchnet3
+# PU Data Selection
+syncotrainmp_data_selection --experiment coSchnet3
+
+# PU Learning
+nohup syncotrainmp_pu_schnet --experiment coSchnet3  --gpu_id 0 > nohups/coSchnet3_synth_gpu0.log &
+
+# PU Analysis
+syncotrainmp_schnet_analyze --experiment coSchnet3
+
+# -------------------------------------------------------------------------------------
+
+# Preparing Data and Training the Synthesizability Predictor
+
+# Producing labels
+python schnet_pred/label_by_average.py
+
+# Augmenting the labeled data
+python schnet_pred/data_augment.py
+
+# Training the predictor
+python schnet_pred/train_schnet.py
+
+# Predicting test results
+python schnet_pred/predict_schnet.py
+
+# Predicing results for schnet_pred/data/<your_crsytal_data>.pkl
+python schnet_pred/predict_schnet.py --input_file <your_crsytal_data>

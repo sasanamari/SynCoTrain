@@ -25,7 +25,7 @@ import argparse
 import numpy as np
 import pandas as pd
 
-from syncotrainmp.experiment_setup import current_setup, str_to_bool
+from syncotrainmp.experiment_setup import current_setup
 
 # Constants [TODO: convert to options]
 DATA_DIR = 'data/clean_data/'
@@ -42,8 +42,8 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(description="Semi-Supervised ML for Synthesizability Prediction")
     parser.add_argument("--experiment", default="alignn0", help="Experiment name and corresponding config files.")
-    parser.add_argument("--ehull015", type=str_to_bool, default=False, help="Evaluate PU Learning efficacy with 0.015 eV cutoff.")
-    parser.add_argument("--small_data", type=str_to_bool, default=False, help="Use a small dataset for quick workflow checks.")
+    parser.add_argument("--ehull015", action='store_true', default=False, help="Evaluate PU Learning efficacy with 0.015 eV cutoff.")
+    parser.add_argument("--small_data", action='store_true', default=False, help="Use a small dataset for quick workflow checks.")
     return parser.parse_args(sys.argv[1:])
 
 
@@ -216,6 +216,11 @@ def main(num_iter=100):
     print(f"-> Number of experimental samples: {experimental_df.shape[0]}")
     print(f"-> Number of positive samples    : {positive_df.shape[0]} (leaveout samples removed)")
     print(f"-> Number of leaveout samples    : {leaveout_df.shape[0]}")
+    print(f"During PU-learning, we sample data from the experimental samples and use it as negative")
+    print(f"set for training. Classifiers are always trained with a balanced set, which means that")
+    print(f"the number of positive samples matches with the number of negative samples. In addition,")
+    print(f"we split a leaveout test set, which is only used for testing. This data is never used")
+    print(f"for training and will be appended to the test data at every PU iteration.")
     print(f"")
 
     save_ids(leaveout_df, os.path.join(output_dir, "leaveout_test_id.txt"))

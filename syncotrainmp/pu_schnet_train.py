@@ -6,8 +6,9 @@ import torch
 import numpy as np
 import pandas as pd
 import argparse
-import torchmetrics
+from importlib.resources import files
 
+import torchmetrics
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import EarlyStopping
 
@@ -15,7 +16,7 @@ import schnetpack as spk
 from schnetpack import transform as trn
 from schnetpack.data import ASEAtomsData, AtomsDataModule
 
-from syncotrainmp.experiment_setup import current_setup, str_to_bool
+from syncotrainmp.experiment_setup import current_setup
 from syncotrainmp.pu_schnet.pu_learn.schnet_funcs import directory_setup, predProb
 from syncotrainmp.pu_schnet.pu_learn.Datamodule4PU import DataModuleWithPred
 from syncotrainmp.pu_schnet.pu_learn import int2metric
@@ -23,13 +24,14 @@ from syncotrainmp.pu_schnet.pu_learn import int2metric
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="SynCoTrainMP SchNet Step"
+        description="Semi-Supervised ML for Synthesizability Prediction -- SchNet PU Step"
     )
     parser.add_argument("--experiment", default="schnet0", help="Name of the experiment and config files.")
-    parser.add_argument("--ehull015", type=str_to_bool, default=False, help="Use 0.015 eV cutoff for stability.")
-    parser.add_argument("--small_data", type=str_to_bool, default=False, help="Use a small dataset for testing.")
+    parser.add_argument("--ehull015", action='store_true', default=False, help="Use 0.015 eV cutoff for stability.")
+    parser.add_argument("--small_data", action='store_true', default=False, help="Use a small dataset for testing.")
     parser.add_argument("--startIt", type=int, default=0, help="Starting iteration number.")
-    parser.add_argument("--gpu_id", type=int, default=3, help="GPU ID to use for training.")
+    parser.add_argument("--gpu_id", type=int, default=0, help="GPU ID to use for training.")
+    parser.add_argument("--output-dir", default="results", help="Name of the experiment and corresponding config files.")
     return parser.parse_args()
 
 
@@ -43,7 +45,7 @@ def initialize_environment(args):
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
 
 
-def load_configuration(args, config_path='syncotrainmp/pu_schnet/schnet_configs/pu_config_schnetpack.json'):
+def load_configuration(args):
     """
     Loads configuration settings for the PU-SchNet model from a JSON file.
 
@@ -54,6 +56,8 @@ def load_configuration(args, config_path='syncotrainmp/pu_schnet/schnet_configs/
     Returns:
         dict: Configuration dictionary with updated start iteration.
     """
+    config_path = files("syncotrainmp.pu_schnet.schnet_configs").joinpath("pu_config_schnetpack.json")
+
     with open(config_path, "r") as read_file:
         config = json.load(read_file)
 
@@ -96,9 +100,9 @@ def get_res_dir(args, config, cs):
     Returns:
         tuple: Paths for result directory and save directory.
     """
-    save_dir = os.path.join(config["schnetDirectory"], f'PUOutput_{cs["dataPrefix"]}{args.experiment}')
+    save_dir = os.path.join(args.output_dir, config["schnetDirectory"], f'PUOutput_{cs["dataPrefix"]}{args.experiment}')
     if args.ehull015:
-        save_dir = os.path.join(config["schnetDirectory"], f'PUehull015_{args.experiment}')
+        save_dir = os.path.join(args.output_dir, config["schnetDirectory"], f'PUehull015_{args.experiment}')
     res_dir = os.path.join(save_dir,'res_df')
 
     return res_dir, save_dir
@@ -147,8 +151,8 @@ def create_model(prop, cutoff=5, n_rbf=30, n_atom_basis=64, n_filters=64, n_inte
     )
 
     scheduler = {
-        'scheduler_cls':torch.optim.lr_scheduler.ReduceLROnPlateau,
-        'scheduler_args':{
+        'scheduler_cls' : torch.optim.lr_scheduler.ReduceLROnPlateau,
+        'scheduler_args': {
             "mode"     : "max", #mode is min for loss, max for merit
             "factor"   : 0.5,
             "patience" : 15,
@@ -159,13 +163,13 @@ def create_model(prop, cutoff=5, n_rbf=30, n_atom_basis=64, n_filters=64, n_inte
     }
 
     task = spk.task.AtomisticTask(
-        model=nnpot,
-        outputs=[output_prop],
-        optimizer_cls=torch.optim.AdamW,
-        optimizer_args={"lr": lr},
-        scheduler_monitor=scheduler['scheduler_monitor'],
-        scheduler_cls=scheduler['scheduler_cls'],
-        scheduler_args=scheduler['scheduler_args'],
+        model             = nnpot,
+        outputs           = [ output_prop ],
+        optimizer_cls     = torch.optim.AdamW,
+        optimizer_args    = {"lr": lr},
+        scheduler_monitor = scheduler['scheduler_monitor'],
+        scheduler_cls     = scheduler['scheduler_cls'],
+        scheduler_args    = scheduler['scheduler_args'],
     )
 
     return task
@@ -186,29 +190,29 @@ def create_trainer(config, cs, save_dir, save_it_dir):
     """
     # This doesn't work when no test data is given.
     early_stopping = EarlyStopping(
-        verbose=2,
-        mode= 'max', #min for loss, max for merit.
-        monitor=f"val_{cs['prop']}_Accuracy",  #if it works, also change in ModelCheckpoint?
-        min_delta=0.02,
-        patience=30,
+        verbose   = 2,
+        mode      = 'max', #min for loss, max for merit.
+        monitor   = f"val_{cs['prop']}_Accuracy",  #if it works, also change in ModelCheckpoint?
+        min_delta = 0.02,
+        patience  = 30,
     )
     model_checkpoint = spk.train.ModelCheckpoint(
-        inference_path=os.path.join(save_it_dir, "best_inference_model"),
-        save_top_k=1,
-        monitor=f"val_{cs['prop']}_Accuracy"
+        inference_path = os.path.join(save_it_dir, "best_inference_model"),
+        save_top_k     = 1,
+        monitor        = f"val_{cs['prop']}_Accuracy"
     )
 
     logger = pl.loggers.TensorBoardLogger(save_dir=save_dir)
     trainer = pl.Trainer(
-        accelerator='gpu',
-        gpus=1,
+        accelerator      = 'gpu',
+        gpus             = 1,
         auto_select_gpus = True,
-        strategy=None,
-        precision=16,
-        callbacks=[early_stopping, model_checkpoint],
-        logger=logger,
-        default_root_dir=save_it_dir,
-        max_epochs=config["epoch_num"],
+        strategy         = None,
+        precision        = 16,
+        callbacks        = [early_stopping, model_checkpoint],
+        logger           = logger,
+        default_root_dir = save_it_dir,
+        max_epochs       = config["epoch_num"],
     )
 
     return trainer
@@ -275,18 +279,18 @@ def get_test_train_data(it, config, cs, crysdf, trainDataPath, testDatapath, spl
     class_dataset.add_systems(np.array(it_traindf.targets), np.array(it_traindf.atoms))
     print('creating data module')
     crysData = AtomsDataModule(datapath=trainDataPath,
-        batch_size=config["batch_size"],
-        num_train=trainLength,
-        num_val=valLength,
-        transforms=[
+        batch_size      = config["batch_size"],
+        num_train       = trainLength,
+        num_val         = valLength,
+        transforms      = [
             trn.ASENeighborList(cutoff=float(cutoff)),
-            trn.CastTo32(), 
+            trn.CastTo32(),
         ],
-        property_units={prop:int(1)},
-        num_workers=4,    
-        split_file = splitFilestring, 
-        pin_memory=True, # set to false, when not using a GPU
-        load_properties=[prop], 
+        property_units  = {prop:int(1)},
+        num_workers     = 4,
+        split_file      = splitFilestring,
+        pin_memory      = True, # set to false, when not using a GPU
+        load_properties = [prop],
     )
     
     crysData.prepare_data()

@@ -1,12 +1,9 @@
-# This is a modified version of a script with the same name in the ALIGNN repo.
-# %%
-import pandas as pd  #more conveneient for ehull setup
+import pandas as pd
 import os
-from data_scripts.crystal_structure_conversion import ase_to_jarvis
-from experiment_setup import current_setup
-# %%
 
-# %%
+from syncotrainmp.utility.crystal_structure_conversion import ase_to_jarvis
+
+
 def prepare_alignn_data(experiment, cs):
     """
     Prepares data for training by converting atomistic structures into a compatible format.

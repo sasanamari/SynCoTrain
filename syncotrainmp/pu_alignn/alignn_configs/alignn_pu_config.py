@@ -2,9 +2,7 @@
 import os
 import json
 
-from experiment_setup import current_setup
-
-def alignn_pu_config_generator(experiment, cs, small_data):
+def alignn_pu_config_generator(experiment, cs, small_data, output_dir):
     prop = cs["prop"]
     data_prefix = cs["dataPrefix"]
     max_num_of_iterations = 60#100
@@ -12,23 +10,22 @@ def alignn_pu_config_generator(experiment, cs, small_data):
     data_dir = "data/clean_data"
     root_dir = os.path.join(data_dir,"alignn_format")
     pu_setup = dict()
-    alignn_dir = "syncotrainmp/pu_alignn"
-    alignn_config_dir = os.path.join(alignn_dir,"alignn_configs")
-    default_class_config = os.path.join(alignn_config_dir, 'default_class_config.json')
-    class_config_name = os.path.join(alignn_config_dir, f'class_config_{data_prefix}{experiment}_{prop}.json')
-    pu_config_name = os.path.join(alignn_config_dir, f'pu_config_{data_prefix}{experiment}_{prop}.json')
-    pu_setup["default_class_config"] =default_class_config
-    pu_setup["pu_config_name"] =pu_config_name
-    pu_setup["class_config_name"] =class_config_name
-    pu_setup["data_dir"]=data_dir
-    pu_setup["root_dir"]=root_dir
+    alignn_dir = os.path.join(output_dir, "pu_alignn")
+    default_class_config = os.path.join(alignn_dir, 'default_class_config.json')
+    class_config_name = os.path.join(alignn_dir, f'class_config_{data_prefix}{experiment}_{prop}.json')
+    pu_config_name = os.path.join(alignn_dir, f'pu_config_{data_prefix}{experiment}_{prop}.json')
+    pu_setup["default_class_config"] = default_class_config
+    pu_setup["pu_config_name"] = pu_config_name
+    pu_setup["class_config_name"] = class_config_name
+    pu_setup["data_dir"] = data_dir
+    pu_setup["root_dir"] = root_dir
     pu_setup["file_format"] = "poscar"
-    pu_setup["keep_data_order"]=False #overwrites this attrib in config
+    pu_setup["keep_data_order"] = False #overwrites this attrib in config
     pu_setup["classification_threshold"] = 0.5 #also overwrites if present
-    pu_setup["batch_size"]=None
+    pu_setup["batch_size"] = None
     pu_setup["output_dir"] = None
-    pu_setup["epochs"]= 120
-    pu_setup["max_num_of_iterations"]= max_num_of_iterations
+    pu_setup["epochs"] = 120
+    pu_setup["max_num_of_iterations"] = max_num_of_iterations
     pu_setup["start_of_iterations"]= start_of_iterations
     pu_setup["small_data"]= small_data
     

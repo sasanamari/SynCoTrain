@@ -81,24 +81,24 @@ Before co-training, train each model separately on the PU data. For example, to 
 ```bash
 mamba activate sync
 syncotrainmp_data_selection --experiment schnet0
-nohup syncotrainmp_pu_schnet --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
+nohup syncotrainmp_schnet_train --experiment schnet0 --gpu_id 0 > nohups/schnet0_synth_gpu0.log &
 ```
 In case you have access to multiple GPUs, the `--gpu_id` parameter can be changed accordingly. Similarly for the ALIGNN experiment we have:
 ```bash
 mamba activate sync
 syncotrainmp_data_selection --experiment alignn0
-nohup syncotrainmp_pu_alignn --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
+nohup syncotrainmp_alignn_train --experiment alignn0 --gpu_id 0 > nohups/alignn0_synth_gpu0.log &
 ```
 
 ### Step 2: Analyze Results and Generate Labels
 
 After each experiment is concluded, the data needs to be analyzed to produce the relevant labels for the next step of co-training. The code for the analysis of results of SchNetPack is
 ```bash
-python pu_schnet/schnet_pu_analysis.py --experiment schnet0 
+syncotrainmp_schnet_analyze --experiment schnet0 
 ```
 and for ALIGNN:
 ```bash
-python pu_alignn/alignn_pu_analysis.py --experiment alignn0 
+syncotrainmp_alignn_analyze --experiment alignn0 
 ```
 
 ### Subsequent Steps
