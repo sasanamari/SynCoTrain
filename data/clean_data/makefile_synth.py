@@ -20,11 +20,6 @@ def parse_arguments():
         default="",
         help="This is your Materials Project ID.",
     )
-    parser.add_argument(
-        "--small",
-        action="store_true",
-        help="If specified, creates a smaller sample for testing purposes."
-    )
     args = parser.parse_args(sys.argv[1:])
 
     return args
@@ -33,16 +28,16 @@ def parse_arguments():
 def query_data(MPID, num_sites):
     """Query the Materials Project database for experimental and theoretical data."""
     pymatgen_exp_array, db_version = exper_oxygen_query(
-        MPID = MPID,
+        MPID             = MPID,
         theoretical_data = False,
-        num_sites = num_sites,
-        fields = "default",
+        num_sites        = num_sites,
+        fields           = "default",
     )
     pymatgen_theo_array, db_version = exper_oxygen_query(
-        MPID=MPID,
+        MPID             = MPID,
         theoretical_data = True,
-        num_sites = num_sites,
-        fields = "default",
+        num_sites        = num_sites,
+        fields           = "default",
     )
 
     print(db_version)
@@ -125,10 +120,7 @@ def main():
     args = parse_arguments()
 
     # Query data
-    if args.small:
-        pymatgen_exp_array, pymatgen_theo_array = query_data(args.MPID, (2, 3))
-    else:
-        pymatgen_exp_array, pymatgen_theo_array = query_data(args.MPID, (1, 150))
+    pymatgen_exp_array, pymatgen_theo_array = query_data(args.MPID, (1, 150))
 
     # Convert structures from dictionaries to Structure objects
     pymatgen_exp_array = convert_structures(pymatgen_exp_array)
@@ -147,10 +139,7 @@ def main():
     # Create and save the DataFrame
     synth_df = create_dataframe(good_exp_data, good_theo_data)
 
-    if args.small:
-        save_dataframe(synth_df, 'miniTestSynthdf.pkl')
-    else:
-        save_dataframe(synth_df, 'synthDF')
+    save_dataframe(synth_df, 'synthDF')
 
 
 if __name__ == "__main__":
