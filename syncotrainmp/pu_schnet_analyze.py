@@ -154,18 +154,21 @@ def pu_report_schnet(
     config = load_config(small_data=small_data)
 
     propDF = pd.read_pickle(propDFpath)
-    resdf, pred_columns, excess_iters = load_experiment_results(
+    crysdf, pred_columns, excess_iters = load_experiment_results(
         config, data_prefix, output_dir, experiment, max_iter, ehull015, half_way_analysis, startIt)
 
-    Preds = resdf[pred_columns]
-    resdf['predScore'] = Preds.apply(score_function, axis=1)
-    resdf[['predScore', 'trial_num']] = pd.DataFrame(resdf.predScore.tolist())
-    resdf["prediction"] = resdf.predScore.map(lambda x: x if np.isnan(x) else round(x))
-    resdf["new_labels"] = resdf.predScore.map(lambda x: x if np.isnan(x) else 1 if x >= pseudo_label_threshold else 0)
+    Preds = crysdf[pred_columns]
+    crysdf['predScore'] = Preds.apply(score_function, axis=1)
+    crysdf[['predScore', 'trial_num']] = pd.DataFrame(crysdf.predScore.tolist())
+    crysdf["prediction"] = crysdf.predScore.map(lambda x: x if np.isnan(x) else round(x))
+    crysdf["new_labels"] = crysdf.predScore.map(lambda x: x if np.isnan(x) else 1 if x >= pseudo_label_threshold else 0)
 
-    resdf = resdf[resdf.predScore.notna()][[
-        'material_id', prop, TARGET,'prediction', 'predScore', 'trial_num']]  #selecting data with prediction values
+    resdf = crysdf[crysdf.predScore.notna()][[
+        'material_id',prop, TARGET,'prediction', 'predScore', 'trial_num']]  #selecting data with prediction values
     resdf = resdf.loc[:, ~resdf.columns.duplicated()] # drops duplicated props at round zero.
+
+    crysdf = crysdf.drop(columns=Preds)
+    crysdf = crysdf.drop(columns=excess_iters) #might require a df like Preds
     
     experimental_data, unlabeled_data, LO_test = split_data(resdf, propDF, prop, id_LOtest)
 
@@ -193,7 +196,7 @@ def pu_report_schnet(
     propDF[experiment] = merged_df.new_labels
     
     report = {'resdf'                  : Preds,
-              'agg_df'                 : resdf,
+              'agg_df'                 : crysdf,
               'cotrain_df'             : merged_df,
               'true_positive_rate'     : round(true_positive_rate, 4), 
               'LO_true_positive_rate'  : round(LO_true_positive_rate, 4),
