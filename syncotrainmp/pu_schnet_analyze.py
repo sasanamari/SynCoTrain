@@ -166,9 +166,6 @@ def pu_report_schnet(
     resdf = resdf[resdf.predScore.notna()][[
         'material_id', prop, TARGET,'prediction', 'predScore', 'trial_num']]  #selecting data with prediction values
     resdf = resdf.loc[:, ~resdf.columns.duplicated()] # drops duplicated props at round zero.
-
-    resdf = resdf.drop(columns=Preds)
-    resdf = resdf.drop(columns=excess_iters) #might require a df like Preds    
     
     experimental_data, unlabeled_data, LO_test = split_data(resdf, propDF, prop, id_LOtest)
 
@@ -196,7 +193,8 @@ def pu_report_schnet(
     propDF[experiment] = merged_df.new_labels
     
     report = {'resdf'                  : Preds,
-              'agg_df'                 : resdf, 
+              'agg_df'                 : resdf,
+              'cotrain_df'             : merged_df,
               'true_positive_rate'     : round(true_positive_rate, 4), 
               'LO_true_positive_rate'  : round(LO_true_positive_rate, 4),
               'predicted_positive_rate': round(predicted_positive_rate, 4),
