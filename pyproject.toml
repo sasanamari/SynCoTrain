@@ -31,4 +31,7 @@ where = ["."]
 include = ["syncotrainmp"]
 
 [tool.setuptools.package-data]
-syncotrainmp = ["pu_alignn/alignn_configs/default_class_config.json"]
+syncotrainmp = [
+    "pu_alignn/alignn_configs/default_class_config.json",
+    "pu_schnet/schnet_configs/pu_config_schnetpack.json",
+]

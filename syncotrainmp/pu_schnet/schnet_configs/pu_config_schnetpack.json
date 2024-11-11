@@ -4,5 +4,5 @@
   "batch_size": 32,
   "data_dir": "data/clean_data/",
   "start_iter": 0,
-  "schnetDirectory": "syncotrainmp/pu_schnet"
+  "schnetDirectory": "pu_schnet"
 }
