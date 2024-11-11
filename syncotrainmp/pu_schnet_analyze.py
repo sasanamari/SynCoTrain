@@ -1,4 +1,3 @@
-# %%
 import os
 import json
 import pandas as pd
@@ -86,9 +85,6 @@ def load_config(small_data=False):
         print("Read Experiment configuration")
         config = json.load(read_file)
 
-    if small_data:
-        config["epoch_num"] = int(config["epoch_num"]*0.5)
-
     return config
 
 
@@ -158,7 +154,8 @@ def pu_report_schnet(
     config = load_config(small_data=small_data)
 
     propDF = pd.read_pickle(propDFpath)
-    resdf, pred_columns, excess_iters = load_experiment_results(config, data_prefix, output_dir, experiment, max_iter, ehull015, half_way_analysis, startIt)
+    resdf, pred_columns, excess_iters = load_experiment_results(
+        config, data_prefix, output_dir, experiment, max_iter, ehull015, half_way_analysis, startIt)
 
     Preds = resdf[pred_columns]
     resdf['predScore'] = Preds.apply(score_function, axis=1)
