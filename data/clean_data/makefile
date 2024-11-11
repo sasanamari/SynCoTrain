@@ -12,3 +12,7 @@ small_synthDF: synthDF
 
 stabilityDF015: synthDF
 	python makefile_stability.py
+
+###############################################################################
+
+.SECONDARY:
