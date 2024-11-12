@@ -13,7 +13,7 @@
 syncotrainmp_data_selection --experiment schnet0 --ehull015 True
 
 # PU Learning
-nohup syncotrainmp_pu_schnet --experiment schnet0 --gpu_id 0 --ehull015 True > nohups/schnet0_stability_gpu0.log &
+nohup syncotrainmp_schnet_train --experiment schnet0 --gpu_id 0 --ehull015 True > nohups/schnet0_stability_gpu0.log &
 
 # PU Analysis
 syncotrainmp_schnet_analyze --experiment schnet0 --ehull015 True
@@ -24,7 +24,7 @@ syncotrainmp_schnet_analyze --experiment schnet0 --ehull015 True
 syncotrainmp_data_selection --experiment alignn0 --ehull015 True
 
 # PU Learning
-nohup syncotrainmp_pu_alignn --experiment alignn0 --gpu_id 0 --ehull015 True > nohups/alignn0_stability_gpu0.log &
+nohup syncotrainmp_alignn_train --experiment alignn0 --gpu_id 0 --ehull015 True > nohups/alignn0_stability_gpu0.log &
 
 # PU Analysis
 syncotrainmp_alignn_analyze --experiment alignn0 --ehull015 True
@@ -35,7 +35,7 @@ syncotrainmp_alignn_analyze --experiment alignn0 --ehull015 True
 syncotrainmp_data_selection --experiment coAlignn1 --ehull015 True
 
 # PU Learning
-nohup syncotrainmp_pu_alignn --experiment coAlignn1 --gpu_id 0 --ehull015 True > nohups/coAlignn1_stability_gpu0.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn1 --gpu_id 0 --ehull015 True > nohups/coAlignn1_stability_gpu0.log &
 
 # PU Analysis
 syncotrainmp_alignn_analyze --experiment coAlignn1 --ehull015 True
@@ -46,7 +46,7 @@ syncotrainmp_alignn_analyze --experiment coAlignn1 --ehull015 True
 syncotrainmp_data_selection --experiment coSchnet1 --ehull015 True
 
 # PU Learning
-nohup syncotrainmp_pu_schnet --experiment coSchnet1 --gpu_id 0 --ehull015 True > nohups/coSchnet1_stability_gpu0.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet1 --gpu_id 0 --ehull015 True > nohups/coSchnet1_stability_gpu0.log &
 
 # PU Analysis
 syncotrainmp_schnet_analyze --experiment coSchnet1 --ehull015 True
@@ -57,7 +57,7 @@ syncotrainmp_schnet_analyze --experiment coSchnet1 --ehull015 True
 syncotrainmp_data_selection --experiment coSchnet2 --ehull015 True
 
 # PU Learning
-nohup syncotrainmp_pu_schnet --experiment coSchnet2 --gpu_id 0 --ehull015 True > nohups/coSchnet2_stability_gpu0.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet2 --gpu_id 0 --ehull015 True > nohups/coSchnet2_stability_gpu0.log &
 
 # PU Analysis
 syncotrainmp_schnet_analyze --experiment coSchnet2 --ehull015 True
@@ -68,7 +68,7 @@ syncotrainmp_schnet_analyze --experiment coSchnet2 --ehull015 True
 syncotrainmp_data_selection --experiment coAlignn2 --ehull015 True
 
 # PU Learning
-nohup syncotrainmp_pu_alignn --experiment coAlignn2  --gpu_id 0 --ehull015 True > nohups/coAlignn2_stability_gpu0.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn2  --gpu_id 0 --ehull015 True > nohups/coAlignn2_stability_gpu0.log &
 
 # PU Analysis
 syncotrainmp_alignn_analyze --experiment coAlignn2 --ehull015 True
@@ -79,7 +79,7 @@ syncotrainmp_alignn_analyze --experiment coAlignn2 --ehull015 True
 syncotrainmp_data_selection --experiment coAlignn3 --ehull015 True
 
 # PU Learning
-nohup syncotrainmp_pu_alignn --experiment coAlignn3  --gpu_id 0 --ehull015 True > nohups/coAlignn3_stability_gpu0.log &
+nohup syncotrainmp_alignn_train --experiment coAlignn3  --gpu_id 0 --ehull015 True > nohups/coAlignn3_stability_gpu0.log &
 
 # PU Analysis
 syncotrainmp_alignn_analyze --experiment coAlignn3 --ehull015 True
@@ -90,7 +90,7 @@ syncotrainmp_alignn_analyze --experiment coAlignn3 --ehull015 True
 syncotrainmp_data_selection --experiment coSchnet3 --ehull015 True
 
 # PU Learning
-nohup syncotrainmp_pu_schnet --experiment coSchnet3  --gpu_id 0 --ehull015 True > nohups/coSchnet3_stability_gpu0.log &
+nohup syncotrainmp_schnet_train --experiment coSchnet3  --gpu_id 0 --ehull015 True > nohups/coSchnet3_stability_gpu0.log &
 
 # PU Analysis
 syncotrainmp_schnet_analyze --experiment coSchnet3 --ehull015 True
