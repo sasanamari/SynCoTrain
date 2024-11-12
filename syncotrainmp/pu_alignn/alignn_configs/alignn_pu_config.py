@@ -29,7 +29,9 @@ def alignn_pu_config_generator(experiment, cs, small_data, output_dir):
     pu_setup["start_of_iterations"]= start_of_iterations
     pu_setup["small_data"]= small_data
     
-    print(os.getcwd())
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     with open(pu_setup["pu_config_name"], "w+") as configJson:
         json.dump(pu_setup, configJson, indent=2)
 
