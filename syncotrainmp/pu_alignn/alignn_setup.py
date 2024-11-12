@@ -52,7 +52,7 @@ def train_for_folder(gpu_id,
     from alignn.config import TrainingConfig
     from jarvis.db.jsonutils import loadjson
 
-    from experiment_setup import current_setup
+    from syncotrainmp.experiment_setup import current_setup
     
     device = "cpu"
     if torch.cuda.is_available():

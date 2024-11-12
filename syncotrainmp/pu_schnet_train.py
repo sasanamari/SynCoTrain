@@ -443,7 +443,7 @@ def run_iteration(it, iteration_results, args, config, cs, crysdf, start_time, c
     remaining_days = int(estimated_remaining_time // (24 * 3600))
     remaining_hours = int((estimated_remaining_time % (24 * 3600)) // 3600)
 
-    time_log_path = os.path.join('time_logs',f'schnet_remaining_time_{data_prefix}{args.experiment}_{prop}.txt')
+    time_log_path = os.path.join(args.output_dir,'time_logs',f'schnet_remaining_time_{data_prefix}{args.experiment}_{prop}.txt')
     with open(time_log_path, 'w') as file:
         file.write(f"Iterations completed: {it - config['start_iter']}\n")
         file.write(f"Iterations remaining: {remaining_iterations}\n")

@@ -28,7 +28,7 @@ except Exception:
 
     pass
 from ignite.handlers import EarlyStopping
-from pu_alignn.pu_learn.class_early_stopping import MyEarlyStopping
+from syncotrainmp.pu_alignn.pu_learn.class_early_stopping import MyEarlyStopping
 from ignite.contrib.handlers.tensorboard_logger import (
     global_step_from_engine,
 )
