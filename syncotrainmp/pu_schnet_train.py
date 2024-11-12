@@ -491,7 +491,7 @@ def save_time_log(args, config, cs, start_time):
     elapsed_days  = int(elapsed_time // (24 * 3600))
     elapsed_hours = int((elapsed_time % (24 * 3600)) // 3600)
 
-    time_log_path = os.path.join('time_logs',f'schnet_remaining_time_{cs["dataPrefix"]}{args.experiment}_{cs["prop"]}.txt')
+    time_log_path = os.path.join(args.output_dir,'time_logs',f'schnet_remaining_time_{cs["dataPrefix"]}{args.experiment}_{cs["prop"]}.txt')
 
     with open(time_log_path, 'w') as file:
         file.write(f"Iterations completed: {config['num_iter'] - config['start_iter']}\n")
