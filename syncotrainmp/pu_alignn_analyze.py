@@ -170,6 +170,10 @@ def pu_report_alignn(
     true_positive_rate = experimental_data['prediction'].mean()
     predicted_positive_rate = unlabeled_data['prediction'].mean()
 
+    print('Our true positive rate is {:.1f}%'.format(true_positive_rate*100))
+    print('Our LO true positive rate is {:.1f}%'.format(LO_true_positive_rate*100))
+    print('and {:.1f}% of currenly unlabeled data have been predicted to belong to the positive class.'.format(predicted_positive_rate*100))
+
     cotraindf = compute_cotrain_labels(propDF, aggdf, TARGET, prop)
        
     report = {'res_dir_list'           : res_dir_list,

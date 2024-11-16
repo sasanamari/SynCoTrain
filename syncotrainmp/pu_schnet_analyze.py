@@ -187,8 +187,8 @@ def pu_report_schnet(
 
     print('Our true positive rate is {:.1f}% after {} iterations of {} epochs.'.format(true_positive_rate*100, config["num_iter"], config["epoch_num"]))
     print('Our LO true positive rate is {:.1f}% after {} iterations of {} epochs.'.format(LO_true_positive_rate*100, config["num_iter"], config["epoch_num"]))
-    print('and {:.1f}% of currenly unlabeled data have been predicted to belong to the positive class.'.format(predicted_positive_rate*100))    
-    
+    print('and {:.1f}% of currenly unlabeled data have been predicted to belong to the positive class.'.format(predicted_positive_rate*100)
+
     merged_df = propDF[['material_id', prop]].merge(
         unlabeled_data[['material_id', 'prediction']], on='material_id', how='left')
     merged_df = merged_df.rename(columns={'prediction': 'new_labels'}) #for clarity
