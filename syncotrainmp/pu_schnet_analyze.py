@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import sys
 import argparse
+import warnings
+
 from importlib.resources import files
 
 from syncotrainmp.experiment_setup import current_setup
@@ -162,6 +164,12 @@ def pu_report_schnet(
     crysdf[['predScore', 'trial_num']] = pd.DataFrame(crysdf.predScore.tolist())
     crysdf["prediction"] = crysdf.predScore.map(lambda x: x if np.isnan(x) else round(x))
     crysdf["new_labels"] = crysdf.predScore.map(lambda x: x if np.isnan(x) else 1 if x >= pseudo_label_threshold else 0)
+
+    if crysdf['new_labels'].isna().mean() > 0.02:
+        warnings.warn(f"{round(crysdf['new_labels'].isna().mean(), 3) * 100}% of 'new_labels' are NaN.",
+                      RuntimeWarning)
+    else:
+        print(f"Rate of NaN values in predicted labels is: {crysdf['new_labels'].isna().mean()}")
 
     resdf = crysdf[crysdf.predScore.notna()][[
         'material_id',prop, TARGET,'prediction', 'predScore', 'trial_num']]  #selecting data with prediction values

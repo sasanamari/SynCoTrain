@@ -126,6 +126,8 @@ def compute_cotrain_labels(propDF, aggdf, TARGET, prop):
     if cotrain_df['new_labels'].isna().mean() > 0.02:
         warnings.warn(f"{round(cotrain_df['new_labels'].isna().mean(), 3) * 100}% of 'new_labels' are NaN.",
                       RuntimeWarning)
+    else:
+        print(f"Rate of NaN values in predicted labels is: {cotrain_df['new_labels'].isna().mean()}")
 
     cotrain_df['new_labels'].fillna(cotrain_df[prop], inplace=True)
     cotrain_df.new_labels = cotrain_df.new_labels.astype(np.int16)
