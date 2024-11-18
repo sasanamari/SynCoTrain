@@ -1,27 +1,5 @@
 #!/usr/bin/env python
 """Module to train for a folder with formatted dataset."""
-# import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = "0"
-
-# import csv
-# import sys
-# import time
-# from jarvis.core.atoms import Atoms
-# ### from alignn.data import get_train_val_loaders
-# from pu_alignn.pu_learn.PU_data_handling import get_train_val_loaders_PU
-# ### from alignn.train import train_dgl
-# from pu_alignn.pu_learn.Train_stop import train_dgl
-# from alignn.config import TrainingConfig
-# from jarvis.db.jsonutils import loadjson
-# import argparse
-# import torch 
-# import numpy as np
-# from experiment_setup import current_setup
-# # %%
-# device = "cpu"
-# if torch.cuda.is_available():
-#     device = torch.device("cuda")
-
 
 def train_for_folder(gpu_id,
     experiment,
