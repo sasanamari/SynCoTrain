@@ -1,5 +1,5 @@
 # SynCoTrain 
-Co-training enhanced PU-learning for crystal synthesizability prediction.
+Co-training enhanced PU-learning for crystal synthesizability prediction. You can read the details of this work in [this preprint](https://arxiv.org/abs/2411.12011).
 
 
 ## Introduction
