@@ -1,23 +1,13 @@
 import logging
 import os
-import shutil
-from copy import copy
-from typing import Optional, List, Dict, Tuple, Union
+from typing import Tuple
 import numpy as np
 import fasteners
-import pytorch_lightning as pl
-from pytorch_lightning.accelerators import GPUAccelerator
 import torch
 from schnetpack.data import (
-    AtomsDataFormat,
-    resolve_format,
-    load_dataset,
-    BaseAtomsData,
     AtomsLoader,
     calculate_stats,
-    SplittingStrategy,
-    RandomSplit,
-   AtomsDataModule,
+    AtomsDataModule,
 )
 
 __all__ = ["DataModuleWithPred", "AtomsDataModuleError"]
@@ -26,18 +16,19 @@ __all__ = ["DataModuleWithPred", "AtomsDataModuleError"]
 class AtomsDataModuleError(Exception):
     pass
 
+
 class DataModuleWithPred(AtomsDataModule):
     """Adding predict_dataloader method to AtomsDataModule.
 
     Args:
         AtomsDataModule (_type_): _description_
     """
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
     def _load_partitions(self) -> Tuple[list, list, list]:
-#I commented out the check for training partition, as this module is only used for testing. 
+        # I commented out the check for training partition, as this module is only used for testing.
         lock = fasteners.InterProcessLock("splitting.lock")
 
         with lock:
@@ -88,26 +79,30 @@ class DataModuleWithPred(AtomsDataModule):
                     )
 
         self._log_with_rank("Exit splitting lock")
+
     def predict_dataloader(self) -> AtomsLoader:
-                return AtomsLoader(
-                    self.test_dataset,
-                    batch_size=self.test_batch_size,
-                    num_workers=self.num_test_workers,
-                    shuffle=False,
-                    pin_memory=self._pin_memory,
-            )
-                
-    def get_stats(self,property: str, divide_by_atoms: bool, 
-                  remove_atomref: bool, mode:str = '') -> Tuple[torch.Tensor, torch.Tensor]:
-    # was modified to use the test_dataloader.
-        if mode == 'train':
+        return AtomsLoader(
+            self.test_dataset,
+            batch_size=self.test_batch_size,
+            num_workers=self.num_test_workers,
+            shuffle=False,
+            pin_memory=self._pin_memory,
+        )
+
+    def get_stats(
+        self, property: str, divide_by_atoms: bool, remove_atomref: bool, mode: str = ""
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        # was modified to use the test_dataloader.
+        if mode == "train":
             dataloader = self.train_dataloader()
-        elif mode == 'val':
+        elif mode == "val":
             dataloader = self.val_dataloader()
-        elif mode == 'test':
+        elif mode == "test":
             dataloader = self.test_dataloader()
         else:
-            raise ValueError("Invalid dataloader type specified. Must be 'train', 'val', or 'test'.")
+            raise ValueError(
+                "Invalid dataloader type specified. Must be 'train', 'val', or 'test'."
+            )
 
         key = (property, divide_by_atoms, remove_atomref)
         if key in self._stats:
@@ -120,4 +115,3 @@ class DataModuleWithPred(AtomsDataModule):
         )[property]
         self._stats[key] = stats
         return stats
-                

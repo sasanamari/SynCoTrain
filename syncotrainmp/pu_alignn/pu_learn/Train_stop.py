@@ -1,32 +1,18 @@
-
-"""Ignite training script.
-
-from the repository root, run
-`PYTHONPATH=$PYTHONPATH:. python alignn/train.py`
-then `tensorboard --logdir tb_logs/test` to monitor results...
-"""
-
-"""
-This is alignn.train filed with correction on eaarlystopping score function.
-"""
+import ignite
+import torch
+import pickle as pk
+import numpy as np
+import json
+import pprint
+import os
 
 from functools import partial
 
 # from pathlib import Path
 from typing import Any, Dict, Union
-import ignite
-import torch
 from ignite.contrib.handlers import TensorboardLogger
 from sklearn.metrics import mean_absolute_error
 
-try:
-    from ignite.contrib.handlers.stores import EpochOutputStore
-
-    # For different version of pytorch-ignite
-except Exception:
-    from ignite.handlers.stores import EpochOutputStore
-
-    pass
 from ignite.handlers import EarlyStopping
 from syncotrainmp.pu_alignn.pu_learn.class_early_stopping import MyEarlyStopping
 from ignite.contrib.handlers.tensorboard_logger import (
@@ -45,10 +31,18 @@ from ignite.metrics import (
     Recall,
     ConfusionMatrix,
 )
-import pickle as pk
-import numpy as np
 from ignite.handlers import Checkpoint, DiskSaver, TerminateOnNan
 from ignite.metrics import Loss, MeanAbsoluteError
+
+try:
+    from ignite.contrib.handlers.stores import EpochOutputStore
+
+    # For different version of pytorch-ignite
+except Exception:
+    from ignite.handlers.stores import EpochOutputStore
+
+    pass
+
 from torch import nn
 from alignn import models
 from alignn.data import get_train_val_loaders
@@ -62,10 +56,6 @@ from alignn.models.densegcn import DenseGCN
 from alignn.models.icgcnn import iCGCNN
 from alignn.models.alignn_cgcnn import ACGCNN
 from jarvis.db.jsonutils import dumpjson
-import json
-import pprint
-
-import os
 
 # from sklearn.decomposition import PCA, KernelPCA
 # from sklearn.preprocessing import StandardScaler
@@ -149,7 +139,7 @@ def train_dgl(
     model: nn.Module = None,
     # checkpoint_dir: Path = Path("./"),
     train_val_test_loaders=[],
-    model_with_drop_config = None,
+    model_with_drop_config=None,
     dropout: float = 0.0,
     # log_tensorboard: bool = False,
 ):
@@ -258,12 +248,12 @@ def train_dgl(
         "alignn_cgcnn": ACGCNN,
         "alignn_layernorm": ALIGNN_LN,
     }
-    
+
     # def initialize_model_with_dropout(config, dropout=0.0):
     #     """Initialize model with a specified dropout value."""
     #     model_name = config.model.name
     #     model_class = _model.get(model_name)
-        
+
     #     if model_class is ALIGNN:
     #         # Initialize the ALIGNN model with a custom dropout value
     #         model = model_class(config.model, dropout=dropout)
@@ -272,7 +262,7 @@ def train_dgl(
     #         model = model_class(config.model)
 
     #     return model
-    
+
     #     # Determine the model to use
     # if model is None:
     #     net = initialize_model_with_dropout(config, dropout)
@@ -292,9 +282,7 @@ def train_dgl(
 
     if config.scheduler == "none":
         # always return multiplier of 1 (i.e. do nothing)
-        scheduler = torch.optim.lr_scheduler.LambdaLR(
-            optimizer, lambda epoch: 1.0
-        )
+        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda epoch: 1.0)
 
     elif config.scheduler == "onecycle":
         steps_per_epoch = len(train_loader)
@@ -355,9 +343,7 @@ def train_dgl(
                         x = np.abs(np.array(p) - np.array(q))
                         stress.append(np.mean(x))
                 if i["target_atomwise_pred"]:
-                    for m, n in zip(
-                        i["target_atomwise_pred"], i["pred_atomwise_pred"]
-                    ):
+                    for m, n in zip(i["target_atomwise_pred"], i["pred_atomwise_pred"]):
                         x = np.abs(np.array(m) - np.array(n))
                         atomw.append(np.mean(x))
             if "target_out" in i:
@@ -414,9 +400,7 @@ def train_dgl(
                         result["out"], dats[2].to(device)
                     )
                     info["target_out"] = dats[2].cpu().numpy().tolist()
-                    info["pred_out"] = (
-                        result["out"].cpu().detach().numpy().tolist()
-                    )
+                    info["pred_out"] = result["out"].cpu().detach().numpy().tolist()
                     # graphlevel_loss += np.mean(
                     #    np.abs(
                     #        dats[2].cpu().numpy()
@@ -453,9 +437,7 @@ def train_dgl(
                     info["target_grad"] = (
                         dats[0].ndata["atomwise_grad"].cpu().numpy().tolist()
                     )
-                    info["pred_grad"] = (
-                        result["grad"].cpu().detach().numpy().tolist()
-                    )
+                    info["pred_grad"] = result["grad"].cpu().detach().numpy().tolist()
                     # gradlevel_loss += np.mean(
                     #    np.abs(
                     #        dats[0].ndata["atomwise_grad"].cpu().numpy()
@@ -481,9 +463,7 @@ def train_dgl(
                 optimizer.step()
                 # optimizer.zero_grad()
                 running_loss += loss.item()
-            mean_out, mean_atom, mean_grad, mean_stress = get_batch_errors(
-                train_result
-            )
+            mean_out, mean_atom, mean_grad, mean_stress = get_batch_errors(train_result)
             # dumpjson(filename="Train_results.json", data=train_result)
             scheduler.step()
             print(
@@ -529,9 +509,7 @@ def train_dgl(
                         result["out"], dats[2].to(device)
                     )
                     info["target_out"] = dats[2].cpu().numpy().tolist()
-                    info["pred_out"] = (
-                        result["out"].cpu().detach().numpy().tolist()
-                    )
+                    info["pred_out"] = result["out"].cpu().detach().numpy().tolist()
                 if (
                     config.model.atomwise_output_features is not None
                     and config.model.atomwise_weight != 0
@@ -554,9 +532,7 @@ def train_dgl(
                     info["target_grad"] = (
                         dats[0].ndata["atomwise_grad"].cpu().numpy().tolist()
                     )
-                    info["pred_grad"] = (
-                        result["grad"].cpu().detach().numpy().tolist()
-                    )
+                    info["pred_grad"] = result["grad"].cpu().detach().numpy().tolist()
                 if config.model.stresswise_weight != 0:
                     loss4 = config.model.stresswise_weight * criterion(
                         result["stress"].to(device),
@@ -571,9 +547,7 @@ def train_dgl(
                 loss = loss1 + loss2 + loss3 + loss4
                 val_result.append(info)
                 val_loss += loss.item()
-            mean_out, mean_atom, mean_grad, mean_stress = get_batch_errors(
-                val_result
-            )
+            mean_out, mean_atom, mean_grad, mean_stress = get_batch_errors(val_result)
             if val_loss < best_loss:
                 best_loss = val_loss
                 best_model_name = "best_model.pt"
@@ -583,15 +557,11 @@ def train_dgl(
                 )
                 print("Saving data for epoch:", e)
                 dumpjson(
-                    filename=os.path.join(
-                        config.output_dir, "Train_results.json"
-                    ),
+                    filename=os.path.join(config.output_dir, "Train_results.json"),
                     data=train_result,
                 )
                 dumpjson(
-                    filename=os.path.join(
-                        config.output_dir, "Val_results.json"
-                    ),
+                    filename=os.path.join(config.output_dir, "Val_results.json"),
                     data=val_result,
                 )
             print(
@@ -630,9 +600,7 @@ def train_dgl(
                     result["out"], dats[2].to(device)
                 )
                 info["target_out"] = dats[2].cpu().numpy().tolist()
-                info["pred_out"] = (
-                    result["out"].cpu().detach().numpy().tolist()
-                )
+                info["pred_out"] = result["out"].cpu().detach().numpy().tolist()
 
             if config.model.atomwise_output_features is not None:
                 loss2 = config.model.atomwise_weight * criterion(
@@ -654,9 +622,7 @@ def train_dgl(
                 info["target_grad"] = (
                     dats[0].ndata["atomwise_grad"].cpu().numpy().tolist()
                 )
-                info["pred_grad"] = (
-                    result["grad"].cpu().detach().numpy().tolist()
-                )
+                info["pred_grad"] = result["grad"].cpu().detach().numpy().tolist()
             if config.model.stresswise_weight != 0:
                 loss4 = config.model.stresswise_weight * criterion(
                     result["stress"][0].to(device),
@@ -665,9 +631,7 @@ def train_dgl(
                 info["target_stress"] = (
                     dats[0].ndata["stresses"][0].cpu().numpy().tolist()
                 )
-                info["pred_stress"] = (
-                    result["stress"].cpu().detach().numpy().tolist()
-                )
+                info["pred_stress"] = result["stress"].cpu().detach().numpy().tolist()
             test_result.append(info)
             loss = loss1 + loss2 + loss3 + loss4
             test_loss += loss.item()
@@ -742,12 +706,8 @@ def train_dgl(
     if config.model.output_features > 1 and config.standard_scalar_and_pca:
         # metrics = {"loss": Loss(criterion), "mae": MeanAbsoluteError()}
         metrics = {
-            "loss": Loss(
-                criterion, output_transform=make_standard_scalar_and_pca
-            ),
-            "mae": MeanAbsoluteError(
-                output_transform=make_standard_scalar_and_pca
-            ),
+            "loss": Loss(criterion, output_transform=make_standard_scalar_and_pca),
+            "mae": MeanAbsoluteError(output_transform=make_standard_scalar_and_pca),
         }
 
     if config.criterion == "zig":
@@ -758,21 +718,15 @@ def train_dgl(
 
         metrics = {
             "loss": Loss(criterion),
-            "mae": MeanAbsoluteError(
-                output_transform=zig_prediction_transform
-            ),
+            "mae": MeanAbsoluteError(output_transform=zig_prediction_transform),
         }
 
     if classification:
         criterion = nn.NLLLoss()
 
         metrics = {
-            "accuracy": Accuracy(
-                output_transform=thresholded_output_transform
-            ),
-            "precision": Precision(
-                output_transform=thresholded_output_transform
-            ),
+            "accuracy": Accuracy(output_transform=thresholded_output_transform),
+            "precision": Precision(output_transform=thresholded_output_transform),
             "recall": Recall(output_transform=thresholded_output_transform),
             # "recall": Recall(output_transform=thresholded_output_transform, average=False),
             "rocauc": ROC_AUC(output_transform=activated_output_transform),
@@ -912,22 +866,20 @@ def train_dgl(
 
         if my_metrics == "recall":
             es_handler = MyEarlyStopping(
-            patience=config.n_early_stopping,
-            score_function=default_score_fn,
-            trainer=trainer,
-        )
+                patience=config.n_early_stopping,
+                score_function=default_score_fn,
+                trainer=trainer,
+            )
         else:
             es_handler = EarlyStopping(
                 patience=config.n_early_stopping,
                 score_function=default_score_fn,
                 trainer=trainer,
             )
-        
-        
+
         evaluator.add_event_handler(Events.EPOCH_COMPLETED, es_handler)
     # optionally log results to tensorboard
     if config.log_tensorboard:
-
         tb_logger = TensorboardLogger(
             log_dir=os.path.join(config.output_dir, "tb_logs", "test")
         )
@@ -970,9 +922,7 @@ def train_dgl(
 
                 f.write("%s, %d, %d\n" % (id, (target), (top_class)))
                 targets.append(target)
-                predictions.append(
-                    top_class.cpu().numpy().flatten().tolist()[0]
-                )
+                predictions.append(top_class.cpu().numpy().flatten().tolist()[0])
         f.close()
         from sklearn.metrics import roc_auc_score
 
@@ -1008,9 +958,7 @@ def train_dgl(
                 info["predictions"] = out_data
                 mem.append(info)
         dumpjson(
-            filename=os.path.join(
-                config.output_dir, "multi_out_predictions.json"
-            ),
+            filename=os.path.join(config.output_dir, "multi_out_predictions.json"),
             data=mem,
         )
     if (
@@ -1033,12 +981,8 @@ def train_dgl(
                 out_data = net([g.to(device), lg.to(device)])
                 out_data = out_data.cpu().numpy().tolist()
                 if config.standard_scalar_and_pca:
-                    sc = pk.load(
-                        open(os.path.join(tmp_output_dir, "sc.pkl"), "rb")
-                    )
-                    out_data = sc.transform(np.array(out_data).reshape(-1, 1))[
-                        0
-                    ][0]
+                    sc = pk.load(open(os.path.join(tmp_output_dir, "sc.pkl"), "rb"))
+                    out_data = sc.transform(np.array(out_data).reshape(-1, 1))[0][0]
                 target = target.cpu().numpy().flatten().tolist()
                 if len(target) == 1:
                     target = target[0]
@@ -1060,9 +1004,7 @@ def train_dgl(
             x = np.array(x, dtype="float").flatten()
             y = np.array(y, dtype="float").flatten()
             f = open(
-                os.path.join(
-                    config.output_dir, "prediction_results_train_set.csv"
-                ),
+                os.path.join(config.output_dir, "prediction_results_train_set.csv"),
                 "w",
             )
             # TODO: Add IDs

@@ -1,13 +1,14 @@
 import numpy as np
 
+
 def format_and_add_noise(df, noise_frac=0.05):
     """
     Adds noise to the target values and formats them for model training.
-    
+
     Parameters:
     df (pd.DataFrame): The dataframe containing the data.
     noise_frac (float): The fraction of the targets to apply noise to.
-    
+
     Returns:
     pd.DataFrame: The dataframe with noise added (if specified) and targets formatted.
     """
@@ -25,5 +26,5 @@ def format_and_add_noise(df, noise_frac=0.05):
     # Format the targets
     df["targets"] = df["targets"].map(lambda target: np.array(target).flatten())
     df["targets"] = df["targets"].map(lambda target: {"synth": np.array(target)})
-    
+
     return df

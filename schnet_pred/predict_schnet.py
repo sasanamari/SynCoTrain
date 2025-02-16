@@ -1,9 +1,28 @@
 # predict_schnet.py
 import argparse
+import os
+from pathlib import Path
+import pandas as pd
+import torch
+import schnetpack as spk
+from pu_schnet.pu_learn.Datamodule4PU import DataModuleWithPred
+from pu_schnet.pu_learn.schnet_funcs import ProbnPred
+import torchmetrics
+import pytorch_lightning as pl
+import syncotrainmp.pu_schnet.pu_learn.int2metric as int2metric
+import numpy as np
+
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Predict using pre-trained SchNet model.")
-parser.add_argument("--input_file", type=str, default="test_df", help="Name of the .pkl file containing the test data.")
-parser.add_argument("--gpu", type=str, default="0", help="CUDA device to use, e.g., 'cuda:0'.")
+parser.add_argument(
+    "--input_file",
+    type=str,
+    default="test_df_aug_75_symmetrical",
+    help="Name of the .pkl file containing the test data.",
+)
+parser.add_argument(
+    "--gpu", type=str, default="0", help="CUDA device to use, e.g., 'cuda:0'."
+)
 args = parser.parse_args()
 
 # Use the provided arguments
@@ -11,26 +30,14 @@ test_filename = args.input_file
 cuda_device = args.gpu
 # threshold = args.threshold
 
-import os
-from pathlib import Path
-import pandas as pd
-import torch
-import schnetpack as spk
-from schnetWithDrop import SchNet
-from pu_schnet.pu_learn.Datamodule4PU import *
-from pu_schnet.pu_learn.schnet_funcs import predProb, ProbnPred
-import torchmetrics
-import pytorch_lightning as pl
-import pu_schnet.pu_learn.int2metric as int2metric
-import numpy as np
-import torch.nn as nn
+
 # from schnet_drop_mod import SchNetWithDropout #need to import/define this class to read the model
 
 # Quick debug flag
 quick_debug = False
 noise_level = 0.05
-dropout_embedding=0.1
-dropout_interaction=0.2
+dropout_embedding = 0.1
+dropout_interaction = 0.2
 # make sure to use test_df_aug_75_symmetrical.pkl for cos sym experiment.
 # Directory setup
 base_dir = Path(__file__).parent.resolve()
@@ -39,14 +46,12 @@ model_dir = base_dir / "models"
 result_dir = base_dir / "results"
 os.makedirs(result_dir, exist_ok=True)
 
-
 exp_id = f"{str(int(noise_level * 100))}_noise_{str(int(dropout_embedding * 100))}_DOE_{str(int(dropout_interaction * 100))}_DOI_aug_75_cos_sym_sc"
-
 
 # Define paths
 model_name = f"schnet_model_{exp_id}"
 
-output_file_base = Path(f'{test_filename}_{exp_id}')
+output_file_base = Path(f"{test_filename}_{exp_id}")
 
 prop = "synth"  # The property to predict
 
@@ -56,7 +61,7 @@ if quick_debug:
     test_filename = "debug_test_df"
 
 # Load the test data
-test_df = pd.read_pickle(data_dir / f'{test_filename}.pkl')
+test_df = pd.read_pickle(data_dir / f"{test_filename}.pkl")
 
 # Prepare the data module for predictions
 test_db_path = data_dir / f"{test_filename}_{exp_id}.db"
@@ -84,7 +89,7 @@ output_prop = int2metric.ModelOutput4ACC(
     metrics={
         "Accuracy": torchmetrics.Accuracy("binary"),
         "recalll": torchmetrics.Recall("binary"),
-    }
+    },
 )
 
 # Prepare necessary parameters
@@ -93,15 +98,15 @@ batch_size = 32  # Use the same batch size as in training
 lr = 1e-3
 
 scheduler = {
-    'scheduler_cls': torch.optim.lr_scheduler.ReduceLROnPlateau,
-    'scheduler_args': {
+    "scheduler_cls": torch.optim.lr_scheduler.ReduceLROnPlateau,
+    "scheduler_args": {
         "mode": "max",  # Mode is 'max' because we monitor accuracy
         "factor": 0.7,
         "patience": 10,
         "threshold": 0.01,
         "min_lr": 1e-6,
     },
-    'scheduler_monitor': "val_synth_Accuracy",
+    "scheduler_monitor": "val_synth_Accuracy",
 }
 
 task = spk.task.AtomisticTask(
@@ -109,18 +114,20 @@ task = spk.task.AtomisticTask(
     outputs=[output_prop],
     optimizer_cls=torch.optim.AdamW,
     optimizer_args={"lr": lr},
-    scheduler_monitor=scheduler['scheduler_monitor'],
-    scheduler_cls=scheduler['scheduler_cls'],
-    scheduler_args=scheduler['scheduler_args'],
+    scheduler_monitor=scheduler["scheduler_monitor"],
+    scheduler_cls=scheduler["scheduler_cls"],
+    scheduler_args=scheduler["scheduler_args"],
 )
 
-test_dataset = spk.data.ASEAtomsData.create(str(test_db_path),
-                                            distance_unit='Ang',
-                                            property_unit_dict={"dummy": int(1)})
+test_dataset = spk.data.ASEAtomsData.create(
+    str(test_db_path), distance_unit="Ang", property_unit_dict={"dummy": int(1)}
+)
 
 # Add systems to the dataset with a minimal dummy property
 
-dummy_properties = [{"dummy": np.array([0.0])} for _ in range(len(test_df))] # Minimal property to satisfy requirement
+dummy_properties = [
+    {"dummy": np.array([0.0])} for _ in range(len(test_df))
+]  # Minimal property to satisfy requirement
 test_dataset.add_systems(np.array(dummy_properties), np.array(test_df.atoms))
 
 
@@ -146,8 +153,10 @@ crysTest.prepare_data()
 crysTest.setup("test")
 
 # Make predictions
-trainer = pl.Trainer(accelerator='gpu', gpus=1, auto_select_gpus=True, precision=16)
-predictions = trainer.predict(model=task, dataloaders=crysTest.predict_dataloader(), return_predictions=True)
+trainer = pl.Trainer(accelerator="gpu", gpus=1, auto_select_gpus=True, precision=16)
+predictions = trainer.predict(
+    model=task, dataloaders=crysTest.predict_dataloader(), return_predictions=True
+)
 
 # Process predictions and extract both prediction and score
 results = []
@@ -159,19 +168,21 @@ for batch in predictions:
 # Recreate the results dataframe with indices and separate the columns for prediction and probability
 res_list = []
 for i, datum in enumerate(crysTest.test_dataset):
-    ind = int(datum['_idx'])  # Get the original index
-    pred_synth = results[i]['pred']
-    synth_score = results[i]['pred_prob']  
+    ind = int(datum["_idx"])  # Get the original index
+    pred_synth = results[i]["pred"]
+    synth_score = results[i]["pred_prob"]
     res_list.append([ind, pred_synth, synth_score])
     if i % 1000 == 0:
         print(f"Processed {i} out of {len(crysTest.test_dataset)} predictions.")
 
 # Create a DataFrame from the results
-resdf = pd.DataFrame(res_list, columns=['testIndex', 'pred_synth', 'synth_score'])
-resdf = resdf.set_index('testIndex').sort_index()
+resdf = pd.DataFrame(res_list, columns=["testIndex", "pred_synth", "synth_score"])
+resdf = resdf.set_index("testIndex").sort_index()
 
 # Merge predictions back to the original test dataframe
-test_df = test_df.merge(resdf[['pred_synth', 'synth_score']], left_index=True, right_index=True, how='outer')
+test_df = test_df.merge(
+    resdf[["pred_synth", "synth_score"]], left_index=True, right_index=True, how="outer"
+)
 
 
 # Save results to CSV

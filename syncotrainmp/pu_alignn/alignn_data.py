@@ -23,7 +23,7 @@ def prepare_alignn_data(experiment, cs):
 
     # Read dataset
     crysdf = pd.read_pickle(propDFpath)
-    crysdf[prop] = crysdf[prop].astype('int16')
+    crysdf[prop] = crysdf[prop].astype("int16")
 
     # Set up directories for data storage
     data_dest = "data/clean_data/alignn_format"
@@ -31,7 +31,9 @@ def prepare_alignn_data(experiment, cs):
 
     # Initialize output files and directories
     id_file_path = os.path.join(data_dest, f"{data_prefix}{prop}_id_from_{TARGET}.csv")
-    data_files_dir = os.path.join(data_dest, f"{data_prefix}atomistic_{prop}_{experiment}")
+    data_files_dir = os.path.join(
+        data_dest, f"{data_prefix}atomistic_{prop}_{experiment}"
+    )
     os.makedirs(data_files_dir, exist_ok=True)
 
     # Write dataset in desired format
@@ -39,7 +41,9 @@ def prepare_alignn_data(experiment, cs):
         for _, row in crysdf.iterrows():
             poscar_name = f"POSCAR-{row['material_id']}.vasp"
             target_value = row[TARGET]
-            formatted_target = f"{target_value:.6f}" if pd.notna(target_value) else "NaN"
+            formatted_target = (
+                f"{target_value:.6f}" if pd.notna(target_value) else "NaN"
+            )
 
             # Save atomic structure to POSCAR file
             jarvis_atom = ase_to_jarvis(row["atoms"])

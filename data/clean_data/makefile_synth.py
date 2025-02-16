@@ -1,20 +1,19 @@
 import sys
-import warnings
-warnings.filterwarnings('ignore')
 import numpy as np
 import pandas as pd
 import argparse
+import warnings
 
 from pymatgen.core import Structure
 from syncotrainmp.utility.crystal_funcs import clean_oxide
 from syncotrainmp.utility.crystal_funcs import exper_oxygen_query
 from syncotrainmp.utility.crystal_structure_conversion import pymatgen_to_ase
 
+warnings.filterwarnings("ignore")
+
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(
-        description="Downloading experimental data."
-    )
+    parser = argparse.ArgumentParser(description="Downloading experimental data.")
     parser.add_argument(
         "--MPID",
         default="",
@@ -28,21 +27,25 @@ def parse_arguments():
 def query_data(MPID, num_sites):
     """Query the Materials Project database for experimental and theoretical data."""
     pymatgen_exp_array, db_version = exper_oxygen_query(
-        MPID             = MPID,
-        theoretical_data = False,
-        num_sites        = num_sites,
-        fields           = "default",
+        MPID=MPID,
+        theoretical_data=False,
+        num_sites=num_sites,
+        fields="default",
     )
     pymatgen_theo_array, db_version = exper_oxygen_query(
-        MPID             = MPID,
-        theoretical_data = True,
-        num_sites        = num_sites,
-        fields           = "default",
+        MPID=MPID,
+        theoretical_data=True,
+        num_sites=num_sites,
+        fields="default",
     )
 
     print(db_version)
-    print(f"We retrieved {len(pymatgen_exp_array)} experimental crystals from the Materials Project database.")
-    print(f"Retrieved {len(pymatgen_theo_array)} theoretical crystals from the Materials Project database.")
+    print(
+        f"We retrieved {len(pymatgen_exp_array)} experimental crystals from the Materials Project database."
+    )
+    print(
+        f"Retrieved {len(pymatgen_theo_array)} theoretical crystals from the Materials Project database."
+    )
 
     return pymatgen_exp_array, pymatgen_theo_array
 
@@ -59,14 +62,10 @@ def clean_data(pymatgen_exp_array, pymatgen_theo_array):
 
     # Also removes "experimental" crystals with e_above_hull > 1 eV
     good_experimental_data = clean_oxide(
-        experimental = True,
-        pymatgenArray = pymatgen_exp_array,
-        reportBadData = False
+        experimental=True, pymatgenArray=pymatgen_exp_array, reportBadData=False
     )
     good_theoretical_data = clean_oxide(
-        experimental = False,
-        pymatgenArray = pymatgen_theo_array,
-        reportBadData = False
+        experimental=False, pymatgenArray=pymatgen_theo_array, reportBadData=False
     )
     print(f"We have {len(good_experimental_data)} experimental oxides after cleaning.")
     print(f"We have {len(good_theoretical_data)} theoretical oxides after cleaning.")
@@ -100,10 +99,21 @@ def create_dataframe(exp_data, theo_data):
 
     synth_df = pd.concat([exp_df, theo_df])
     synth_df = synth_df.sample(frac=1, ignore_index=True)  # Shuffle data
-    synth_df["material_id"] = synth_df["material_id"].astype(str)  # Ensure all IDs are strings
+    synth_df["material_id"] = synth_df["material_id"].astype(
+        str
+    )  # Ensure all IDs are strings
 
     # Add columns for experiments with NaN values
-    experiment_columns = ['schnet0', 'alignn0', 'coSchnet1', 'coAlignn1', 'coSchnet2', 'coAlignn2', 'coSchnet3', 'coAlignn3']
+    experiment_columns = [
+        "schnet0",
+        "alignn0",
+        "coSchnet1",
+        "coAlignn1",
+        "coSchnet2",
+        "coAlignn2",
+        "coSchnet3",
+        "coAlignn3",
+    ]
     synth_df[experiment_columns] = np.nan
 
     return synth_df
@@ -130,7 +140,12 @@ def main():
     good_exp_data, good_theo_data = clean_data(pymatgen_exp_array, pymatgen_theo_array)
 
     # Filter keys and label data
-    keys_to_keep = ["material_id", "atoms", "energy_above_hull", "formation_energy_per_atom"]
+    keys_to_keep = [
+        "material_id",
+        "atoms",
+        "energy_above_hull",
+        "formation_energy_per_atom",
+    ]
     good_exp_data = filter_keys(good_exp_data, keys_to_keep)
     good_theo_data = filter_keys(good_theo_data, keys_to_keep)
     good_exp_data = label_data(good_exp_data, label=1)  # Label as experimental
@@ -139,7 +154,7 @@ def main():
     # Create and save the DataFrame
     synth_df = create_dataframe(good_exp_data, good_theo_data)
 
-    save_dataframe(synth_df, 'synthDF')
+    save_dataframe(synth_df, "synthDF")
 
 
 if __name__ == "__main__":

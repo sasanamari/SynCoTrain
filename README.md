@@ -136,25 +136,33 @@ python schnet_pred/predict_schnet.py
 ## Querying the Data
 The data for this project was obtained from the Materials Project API. A pickled DataFrame containing this data is available in `data/clean_data/synthDF`.
 
-To reproduce the data query, you can use the `icsd_data_query.py` script. Follow these steps to set up the necessary environment and API access:
+To reproduce the data query, follow these steps to set up the necessary environment and API access:
 
-1. **Install the Materials Project API**:
+1. **Obtain a Materials Project API Key**:
+
+    - Sign up at the [Materials Project website](https://next-gen.materialsproject.org/api)  and obtain an API key for access.
+
+2. **Install the Materials Project API**:
 
     - Due to conflicting dependencies—specifically, different `pydantic` versions required by `ALIGNN` and the API—it’s recommended to create a separate Conda (or Mamba) environment.
-    - Sign up at the [Materials Project website](https://next-gen.materialsproject.org/api)  and obtain an API key for access.
-2. **Set Up the Environment**:
 
 ```bash
 cd SynCoTrain
 mamba create -n query python=3.10 numpy pandas requests typing pymatgen ase jarvis-tools mp-api
 mamba activate query
-pip install -e . #to enable relative paths
+# In the SynCoTrainMP base directory run
+pip install -e .
 ```
-3. **Run the Query Script**: By default, `icsd_data_query.py` will query and save a small sample DataFrame to demonstrate the data pipeline. To download the full dataset, uncomment the lines `# num_sites = (1,150)` and `# dataFrame_name = 'synthDF'` in the script.
+
+3. **Run the Query Script**:
+
+    - Change directory to `data/clean_data` and run `make`, i.e.
 
 ```bash
-python data_scripts/icsd_data_query.py --MPID <your_api_key>
+cd data/clean_data
+make
 ```
+    - This will execute all scripts in the directory in the required order and ask you for your material project key to download the data.
 
 ## References
 If you use this code, please cite our [paper](https://arxiv.org/abs/2411.12011) [1]:
