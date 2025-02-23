@@ -7,7 +7,7 @@ SynthCoTrain is a materials-informatics package which predicts the synthesizabil
 
 <!-- ![cotraining scheme](figures/cotraining_scheme.jpg) -->
 <div style="text-align:center">
-<img src="figures/cotraining_scheme_new.png" alt="cotraining scheme" width="550" height="350">
+<img src="figures/cotraining_scheme.png" alt="cotraining scheme" width="550" height="350">
 </div>
 
 The final model achieves a notable true-positive rate of 96% for the experimentally synthesized test-set and predicts that 29% of the theoretical crystals are synthesizable. These results go beyond the scope of thermodynamic stability analysis alone. This work carries significant implications, including the filtration of structural predictions from high-throughput simulations to identify synthesizable candidates.
