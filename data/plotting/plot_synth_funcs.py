@@ -17,7 +17,7 @@ def save_plot(figure, filename):
         filename (str): The name of the file to save the figure as.
     """
     figure.savefig(
-        filename, dpi=350, format="png", bbox_inches="tight", transparent=True
+        filename, dpi=350, bbox_inches="tight", transparent=True
     )
 
 
