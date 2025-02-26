@@ -1270,7 +1270,7 @@ midlabel_dist(coschnet3, df, figtitle="Iteration '3' with SchNet",
 # finaldf = pd.read_pickle(os.path.join(
 #     os.path.dirname(__file__),'../../predict_target/final_df'))
 # %%
-scatter_hm_final_frac(synthlab,df, prop=prop, filename='final_sctter_hm_frac_it2.png')
+scatter_hm_final_frac(synthlab,df, prop=prop, filename='final_sctter_hm_frac_it2.pdf')
 # %%
 final_labels(synthlab, figtitle="Label Distribution After Averaging")#, filename='final_label_dist_it2.png')    
 # %%

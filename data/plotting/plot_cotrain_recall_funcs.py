@@ -9,7 +9,7 @@ def plot_recall_stability(res_df, y_lims=None, title="Recall Rate"):
     y = 100 * res_df.true_positive_rate  # Values for y-axis
     y2 = 100 * res_df.LO_true_positive_rate  # Create a range of numbers
 
-    plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
+    plt.figure(figsize=(5, 3))  # Adjust the figure size as needed
     plt.plot(x, y, "--o", label="Averaged Recall")  # Plot with markers for each point
     plt.plot(x, y2, "--o", label="Leave-out Recall")  # Plot with markers for each point
     # try:
@@ -37,7 +37,7 @@ def plot_recall_stability(res_df, y_lims=None, title="Recall Rate"):
     plt.legend(fontsize=13, loc="lower right")
     if title:
         plt.savefig(
-            f"{title.replace(' ', '_')}.png",
+            f"{title.replace(' ', '_')}.pdf",
             dpi=350,
             transparent=True,
             bbox_inches="tight",
@@ -52,7 +52,7 @@ def plot_recall_synth(res_df, y_lims=None, title="Recall Rate"):
     y2 = 100 * res_df.LO_true_positive_rate  # Create a range of numbers
     y_ppr = 100 * res_df.predicted_positive_rate  # Create a range of numbers
 
-    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(12, 12), sharex=True)
+    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(10, 8), sharex=True)
 
     ax1.plot(x, y, "--o", label="Averaged Recall")
     ax1.plot(x, y2, "--o", label="Leave-out Recall")
@@ -82,7 +82,7 @@ def plot_recall_synth(res_df, y_lims=None, title="Recall Rate"):
 
     if title:
         plt.savefig(
-            f"{title.replace(' ', '_')}.png",
+            f"{title.replace(' ', '_')}.pdf",
             dpi=350,
             transparent=True,
             bbox_inches="tight",

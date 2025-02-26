@@ -38,10 +38,10 @@ synthlab = pd.read_pickle(
 # %%
 
 midlabel_dist(
-    schnet0, df, figtitle="Iteration '0' with SchNet", filename="schnet0_prop_dist.png"
+    schnet0, df, figtitle="Iteration '0' with SchNet", filename="schnet0_prop_dist.pdf"
 )
 midlabel_dist(
-    alignn0, df, figtitle="Iteration '0' with ALIGNN", filename="alignn0_prop_dist.png"
+    alignn0, df, figtitle="Iteration '0' with ALIGNN", filename="alignn0_prop_dist.pdf"
 )
 # )
 # %%
@@ -49,54 +49,54 @@ midlabel_dist(
     coalignn1,
     df,
     figtitle="Iteration '1' with ALIGNN",
-    filename="coalignn1_prop_dist.png",
+    filename="coalignn1_prop_dist.pdf",
 )
 midlabel_dist(
     coschnet1,
     df,
     figtitle="Iteration '1' with SchNet",
-    filename="coschnet1_prop_dist.png",
+    filename="coschnet1_prop_dist.pdf",
 )
 # %%
 midlabel_dist(
     coalignn2,
     df,
     figtitle="Iteration '2' with ALIGNN",
-    filename="coalignn2_prop_dist.png",
+    filename="coalignn2_prop_dist.pdf",
 )
 midlabel_dist(
     coschnet2,
     df,
     figtitle="Iteration '2' with SchNet",
-    filename="coschnet2_prop_dist.png",
+    filename="coschnet2_prop_dist.pdf",
 )
 # %%
 midlabel_dist(
     coalignn3,
     df,
     figtitle="Iteration '3' with ALIGNN",
-    filename="coalignn3_prop_dist.png",
+    filename="coalignn3_prop_dist.pdf",
 )
 midlabel_dist(
     coschnet3,
     df,
     figtitle="Iteration '3' with SchNet",
-    filename="coschnet3_prop_dist.png",
+    filename="coschnet3_prop_dist.pdf",
 )
 
 # %%
-scatter_hm_final_frac(synthlab, df, prop=prop, filename="final_sctter_hm_frac_it2.png")
+scatter_hm_final_frac(synthlab, df, prop=prop, filename="final_sctter_hm_frac_it2.pdf")
 
 # %%
 final_labels(
     synthlab,
     figtitle="Label Distribution After Averaging",
-    filename="final_label_dist_it2.png",
+    filename="final_label_dist_it2.pdf",
 )
 
 # %%
 label_dist4_frames(
-    synthlab, df, pred_col="synth_preds", filename="final_label_class_dist_it2.png"
+    synthlab, df, pred_col="synth_preds", filename="final_label_class_dist_it2.pdf"
 )
 
 # %%
@@ -114,12 +114,12 @@ synthlab_t75 = pd.read_pickle(
 final_labels(
     synthlab_t75,
     figtitle="Label Distribution with 0.75 Threshold",
-    filename="final_label_dist_it2_75.png",
+    filename="final_label_dist_it2_75.pdf",
     threshold=0.75,
 )
 final_labels(
     synthlab_t25,
     figtitle="Label Distribution with 0.25 Threshold",
-    filename="final_label_dist_it2_25.png",
+    filename="final_label_dist_it2_25.pdf",
     threshold=0.25,
 )
