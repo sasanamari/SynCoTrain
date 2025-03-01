@@ -13,8 +13,8 @@ def format_time(seconds):
     return f"{int(days)}d {int(hours)}h {int(minutes)}m {int(seconds)}s"
 
 
-synthDF = pd.read_pickle("data/clean_data/synthDF")
-oqmd = pd.read_pickle("data/clean_data/oqmd_df.pkl")
+synthDF = pd.read_pickle("../data/clean_data/synthDF")
+oqmd = pd.read_pickle("../data/oqmd_data/oqmd_df.pkl")
 # Convert ASE Atoms to Pymatgen Structures and calculate composition
 oqmd["structure"] = oqmd["atoms"].apply(lambda x: AseAtomsAdaptor.get_structure(x))
 oqmd["composition"] = oqmd["structure"].apply(lambda x: x.composition.reduced_formula)
@@ -78,5 +78,5 @@ duplicates_by_composition_df = pd.DataFrame(
     duplicates_by_composition, columns=["oqmd_material_id", "synthDF_material_id"]
 )
 duplicates_by_composition_df.to_csv(
-    "schnet_pred/data/duplicate_materials_by_composition.csv", index=False
+    "duplicate_materials_by_composition.csv", index=False
 )
