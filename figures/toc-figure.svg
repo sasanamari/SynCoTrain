@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="8cm"
+   height="4cm"
+   viewBox="0 0 80 39.999999"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="toc.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     units="cm"
+     inkscape:zoom="2"
+     inkscape:cx="102"
+     inkscape:cy="131"
+     inkscape:window-width="1918"
+     inkscape:window-height="1181"
+     inkscape:window-x="1"
+     inkscape:window-y="19"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       position="20.615287,32.646007"
+       orientation="0,-1"
+       id="guide19054" />
+    <sodipodi:guide
+       position="2.531702,26.859259"
+       orientation="1,0"
+       id="guide42778" />
+    <sodipodi:guide
+       position="77.397747,17.696909"
+       orientation="1,0"
+       id="guide42780" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2">
+    <rect
+       x="-73.359556"
+       y="317.58764"
+       width="217.34477"
+       height="57.867476"
+       id="rect13962" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       x="40.072548"
+       y="0.12221005"
+       width="39.812225"
+       height="39.763931"
+       stroke="#aabfe4"
+       stroke-width="0.230823"
+       stroke-miterlimit="8"
+       fill="#aabfe4"
+       id="rect1471" />
+    <rect
+       x="0.14910768"
+       y="0.12187368"
+       width="39.922905"
+       height="39.76461"
+       stroke="#dae3f3"
+       stroke-width="0.229922"
+       stroke-miterlimit="8"
+       fill="#dae3f3"
+       id="rect1473" />
+    <path
+       d="M 47.935581,32.896671 H 37.566118 v -15.58031 l 0.648102,0.274935 h -6.481024 v -0.549871 h 7.129125 V 32.621737 L 38.21422,32.346799 h 9.721361 z M 32.381298,18.141169 28.492685,17.316361 32.381298,16.491552 Z"
+       fill="#00a375"
+       id="path1475"
+       style="stroke-width:0.112567" />
+    <text
+       font-family="'Times New Roman', 'Times New Roman_MSFontService', Arial"
+       font-weight="700"
+       font-size="5.29167px"
+       id="text1477"
+       x="63.353062"
+       y="7.1727653"
+       style="font-size:4.23333px;stroke-width:0.264583">View #2</text>
+    <text
+       font-family="'Times New Roman', 'Times New Roman_MSFontService', Arial"
+       font-weight="700"
+       font-size="5.29167px"
+       id="text1479"
+       x="2.5211337"
+       y="7.1727667"
+       style="font-size:4.23333px;stroke-width:0.264583">View #1</text>
+    <path
+       d="m 43.571866,7.095063 v 3.92294 h 19.014803 l -0.648102,-0.283944 v 2.219263 h 1.296205 V 10.450113 H 44.219968 l 0.648103,0.283946 V 7.095063 Z m 17.070461,5.574314 1.944342,1.703671 1.944307,-1.703671 z"
+       fill="#4472c4"
+       id="path1481"
+       style="stroke-width:0.114396" />
+    <path
+       d="m 36.83454,7.095063 v 3.905353 H 17.777393 l 0.648102,-0.282134 v 2.212468 h -1.296222 v -2.494604 h 19.057164 l -0.648102,0.282136 V 7.095063 Z M 19.7217,12.648615 17.777393,14.341426 15.83307,12.648615 Z"
+       fill="#4472c4"
+       id="path1483"
+       style="stroke-width:0.11403" />
+    <path
+       d="m 18.425495,20.136618 0.116312,9.176838 -1.296204,0.0033 -0.116295,-9.176915 z m 1.408888,8.884178 -1.922358,1.741379 -1.966273,-1.731577 z"
+       fill="#4472c4"
+       id="path1485"
+       style="stroke-width:0.115493" />
+    <path
+       d="m 34.195985,31.897297 h 9.556623 V 17.323504 l -0.648101,0.277316 h 5.667956 v -0.554634 h -6.316059 v 14.573795 l 0.648103,-0.277319 h -8.908522 z m 13.928376,-13.741843 3.888563,-0.83195 -3.888563,-0.831952 z"
+       fill="#00a375"
+       id="path1487"
+       style="stroke-width:0.113052" />
+    <rect
+       x="2.531702"
+       y="30.722784"
+       width="18.702236"
+       height="2.8556066"
+       fill="#e73a23"
+       id="rect1491"
+       style="stroke-width:0.123264" />
+    <rect
+       x="21.233936"
+       y="30.722784"
+       width="12.616392"
+       height="2.8556066"
+       fill="#00a375"
+       id="rect1493"
+       style="stroke-width:0.115493" />
+    <rect
+       x="7.1485143"
+       y="14.542793"
+       width="21.430584"
+       height="5.6340346"
+       fill="#788fce"
+       id="rect1495"
+       style="stroke-width:0.115493" />
+    <path
+       d="m 9.8273376,14.542793 v 5.634034 M 25.900276,14.542793 v 5.634034"
+       stroke="#ffffff"
+       stroke-width="0.346477"
+       stroke-miterlimit="8"
+       fill="none"
+       fill-rule="evenodd"
+       id="path1497" />
+    <rect
+       x="7.1485143"
+       y="14.542793"
+       width="21.430584"
+       height="5.6340346"
+       stroke="#ffffff"
+       stroke-width="0.346477"
+       stroke-miterlimit="8"
+       fill="none"
+       id="rect1499" />
+    <path
+       d="m 63.187763,20.135074 0.224157,9.176916 -1.296205,0.0064 -0.224157,-9.176917 z m 1.513102,8.881245 -1.901618,1.745856 -1.98665,-1.726948 z"
+       fill="#4472c4"
+       id="path1507"
+       style="stroke-width:0.115493" />
+    <rect
+       x="52.083607"
+       y="14.542793"
+       width="21.257757"
+       height="5.6340346"
+       fill="#365096"
+       id="rect1509"
+       style="stroke-width:0.115493" />
+    <path
+       d="m 54.740829,14.542793 v 5.634034 m 15.943318,-5.634034 v 5.634034"
+       stroke="#ffffff"
+       stroke-width="0.346477"
+       stroke-miterlimit="8"
+       fill="none"
+       fill-rule="evenodd"
+       id="path1511" />
+    <rect
+       x="52.083607"
+       y="14.542793"
+       width="21.257757"
+       height="5.6340346"
+       stroke="#ffffff"
+       stroke-width="0.346477"
+       stroke-miterlimit="8"
+       fill="none"
+       id="rect1513" />
+    <rect
+       x="48.367821"
+       y="30.722784"
+       width="20.220791"
+       height="2.8556066"
+       fill="#e73a23"
+       id="rect1521"
+       style="stroke-width:0.115493" />
+    <rect
+       x="68.588615"
+       y="30.722784"
+       width="8.8141909"
+       height="2.8556066"
+       fill="#00a375"
+       id="rect1523"
+       style="stroke-width:0.115493" />
+    <text
+       font-family="'Times New Roman', 'Times New Roman_MSFontService', Arial"
+       font-weight="400"
+       font-size="4.7625px"
+       id="text1525"
+       x="4.5568786"
+       y="36.168407"
+       style="font-size:2.82222px;stroke-width:0.264583">Positive labels expanded</text>
+    <text
+       font-family="'Times New Roman', 'Times New Roman_MSFontService', Arial"
+       font-weight="400"
+       font-size="4.7625px"
+       id="text1527"
+       x="9.5743208"
+       y="39.09586"
+       style="font-size:2.82222px;stroke-width:0.264583"><tspan
+         sodipodi:role="line"
+         id="tspan75282"
+         x="9.5743208"
+         y="39.09586">by classifier 1</tspan></text>
+    <text
+       font-family="'Times New Roman', 'Times New Roman_MSFontService', Arial"
+       font-weight="400"
+       font-size="4.7625px"
+       id="text1525-5"
+       x="48.832184"
+       y="36.343143"
+       style="font-size:2.82222px;stroke-width:0.264583">Positive labels expanded</text>
+    <text
+       font-family="'Times New Roman', 'Times New Roman_MSFontService', Arial"
+       font-weight="400"
+       font-size="4.7625px"
+       id="text1527-8"
+       x="53.849625"
+       y="39.270596"
+       style="font-size:2.82222px;stroke-width:0.264583"><tspan
+         sodipodi:role="line"
+         id="tspan75282-1"
+         x="53.849625"
+         y="39.270596">by classifier 2</tspan></text>
+    <rect
+       x="25.727449"
+       y="3.9969118"
+       width="22.986029"
+       height="3.35708"
+       fill="#a5a5a5"
+       id="rect1533"
+       style="stroke-width:0.128752" />
+    <rect
+       x="48.71347"
+       y="3.9969118"
+       width="5.8761282"
+       height="3.35708"
+       fill="#00a375"
+       id="rect1535"
+       style="stroke-width:0.128752" />
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text13960"
+       style="fill:black;fill-opacity:1;line-height:1.25;stroke:none;font-family:sans-serif;font-style:normal;font-weight:normal;font-size:40px;white-space:pre;shape-inside:url(#rect13962)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:2.82222px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="31.244585"
+       y="6.4631534"
+       id="text47205"><tspan
+         sodipodi:role="line"
+         id="tspan47203"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="31.244585"
+         y="6.4631534">Training Data</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:2.82222px;line-height:1.25;font-family:sans-serif;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="10.126808"
+       y="18.204144"
+       id="text57505"><tspan
+         sodipodi:role="line"
+         id="tspan57503"
+         style="font-size:2.82222px;stroke-width:0.264583;fill:#ffffff"
+         x="10.126808"
+         y="18.204144">Classifier 1</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:2.82222px;line-height:1.25;font-family:sans-serif;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="55.073334"
+       y="18.412374"
+       id="text57505-1"><tspan
+         sodipodi:role="line"
+         id="tspan57503-1"
+         style="font-size:2.82222px;stroke-width:0.264583;fill:#ffffff"
+         x="55.073334"
+         y="18.412374">Classifier 2</tspan></text>
+  </g>
+</svg>
