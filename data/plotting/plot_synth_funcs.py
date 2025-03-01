@@ -54,7 +54,8 @@ def heatmap(codf, datadf, filename=None):
     plt.title("Density Heatmap")
     if filename:
         save_plot(plt.gcf(), filename)
-    plt.show()
+    else:
+        plt.show()
 
 
 # %%
@@ -92,7 +93,8 @@ def heatmapZoom(codf, datadf, ehull_cutoff=1, filename=None):
     plt.title("Zoomed in Density Heatmap")
     if filename:
         save_plot(plt.gcf(), filename)
-    plt.show()
+    else:
+        plt.show()
 
 
 # %%
@@ -145,7 +147,8 @@ def scatter_hm(codf, datadf, filename=None):
     plt.title("Density Scatter Plot")
     if filename:
         save_plot(plt.gcf(), filename)
-    plt.show()
+    else:
+        plt.show()
 
 
 # %%
@@ -193,9 +196,11 @@ def scatter_hm_zoomed(codf, datadf, ehull_cutoff=1, filename=None):
     plt.xlabel("predScore (Zoomed)")
     plt.ylabel("energy_above_hull (Zoomed)")
     plt.title("Zoomed Density Scatter Plot")
+
     if filename:
         save_plot(plt.gcf(), filename)
-    plt.show()
+    else:
+        plt.show()
 
 
 # %%
@@ -275,7 +280,8 @@ def label_dist(codf, datadf, ehull=False, prop="synth", filename=None):
     )
     if filename:
         save_plot(figure=fig, filename=filename)
-
+    else:
+        plt.show()
 
 # %%
 
@@ -363,9 +369,8 @@ def label_dist2(codf, datadf, prop="synth", ehull=False, filename=None):
 
     if filename:
         save_plot(figure=fig, filename=filename)
-
-    plt.show()
-
+    else:
+        plt.show()
 
 # %%
 def label_dist3(codf, datadf, ehull=False, prop="synth", filename=None):
@@ -469,9 +474,8 @@ def label_dist3(codf, datadf, ehull=False, prop="synth", filename=None):
 
     if filename:
         save_plot(figure=fig, filename=filename)
-
-    plt.show()
-
+    else:
+        plt.show()
 
 # %%
 def label_dist4(
@@ -660,9 +664,8 @@ def label_dist4(
 
     if filename:
         save_plot(figure=fig, filename=filename)
-
-    plt.show()
-
+    else:
+        plt.show()
 
 # %%
 def label_dist4_frames(
@@ -835,9 +838,8 @@ def label_dist4_frames(
     # Save the plot
     if filename:
         fig.savefig(filename, dpi=300, bbox_inches="tight")
-
-    plt.show()
-
+    else:
+        plt.show()
 
 # %%
 # %%
@@ -873,7 +875,7 @@ def midlabel_dist(
     true_positive_rate = testSet.prediction.mean()
     # tpr_mean = np.mean([LO_true_positive_rate, true_positive_rate])
     unlabeled_synth_frac = tdf.prediction.mean()
-    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(8, 8))
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(5, 5))
     if "predScore" in edf.columns:
         prob = "predScore"
     else:
@@ -881,7 +883,7 @@ def midlabel_dist(
     n, bins, patches = ax1.hist(edf[prob], bins=40)
     max_height = n.max()
     ax1.set_title(
-        "Synthesizability Score for Experimental Data", fontsize=13.5, fontweight="bold"
+        "Synthesizability Score for Experimental Data", fontsize=11, fontweight="bold"
     )
     ax1.vlines(0.5, 0, max_height, "r", linewidth=3)
     ax1.arrow(
@@ -899,13 +901,13 @@ def midlabel_dist(
         0.55,
         max_height * 0.6,
         "{:.1f}% Recall".format(true_positive_rate * 100),
-        fontsize=14,
+        fontsize=10,
     )
     ax1.text(
         0.55,
         max_height * 0.4,
-        "{:.1f}% Leave-out Recall".format(LO_true_positive_rate * 100),
-        fontsize=14,
+        "{:.1f}% Leave-out\nRecall".format(LO_true_positive_rate * 100),
+        fontsize=10,
     )
     # ax1.text(.55,max_height*.4, '{:.1f}% true- \npositive rate'.format(tpr_mean*100), fontsize = 15);
 
@@ -927,20 +929,20 @@ def midlabel_dist(
         head_length=0.05,
     )
     ax2.set_title(
-        "Synthesizability Score for Theoretical Data", fontsize=13.5, fontweight="bold"
+        "Synthesizability Score for Theoretical Data", fontsize=11, fontweight="bold"
     )
     ax2.text(
         0.55,
         max_height * 0.4,
         "{:.1f}% predicted \n synthesizable".format(unlabeled_synth_frac * 100),
-        fontsize=14,
+        fontsize=10,
     )
     if figtitle:
-        fig.suptitle(figtitle, fontsize=25, y=1.02)
+        fig.suptitle(figtitle, fontsize=14, y=1.02)
     if filename:
         save_plot(figure=fig, filename=filename)
-    plt.show()
-
+    else:
+        plt.show()
 
 # %%
 # midlabel_dist(codf, df)
@@ -953,7 +955,7 @@ def midlabel_dist(
 # #mdf is synthdf or schnet0 or coSchnet...
 # %%
 def final_labels(
-    plot_df, ehull=False, prop="synth", figtitle=None, filename=None, threshold=0.5
+    plot_df, prop="synth", figtitle=None, filename=None, threshold=0.5
 ):
     edf = plot_df[plot_df[prop] == 1]
     tdf = plot_df[plot_df[prop] == 0]
@@ -981,7 +983,7 @@ def final_labels(
     unlabeled_synth_frac = tdf[prob_col].mean()
     # unlabeled_synth_frac = tdf.prediction.mean()
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(8, 8))
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(5, 5))
     if threshold <= 0.5:
         # Position the text to the right of the vline
         text_halign = "left"
@@ -994,7 +996,7 @@ def final_labels(
     max_height = n.max()
     ax1.set_title(
         "Synthesizability Prediction for Experimental Data",
-        fontsize=13.5,
+        fontsize=11,
         fontweight="bold",
     )
     ax1.vlines(threshold, 0, max_height, "r", linewidth=3)
@@ -1014,14 +1016,14 @@ def final_labels(
         threshold + text_offset,
         max_height * 0.6,
         "{:.1f}% Recall".format(true_positive_rate * 100),
-        fontsize=14,
+        fontsize=10,
         ha=text_halign,
     )
     ax1.text(
         threshold + text_offset,
         max_height * 0.4,
         "{:.1f}% Leave-out Recall".format(LO_true_positive_rate * 100),
-        fontsize=14,
+        fontsize=10,
         ha=text_halign,
     )
     # ax1.text(.55,max_height*.4, '{:.1f}% true- \npositive rate'.format(true_positive_rate*100), fontsize = 15);
@@ -1044,22 +1046,22 @@ def final_labels(
     )
     ax2.set_title(
         "Synthesizability Prediction for Theoretical Data",
-        fontsize=13.5,
+        fontsize=11,
         fontweight="bold",
     )
     ax2.text(
         threshold + text_offset,
         max_height * 0.4,
         "{:.1f}% predicted \n synthesizable".format(unlabeled_synth_frac * 100),
-        fontsize=14,
+        fontsize=10,
         ha=text_halign,
     )
     if figtitle:
-        fig.suptitle(figtitle, fontsize=25, y=1.02)
+        fig.suptitle(figtitle, fontsize=14, y=1.02)
     if filename:
         save_plot(figure=fig, filename=filename)
-    plt.show()
-
+    else:
+        plt.show()
 
 # %%
 def scatter_hm_final(proplab, datadf, prop="synth", filename=None):
@@ -1078,7 +1080,8 @@ def scatter_hm_final(proplab, datadf, prop="synth", filename=None):
     plt.title("Density Scatter Plot", fontsize=17)
     if filename:
         save_plot(plt.gcf(), filename)
-    plt.show()
+    else:
+        plt.show()
 
 
 # %%
@@ -1175,7 +1178,8 @@ def scatter_hm_final_frac(proplab, datadf, prop="synth", filename=None):
 
     if filename:
         save_plot(plt.gcf(), filename)
-    plt.show()
+    else:
+        plt.show()
 
 
 # %%
@@ -1212,7 +1216,8 @@ def heatmap_final(codf, datadf, prop="synth", filename=None):
     plt.title("Density Heatmap")
     if filename:
         save_plot(plt.gcf(), filename)
-    plt.show()
+    else:
+        plt.show()
 
 
 # %%
@@ -1446,8 +1451,8 @@ def label_dist5(
     # Save the plot
     if filename:
         fig.savefig(filename, dpi=300, bbox_inches="tight")
-
-    plt.show()
+    else:
+        plt.show()
 
 
 # %%

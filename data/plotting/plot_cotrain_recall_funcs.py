@@ -42,7 +42,8 @@ def plot_recall_stability(res_df, y_lims=None, title="Recall Rate"):
             transparent=True,
             bbox_inches="tight",
         )
-    plt.show()
+    else:
+        plt.show()
 
 
 # %%
@@ -52,7 +53,7 @@ def plot_recall_synth(res_df, y_lims=None, title="Recall Rate"):
     y2 = 100 * res_df.LO_true_positive_rate  # Create a range of numbers
     y_ppr = 100 * res_df.predicted_positive_rate  # Create a range of numbers
 
-    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(10, 8), sharex=True)
+    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(8, 7), sharex=True)
 
     ax1.plot(x, y, "--o", label="Averaged Recall")
     ax1.plot(x, y2, "--o", label="Leave-out Recall")
@@ -78,7 +79,7 @@ def plot_recall_synth(res_df, y_lims=None, title="Recall Rate"):
         ax2.set_ylim(y_lims[1])  # Apply the second set of limits to the second subplot
 
     fig.suptitle(title, fontsize=20)
-    plt.tight_layout(pad=3.0)  # Increase padding to prevent overlap with the title
+    plt.tight_layout(pad=2.0)  # Increase padding to prevent overlap with the title
 
     if title:
         plt.savefig(
@@ -87,7 +88,8 @@ def plot_recall_synth(res_df, y_lims=None, title="Recall Rate"):
             transparent=True,
             bbox_inches="tight",
         )
-    plt.show()
+    else:
+        plt.show()
 
 
 # %%
