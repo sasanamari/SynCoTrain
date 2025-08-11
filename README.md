@@ -168,11 +168,11 @@ make
 If you use this code, please cite our [paper](https://doi.org/10.1039/d4dd00394b) [1]:
 
 ```bibtex
-@article{amariamir2024syncotrain,
+@article{amariamir2025syncotrain,
   title   = {SynCoTrain: A Dual Classifier PU-learning Framework for Synthesizability Prediction},
   author  = {Amariamir, Sasan and George, Janine and Benner, Philipp},
   journal = {Digital Discovery},
-  year    = {2024},
+  year    = {2025},
   volume  = {4},
   number  = {6},
   pages   = {1437--1448},
@@ -181,4 +181,4 @@ If you use this code, please cite our [paper](https://doi.org/10.1039/d4dd00394b
 }
 ```
 
-[1] Amariamir, Sasan, Janine George, and Philipp Benner. "SynCoTrain: A Dual Classifier PU-learning Framework for Synthesizability Prediction." Digital Discovery 4, no. 6 (2024): 1437–1448. https://doi.org/10.1039/d4dd00394b.
+[1] Amariamir, Sasan, Janine George, and Philipp Benner. "SynCoTrain: A Dual Classifier PU-learning Framework for Synthesizability Prediction." Digital Discovery 4, no. 6 (2025): 1437–1448. https://doi.org/10.1039/d4dd00394b.
