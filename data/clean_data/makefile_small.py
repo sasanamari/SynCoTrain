@@ -8,7 +8,7 @@ np.random.seed(42)
 small_data_frac = 0.05
 
 # Load the full dataset of crystal synthesizability information
-synthDF = pd.read_pickle('synthDF')
+synthDF = pd.read_pickle("synthDF")
 
 # Separate experimental and theoretical entries
 experimental_df = synthDF[synthDF.synth == 1]
@@ -26,4 +26,4 @@ small_theoretical_df = theoretical_df.sample(
 small_df = pd.concat([small_experimental_df, small_theoretical_df], ignore_index=True)
 
 # Save the smaller dataset for quick experimentation
-small_df.to_pickle('small_synthDF')
+small_df.to_pickle("small_synthDF")

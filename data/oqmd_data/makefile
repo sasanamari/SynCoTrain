@@ -1,5 +1,5 @@
 
-all: oqmd_raw_oxygen.npy
+all: oqmd_df.pkl
 
 ###############################################################################
 
@@ -9,6 +9,9 @@ oqmd_raw_oxygen.npy:
 	@echo "> conda activate jarvis"
 	@echo "> pip install jarvis"
 	python makefile_oqmd.py
+
+oqmd_df.pkl: oqmd_raw_oxygen.npy
+	python makefile_pd.py
 
 ###############################################################################
 

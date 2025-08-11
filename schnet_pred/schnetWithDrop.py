@@ -34,7 +34,7 @@ class SchNetInteractionWithDrop(nn.Module):
         self.in2f = Dense(n_atom_basis, n_filters, bias=False, activation=None)
         self.f2out = nn.Sequential(
             Dense(n_filters, n_atom_basis, activation=activation),
-            nn.Dropout(dropout_rate), 
+            nn.Dropout(dropout_rate),
             Dense(n_atom_basis, n_atom_basis, activation=None),
         )
         self.filter_network = nn.Sequential(
@@ -102,7 +102,7 @@ class SchNet(nn.Module):
         max_z: int = 100,
         activation: Callable = shifted_softplus,
         dropout_rate_interaction: float = 0.0,  # Dropout rate for interaction layers
-        dropout_rate_embedding: float = 0.0,    # Dropout rate for embedding layer
+        dropout_rate_embedding: float = 0.0,  # Dropout rate for embedding layer
     ):
         """
         Args:
@@ -135,7 +135,7 @@ class SchNet(nn.Module):
                 n_rbf=self.radial_basis.n_rbf,
                 n_filters=self.n_filters,
                 activation=activation,
-                dropout_rate = dropout_rate_interaction,
+                dropout_rate=dropout_rate_interaction,
             ),
             n_interactions,
             shared_interactions,

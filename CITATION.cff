@@ -1,0 +1,77 @@
+cff-version: 1.2.0
+title: >-
+  SynCoTrain: A Dual Classifier PU-learning Framework for
+  Synthesizability Prediction
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Sasan
+    family-names: Amariamir
+    affiliation: >-
+      Federal Institute of Materials Research and Testing,
+      Unter den Eichen 87, 12205 Berlin, Germany
+  - given-names: Janine
+    family-names: George
+    affiliation: >-
+      Federal Institute of Materials Research and Testing,
+      Unter den Eichen 87, 12205 Berlin, Germany
+      Friedrich Schiller University Jena,
+      Institute of Condensed Matter Theory and Solid-State Optics,
+      Max-Wien-Platz 1, 07743 Jena (Germany)
+    email: janine.george@bam.de
+    orcid: 'https://orcid.org/0000-0001-8907-0336'
+  - given-names: Philipp
+    family-names: Benner
+    email: philipp.benner@bam.de
+    affiliation: >-
+      Federal Institute of Materials Research and Testing,
+      Unter den Eichen 87, 12205 Berlin, Germany
+    orcid: 'https://orcid.org/0000-0002-0912-8137'
+identifiers:
+  - type: other
+    value: 'arXiv:2411.12011'
+    description: The ArXiv preprint of the paper
+repository-code: 'https://github.com/BAMeScience/SynCoTrainMP'
+abstract: >+
+  Material discovery is a cornerstone of modern science,
+  driving advancements in diverse disciplines from
+  biomedical technology to climate solutions. Predicting
+  synthesizability, a critical factor in realizing novel
+  materials, remains a complex challenge due to the
+  limitations of traditional heuristics and thermodynamic
+  proxies. While stability metrics such as formation energy
+  offer partial insights, they fail to account for kinetic
+  factors and technological constraints that influence
+  synthesis outcomes. These challenges are further
+  compounded by the scarcity of negative data, as failed
+  synthesis attempts are often unpublished or
+  context-specific. We present SynCoTrain, a semi-supervised
+  machine learning model designed to predict the
+  synthesizability of materials. SynCoTrain employs a
+  co-training framework leveraging two complementary graph
+  convolutional neural networks: SchNet and ALIGNN. By
+  iteratively exchanging predictions between classifiers,
+  SynCoTrain mitigates model bias and enhances
+  generalizability. Our approach uses Positive and Unlabeled
+  (PU) Learning to address the absence of explicit negative
+  data, iteratively refining predictions through
+  collaborative learning. The model demonstrates robust
+  performance, achieving high recall on internal and
+  leave-out test sets. By focusing on oxide crystals, a
+  well-characterized material family with extensive
+  experimental data, we establish SynCoTrain as a reliable
+  tool for predicting synthesizability while balancing
+  dataset variability and computational efficiency. This
+  work highlights the potential of co-training to advance
+  high-throughput materials discovery and generative
+  research, offering a scalable solution to the challenge of
+  synthesizability prediction.
+
+keywords:
+  - Machine Learning
+  - Materials Science
+license: MIT
+version: 0.0.2
+date-released: '2024-12-12'

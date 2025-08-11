@@ -28,7 +28,7 @@ import pandas as pd
 from syncotrainmp.experiment_setup import current_setup
 
 # Constants [TODO: convert to options]
-DATA_DIR = 'data/clean_data/'
+DATA_DIR = "data/clean_data/"
 TEST_PORTION = 0.1
 LEAVEOUT_TEST_PORTION = TEST_PORTION * 0.5
 
@@ -40,10 +40,26 @@ def parse_arguments():
     Returns:
         argparse.Namespace: Contains parsed arguments for experiment, ehull015 cutoff, and small data usage.
     """
-    parser = argparse.ArgumentParser(description="Semi-Supervised ML for Synthesizability Prediction")
-    parser.add_argument("--experiment", default="alignn0", help="Experiment name and corresponding config files.")
-    parser.add_argument("--ehull015", action='store_true', default=False, help="Evaluate PU Learning efficacy with 0.015 eV cutoff.")
-    parser.add_argument("--small_data", action='store_true', default=False, help="Use a small dataset for quick workflow checks.")
+    parser = argparse.ArgumentParser(
+        description="Semi-Supervised ML for Synthesizability Prediction"
+    )
+    parser.add_argument(
+        "--experiment",
+        default="alignn0",
+        help="Experiment name and corresponding config files.",
+    )
+    parser.add_argument(
+        "--ehull015",
+        action="store_true",
+        default=False,
+        help="Evaluate PU Learning efficacy with 0.015 eV cutoff.",
+    )
+    parser.add_argument(
+        "--small_data",
+        action="store_true",
+        default=False,
+        help="Use a small dataset for quick workflow checks.",
+    )
     return parser.parse_args(sys.argv[1:])
 
 
@@ -60,9 +76,9 @@ def load_and_prepare_data(data_path, prop, TARGET):
         pd.DataFrame: Cleaned DataFrame ready for train/test splitting.
     """
     df = pd.read_pickle(data_path)
-    df = df[['material_id', prop, TARGET]]
-    df = df.loc[:, ~df.columns.duplicated()] # Drops duplicated props at round zero
-    df = df[~df[TARGET].isna()]              # Remving NaN values. for small_data
+    df = df[["material_id", prop, TARGET]]
+    df = df.loc[:, ~df.columns.duplicated()]  # Drops duplicated props at round zero
+    df = df[~df[TARGET].isna()]  # Remving NaN values. for small_data
     return df
 
 
@@ -95,6 +111,7 @@ def prepare_experiment_data(experiment, cs):
     """
     if experiment in {"alignn0", "coAl"}:
         from syncotrainmp.pu_alignn.alignn_data import prepare_alignn_data
+
         return prepare_alignn_data(experiment, cs)
 
 
@@ -151,26 +168,41 @@ def train_test_split(df, positive_df, leaveout_df, TARGET, num_iter, test_ratio)
         testdf1 = positive_df.sample(frac=test_ratio, random_state=it)
         testdf1 = pd.concat([leaveout_df, testdf1])
         df_wo_test = df.drop(index=testdf1.index)
-        traindf1 = df_wo_test[df_wo_test[TARGET] == 1].sample(frac=1, random_state=it+1)
+        traindf1 = df_wo_test[df_wo_test[TARGET] == 1].sample(
+            frac=1, random_state=it + 1
+        )
         class_train_num = len(traindf1)
 
         # traindf0/testdf0 are training and test sets with unlabeled data
         unlabeled_df = df_wo_test[df_wo_test[TARGET] == 0]
         unlabeled_shortage = class_train_num - len(unlabeled_df)
         if unlabeled_shortage > 0:
-            testdf0 = unlabeled_df.sample(n=int(test_ratio * max(len(unlabeled_df), len(positive_df))), random_state=it+4)
+            testdf0 = unlabeled_df.sample(
+                n=int(test_ratio * max(len(unlabeled_df), len(positive_df))),
+                random_state=it + 4,
+            )
             unlabeled_df = unlabeled_df.drop(index=testdf0.index)
-            traindf0 = pd.concat([unlabeled_df.sample(frac=1, random_state=it+2),
-                                  unlabeled_df.sample(n=unlabeled_shortage, replace=True, random_state=it+3)])
+            traindf0 = pd.concat(
+                [
+                    unlabeled_df.sample(frac=1, random_state=it + 2),
+                    unlabeled_df.sample(
+                        n=unlabeled_shortage, replace=True, random_state=it + 3
+                    ),
+                ]
+            )
         else:
-            traindf0 = unlabeled_df.sample(n=class_train_num, random_state=it+2)
-            testdf0  = unlabeled_df.drop(index=traindf0.index)
+            traindf0 = unlabeled_df.sample(n=class_train_num, random_state=it + 2)
+            testdf0 = unlabeled_df.drop(index=traindf0.index)
 
         traindf = pd.concat([traindf0, traindf1])
-        testdf  = pd.concat([ testdf0,  testdf1])
+        testdf = pd.concat([testdf0, testdf1])
 
-        splits.append((traindf.sample(frac=1, random_state=it+3),
-                        testdf.sample(frac=1, random_state=it+4)))
+        splits.append(
+            (
+                traindf.sample(frac=1, random_state=it + 3),
+                testdf.sample(frac=1, random_state=it + 4),
+            )
+        )
 
     return splits, traindf.shape[0], testdf.shape[0]
 
@@ -193,33 +225,55 @@ def main(num_iter=100):
     Main execution function to set up, process, and save experiment data splits.
     """
     args = parse_arguments()
-    cs = current_setup(small_data=args.small_data, experiment=args.experiment, ehull015=args.ehull015)
+    cs = current_setup(
+        small_data=args.small_data, experiment=args.experiment, ehull015=args.ehull015
+    )
 
     print(f"Information:")
     print(f"-> Using property  : {cs['prop']}")
     print(f"-> Using target    : {cs['TARGET']}")
     print(f"-> Using experiment: {args.experiment}")
-    print(f"The property is the quantity we would like to predict, i.e. either synthesizability or stability. The")
-    print(f"target on the other hand is what we use as labels for training our ML models. After each PU-step the")
-    print(f"targets will be updated using the predictions from the trained ML model. Initially, the target is")
+    print(
+        f"The property is the quantity we would like to predict, i.e. either synthesizability or stability. The"
+    )
+    print(
+        f"target on the other hand is what we use as labels for training our ML models. After each PU-step the"
+    )
+    print(
+        f"targets will be updated using the predictions from the trained ML model. Initially, the target is"
+    )
     print(f"identical to the property.")
     print(f"")
 
     df = load_and_prepare_data(cs["propDFpath"], cs["prop"], cs["TARGET"])
-    output_dir = setup_output_directory(cs["propDFpath"], cs["dataPrefix"], cs["TARGET"], cs["prop"])
+    output_dir = setup_output_directory(
+        cs["propDFpath"], cs["dataPrefix"], cs["TARGET"], cs["prop"]
+    )
     tmp_path = prepare_experiment_data(args.experiment, cs)
 
-    experimental_df, positive_df, leaveout_df = leaveout_test_split(df, cs["prop"], cs["TARGET"])
+    experimental_df, positive_df, leaveout_df = leaveout_test_split(
+        df, cs["prop"], cs["TARGET"]
+    )
 
     print(f"Data Information:")
     print(f"-> Number of data points         : {df.shape[0]}")
     print(f"-> Number of experimental samples: {experimental_df.shape[0]}")
-    print(f"-> Number of positive samples    : {positive_df.shape[0]} (leaveout samples removed)")
+    print(
+        f"-> Number of positive samples    : {positive_df.shape[0]} (leaveout samples removed)"
+    )
     print(f"-> Number of leaveout samples    : {leaveout_df.shape[0]}")
-    print(f"During PU-learning, we sample data from the experimental samples and use it as negative")
-    print(f"set for training. Classifiers are always trained with a balanced set, which means that")
-    print(f"the number of positive samples matches with the number of negative samples. In addition,")
-    print(f"we split a leaveout test set, which is only used for testing. This data is never used")
+    print(
+        f"During PU-learning, we sample data from the experimental samples and use it as negative"
+    )
+    print(
+        f"set for training. Classifiers are always trained with a balanced set, which means that"
+    )
+    print(
+        f"the number of positive samples matches with the number of negative samples. In addition,"
+    )
+    print(
+        f"we split a leaveout test set, which is only used for testing. This data is never used"
+    )
     print(f"for training and will be appended to the test data at every PU iteration.")
     print(f"")
 
@@ -228,7 +282,14 @@ def main(num_iter=100):
     with open(os.path.join(output_dir, "experimentalDataSize.txt"), "w") as f:
         f.write(str(experimental_df[cs["prop"]].sum()))
 
-    splits, n_train, n_test = train_test_split(df, positive_df, leaveout_df, cs["TARGET"], num_iter=num_iter, test_ratio=TEST_PORTION)
+    splits, n_train, n_test = train_test_split(
+        df,
+        positive_df,
+        leaveout_df,
+        cs["TARGET"],
+        num_iter=num_iter,
+        test_ratio=TEST_PORTION,
+    )
     save_splits(splits, output_dir)
 
     print(f"Train/Test Data Information:")
@@ -238,7 +299,7 @@ def main(num_iter=100):
     print(f"")
 
     print(f"Path Information:")
-    print(f"-> Input data                  :", cs['propDFpath'])
+    print(f"-> Input data                  :", cs["propDFpath"])
     print(f"-> Train/test data for PU-steps:", output_dir)
     if tmp_path is not None:
         print(f"-> Temporary data directory    : {tmp_path}")

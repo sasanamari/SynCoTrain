@@ -1,4 +1,3 @@
-
 def current_setup(small_data, experiment, ehull015):
     """
     Set up the current experiment configuration based on input parameters.
@@ -21,49 +20,52 @@ def current_setup(small_data, experiment, ehull015):
         KeyError: If the experiment is not recognized in the mapping.
     """
     if ehull015 and small_data:
-        raise Exception("small_data and ehull015 cannot be set to True at the same time.")
+        raise Exception(
+            "small_data and ehull015 cannot be set to True at the same time."
+        )
 
     elif small_data:
-        propDFpath = 'data/clean_data/small_synthDF'
-        result_dir = 'data/results/small_data_synth'
-        prop = 'synth'
+        propDFpath = "data/clean_data/small_synthDF"
+        result_dir = "data/results/small_data_synth"
+        prop = "synth"
     elif ehull015:
-        propDFpath = 'data/clean_data/stabilityDF015' 
-        result_dir = 'data/results/stability015'
-        prop = 'stability'
+        propDFpath = "data/clean_data/stabilityDF015"
+        result_dir = "data/results/stability015"
+        prop = "stability"
     else:
-        propDFpath = 'data/clean_data/synthDF'
-        result_dir = 'data/results/synth'
-        prop = 'synth'
+        propDFpath = "data/clean_data/synthDF"
+        result_dir = "data/results/synth"
+        prop = "synth"
 
     experiment_target_match = {
-            'alignn0'  : prop,
-            'coAlignn1': 'schnet0',
-            'coAlignn2': 'coSchnet1',
-            'coAlignn3': 'coSchnet2',
-            'coAlignn4': 'coSchnet3',
-            'coAlignn5': 'coSchnet4',
-            'schnet0'  : prop,
-            'coSchnet1': 'alignn0',
-            'coSchnet2': 'coAlignn1',
-            'coSchnet3': 'coAlignn2',
-            'coSchnet4': 'coAlignn3',
-            'coSchnet5': 'coAlignn4',
-            'final_avg': 'final_label',
+        "alignn0": prop,
+        "coAlignn1": "schnet0",
+        "coAlignn2": "coSchnet1",
+        "coAlignn3": "coSchnet2",
+        "coAlignn4": "coSchnet3",
+        "coAlignn5": "coSchnet4",
+        "schnet0": prop,
+        "coSchnet1": "alignn0",
+        "coSchnet2": "coAlignn1",
+        "coSchnet3": "coAlignn2",
+        "coSchnet4": "coAlignn3",
+        "coSchnet5": "coAlignn4",
+        "final_avg": "final_label",
     }
     data_prefix = "small_" if small_data else ""
     if ehull015:
         data_prefix = "15_"
-    
+
     # Ensure the experiment is valid and retrieve the target
     if experiment not in experiment_target_match:
         raise KeyError(f"Unrecognized experiment: {experiment}")
 
     result = {
-        "propDFpath" : propDFpath,
-        "result_dir" : result_dir,
-        "prop"       : prop,
-        "TARGET"     : experiment_target_match[experiment],
-        "dataPrefix" : data_prefix }
+        "propDFpath": propDFpath,
+        "result_dir": result_dir,
+        "prop": prop,
+        "TARGET": experiment_target_match[experiment],
+        "dataPrefix": data_prefix,
+    }
 
     return result
