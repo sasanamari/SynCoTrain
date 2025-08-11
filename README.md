@@ -1,5 +1,5 @@
 # SynCoTrain 
-Co-training enhanced PU-learning for crystal synthesizability prediction. You can read the details of this work in [this preprint](https://arxiv.org/abs/2411.12011).
+Co-training enhanced PU-learning for crystal synthesizability prediction. You can read the details of this work in our [paper](https://doi.org/10.1039/d4dd00394b).
 
 
 ## Introduction
@@ -165,15 +165,20 @@ make
     - This will execute all scripts in the directory in the required order and ask you for your material project key to download the data.
 
 ## References
-If you use this code, please cite our [paper](https://arxiv.org/abs/2411.12011) [1]:
+If you use this code, please cite our [paper](https://doi.org/10.1039/d4dd00394b) [1]:
 
 ```bibtex
 @article{amariamir2024syncotrain,
-  title={SynCoTrain: A Dual Classifier PU-learning Framework for Synthesizability Prediction},
-  author={Amariamir, Sasan and George, Janine and Benner, Philipp},
-  journal={arXiv preprint arXiv:2411.12011},
-  year={2024}
+  title   = {SynCoTrain: A Dual Classifier PU-learning Framework for Synthesizability Prediction},
+  author  = {Amariamir, Sasan and George, Janine and Benner, Philipp},
+  journal = {Digital Discovery},
+  year    = {2024},
+  volume  = {4},
+  number  = {6},
+  pages   = {1437--1448},
+  doi     = {10.1039/d4dd00394b},
+  url     = {https://doi.org/10.1039/d4dd00394b}
 }
 ```
 
-[1] Amariamir, Sasan, Janine George, and Philipp Benner. "SynCoTrain: A Dual Classifier PU-learning Framework for Synthesizability Prediction." arXiv preprint arXiv:2411.12011 (2024).
+[1] Amariamir, Sasan, Janine George, and Philipp Benner. "SynCoTrain: A Dual Classifier PU-learning Framework for Synthesizability Prediction." Digital Discovery 4, no. 6 (2024): 1437–1448. https://doi.org/10.1039/d4dd00394b.
